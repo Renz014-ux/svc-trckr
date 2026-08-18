@@ -2,8 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>E-motorcycle service dashboard</title>
+<title>Service Tracker Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Google Fonts: Poppins para sa Header -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&display=swap" rel="stylesheet">
 
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
@@ -46,8 +51,28 @@
     padding: 24px;
   }
   .wrap { max-width: 1200px; margin: 0 auto; }
-  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  
+  /* --- HEADER STYLES --- */
+  .header-container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 4px;
+  }
+  .nrd-logo {
+    height: 45px; /* Pwede mong liitan o lakihan ito depende sa gusto mo */
+    width: auto;
+    object-fit: contain;
+  }
+  h1 { 
+    font-family: 'Poppins', sans-serif; /* Bagong font para sa header */
+    font-size: 26px; 
+    font-weight: 700; 
+    margin: 0; 
+    letter-spacing: -0.5px;
+  }
   .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0 0 20px; }
+  
   .status-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
   .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
   .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
@@ -124,7 +149,7 @@
     display: flex; justify-content: center; align-items: center;
   }
   .modal-close:hover { background: #e1e0d9; color: var(--danger); }
-  .modal-title { margin-top: 0; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .modal-title { margin-top: 0; font-size: 18px; font-weight: 600; margin-bottom: 16px; font-family: 'Poppins', sans-serif; }
   .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
   .modal-table th { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; color: var(--text-secondary); }
   .modal-table td { padding: 10px; border-bottom: 0.5px solid var(--border); white-space: normal !important; word-wrap: break-word; }
@@ -132,8 +157,14 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>E-motorcycle service dashboard</h1>
+  
+  <!-- BAGONG HEADER LAYOUT -->
+  <div class="header-container">
+    <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
+    <h1>Service Tracker Dashboard</h1>
+  </div>
   <p class="subtitle">Live from Google Sheets — updates automatically, no manual refresh</p>
+  
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
   <div class="error-box" id="errorBox"></div>
 
@@ -227,20 +258,19 @@ const POLL_SECONDS = 30;
 let DATA = [];
 let CURRENT_FILTERED_DATA = [];
 let statusChart, modelChart, issueChart, customerChart, trendChart;
-let dtInstance; // DataTables instance
+let dtInstance; 
 let filtersPopulated = false;
 const PALETTE = ["#2a78d6","#eb6834","#1baf7a","#eda100","#e87ba4","#008300","#4a3aa7","#e34948"];
 
-// 1. Initialize DataTable on Page Load
 $(document).ready(function() {
     dtInstance = $('#mainTable').DataTable({
         responsive: true,
         paging: true,
         pageLength: 10,
-        searching: false, // Turned off default search, we use custom search
+        searching: false, 
         lengthChange: false,
-        info: false, // Turned off default info, we use #rowCount
-        order: [[ 5, "desc" ]], // Sort by Date column
+        info: false, 
+        order: [[ 5, "desc" ]], 
         columns: [
             { data: 'jo' },
             { data: 'plate' },
@@ -254,7 +284,6 @@ $(document).ready(function() {
         ]
     });
     
-    // Fetch data after table init
     fetchData();
     setInterval(fetchData, POLL_SECONDS * 1000);
 });
@@ -529,7 +558,6 @@ function openCustomerModal(customerName) {
     customerRecords.forEach(r => {
         const tr = document.createElement("tr");
         const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-        // Uunahin niyang ipakita ang Plate Number, kung wala, JO Number ang lalabas
         const identifier = r.plate ? r.plate : (r.jo || "-");
         
         tr.innerHTML = `
