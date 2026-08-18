@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>E-motorcycle service dashboard</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --surface-1: #f5f5f3;
+    --surface-2: #ffffff;
+    --border: #e1e0d9;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --success: #0ca30c;
+    --success-bg: #eaf3de;
+    --warning: #854f0b;
+    --warning-bg: #faeeda;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--surface-1);
+    color: var(--text-primary);
+    margin: 0;
+    padding: 24px;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0 0 20px; }
+  .status-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
+  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .stat-card { flex: 1; min-width: 130px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
+  .stat-label { font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
+  .stat-value { font-size: 24px; font-weight: 600; margin: 0; }
+  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .chart-box { flex: 1; min-width: 280px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
+  .chart-title { font-size: 13px; color: var(--text-secondary); margin: 0 0 10px; }
+  .chart-inner { position: relative; height: 200px; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .controls input, .controls select {
+    padding: 8px 10px; border: 0.5px solid var(--border); border-radius: 8px;
+    font-size: 13px; background: var(--surface-2);
+  }
+  #searchBox { flex: 1; min-width: 200px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface-2); border-radius: 10px; overflow: hidden; }
+  th { text-align: left; padding: 10px 8px; color: var(--text-secondary); font-weight: 600; border-bottom: 0.5px solid var(--border); }
+  td { padding: 10px 8px; border-bottom: 0.5px solid var(--border); }
+  .badge { font-size: 12px; padding: 2px 10px; border-radius: 6px; font-weight: 500; }
+  .badge-done { background: var(--success-bg); color: var(--success); }
+  .badge-pending { background: var(--warning-bg); color: var(--warning); }
+  .row-count { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
+  .error-box { background: #fcebeb; color: #791f1f; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>E-motorcycle service dashboard</h1>
+  <p class="subtitle">Live from Google Sheets — updates automatically, no manual refresh</p>
+  <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
+  <div class="error-box" id="errorBox"></div>
+
+  <div class="stats">
+    <div class="stat-card"><p class="stat-label">Total units</p><p class="stat-value" id="stat-total">–</p></div>
+    <div class="stat-card"><p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">–</p></div>
+    <div class="stat-card"><p class="stat-label">Pending / in service</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">–</p></div>
+    <div class="stat-card"><p class="stat-label">Completion rate</p><p class="stat-value" id="stat-rate">–</p></div>
+  </div>
+
+  <div class="charts">
+    <div class="chart-box">
+      <p class="chart-title">Status breakdown</p>
+      <div class="chart-inner"><canvas id="statusChart" role="img" aria-label="Doughnut chart of units by status"></canvas></div>
+    </div>
+    <div class="chart-box">
+      <p class="chart-title">Units by model</p>
+      <div class="chart-inner"><canvas id="modelChart" role="img" aria-label="Bar chart of units by model"></canvas></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <input type="text" id="searchBox" placeholder="Search JO number, customer, or issue">
+    <select id="statusFilter"><option value="all">All statuses</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
+    <select id="modelFilter"><option value="all">All models</option></select>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table>
+      <thead><tr><th>JO number</th><th>Status</th><th>Model</th><th>Customer</th><th>Date</th><th>Issue</th></tr></thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <p class="row-count" id="rowCount"></p>
+</div>
+
+<script>
+// ==== SET THIS to your Apps Script Web App URL (ends in /exec) ====
+const API_URL = "https://script.google.com/a/macros/nrdev.ph/s/AKfycbyq1R1w0eR5hZvd7J34I_k-LdJGkWUlgLDJ9yLLStv7Z3qEbEogQDSGoTd1ufncsCCRxA/exec";
+const POLL_SECONDS = 30;
+// ====================================================================
+
+let DATA = [];
+let statusChart, modelChart;
+let modelsPopulated = false;
+
+async function fetchData() {
+  try {
+    const res = await fetch(API_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    DATA = await res.json();
+    document.getElementById("errorBox").style.display = "none";
+    document.getElementById("liveDot").style.background = "#0ca30c";
+    document.getElementById("lastUpdated").textContent =
+      "Last updated " + new Date().toLocaleTimeString();
+    populateModelFilter();
+    applyFilters();
+  } catch (err) {
+    document.getElementById("liveDot").style.background = "#e24b4a";
+    document.getElementById("errorBox").style.display = "block";
+    document.getElementById("errorBox").textContent =
+      "Couldn't reach the data source. Check the API_URL at the top of the file. (" + err.message + ")";
+  }
+}
+
+function populateModelFilter() {
+  if (modelsPopulated) return;
+  const models = [...new Set(DATA.map(d => d.model).filter(Boolean))].sort();
+  const sel = document.getElementById("modelFilter");
+  models.forEach(m => {
+    const o = document.createElement("option");
+    o.value = m; o.textContent = m;
+    sel.appendChild(o);
+  });
+  modelsPopulated = true;
+}
+
+function renderStats(rows) {
+  const total = rows.length;
+  const done = rows.filter(r => r.status === "Done").length;
+  const pending = rows.filter(r => r.status === "Pending").length;
+  document.getElementById("stat-total").textContent = total;
+  document.getElementById("stat-done").textContent = done;
+  document.getElementById("stat-pending").textContent = pending;
+  document.getElementById("stat-rate").textContent = total ? Math.round((done / total) * 100) + "%" : "0%";
+}
+
+function renderTable(rows) {
+  const body = document.getElementById("tableBody");
+  body.innerHTML = "";
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
+    tr.innerHTML = `
+      <td>${r.jo}</td>
+      <td><span class="badge ${badgeClass}">${r.status}</span></td>
+      <td>${r.model || "-"}</td>
+      <td>${r.customer || "-"}</td>
+      <td>${r.date || "-"}</td>
+      <td style="color:var(--text-secondary);">${r.issue || "-"}</td>
+    `;
+    body.appendChild(tr);
+  });
+  document.getElementById("rowCount").textContent = `Showing ${rows.length} of ${DATA.length} units`;
+}
+
+function renderCharts(rows) {
+  const done = rows.filter(r => r.status === "Done").length;
+  const pending = rows.filter(r => r.status === "Pending").length;
+
+  const modelCounts = {};
+  rows.forEach(r => { if (r.model) modelCounts[r.model] = (modelCounts[r.model] || 0) + 1; });
+
+  if (statusChart) statusChart.destroy();
+  if (modelChart) modelChart.destroy();
+
+  statusChart = new Chart(document.getElementById("statusChart"), {
+    type: "doughnut",
+    data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#0ca30c", "#eda100"], borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+
+  modelChart = new Chart(document.getElementById("modelChart"), {
+    type: "bar",
+    data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#2a78d6", borderRadius: 4, maxBarThickness: 40 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+  });
+}
+
+function applyFilters() {
+  const search = document.getElementById("searchBox").value.toLowerCase();
+  const status = document.getElementById("statusFilter").value;
+  const model = document.getElementById("modelFilter").value;
+  const rows = DATA.filter(r => {
+    if (status !== "all" && r.status !== status) return false;
+    if (model !== "all" && r.model !== model) return false;
+    if (search) {
+      const hay = (r.jo + " " + r.customer + " " + r.issue).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  renderStats(rows);
+  renderTable(rows);
+  renderCharts(rows);
+}
+
+document.getElementById("searchBox").addEventListener("input", applyFilters);
+document.getElementById("statusFilter").addEventListener("change", applyFilters);
+document.getElementById("modelFilter").addEventListener("change", applyFilters);
+
+fetchData();
+setInterval(fetchData, POLL_SECONDS * 1000);
+</script>
+</body>
+</html>
