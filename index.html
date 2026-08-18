@@ -17,6 +17,8 @@
     --success-bg: #eaf3de;
     --warning: #854f0b;
     --warning-bg: #faeeda;
+    --danger: #a32d2d;
+    --danger-bg: #fcebeb;
   }
   * { box-sizing: border-box; }
   body {
@@ -26,7 +28,7 @@
     margin: 0;
     padding: 24px;
   }
-  .wrap { max-width: 1100px; margin: 0 auto; }
+  .wrap { max-width: 1200px; margin: 0 auto; }
   h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
   .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0 0 20px; }
   .status-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
@@ -36,23 +38,30 @@
   .stat-label { font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
   .stat-value { font-size: 24px; font-weight: 600; margin: 0; }
   .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-  .chart-box { flex: 1; min-width: 280px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
+  .chart-box { flex: 1; min-width: 260px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
   .chart-title { font-size: 13px; color: var(--text-secondary); margin: 0 0 10px; }
-  .chart-inner { position: relative; height: 200px; }
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+  .chart-inner { position: relative; height: 220px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); }
+  .legend span.sw { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
+  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
   .controls input, .controls select {
     padding: 8px 10px; border: 0.5px solid var(--border); border-radius: 8px;
     font-size: 13px; background: var(--surface-2);
   }
-  #searchBox { flex: 1; min-width: 200px; }
+  #searchBox { flex: 2; min-width: 200px; }
+  .date-label { font-size: 12px; color: var(--text-muted); }
   table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--surface-2); border-radius: 10px; overflow: hidden; }
-  th { text-align: left; padding: 10px 8px; color: var(--text-secondary); font-weight: 600; border-bottom: 0.5px solid var(--border); }
+  th { text-align: left; padding: 10px 8px; color: var(--text-secondary); font-weight: 600; border-bottom: 0.5px solid var(--border); white-space: nowrap; }
   td { padding: 10px 8px; border-bottom: 0.5px solid var(--border); }
-  .badge { font-size: 12px; padding: 2px 10px; border-radius: 6px; font-weight: 500; }
+  .badge { font-size: 12px; padding: 2px 10px; border-radius: 6px; font-weight: 500; white-space: nowrap; }
   .badge-done { background: var(--success-bg); color: var(--success); }
   .badge-pending { background: var(--warning-bg); color: var(--warning); }
+  .badge-sla-yes { background: var(--success-bg); color: var(--success); }
+  .badge-sla-no { background: var(--danger-bg); color: var(--danger); }
   .row-count { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
-  .error-box { background: #fcebeb; color: #791f1f; padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+  .error-box { background: var(--danger-bg); color: var(--danger); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+  .clear-btn { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
+  .clear-btn:hover { background: var(--surface-1); }
 </style>
 </head>
 <body>
@@ -63,10 +72,11 @@
   <div class="error-box" id="errorBox"></div>
 
   <div class="stats">
-    <div class="stat-card"><p class="stat-label">Total units</p><p class="stat-value" id="stat-total">–</p></div>
-    <div class="stat-card"><p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">–</p></div>
-    <div class="stat-card"><p class="stat-label">Pending / in service</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">–</p></div>
-    <div class="stat-card"><p class="stat-label">Completion rate</p><p class="stat-value" id="stat-rate">–</p></div>
+    <div class="stat-card"><p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p></div>
+    <div class="stat-card"><p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p></div>
+    <div class="stat-card"><p class="stat-label">Pending / in service</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p></div>
+    <div class="stat-card"><p class="stat-label">Completion rate</p><p class="stat-value" id="stat-rate">-</p></div>
+    <div class="stat-card"><p class="stat-label">SLA compliance rate</p><p class="stat-value" id="stat-sla">-</p></div>
   </div>
 
   <div class="charts">
@@ -78,32 +88,50 @@
       <p class="chart-title">Units by model</p>
       <div class="chart-inner"><canvas id="modelChart" role="img" aria-label="Bar chart of units by model"></canvas></div>
     </div>
+    <div class="chart-box">
+      <p class="chart-title">Top recurring issues</p>
+      <div class="chart-inner"><canvas id="issueChart" role="img" aria-label="Pie chart of the most common reported issues"></canvas></div>
+      <div class="legend" id="issueLegend"></div>
+    </div>
+    <div class="chart-box">
+      <p class="chart-title">Units per customer</p>
+      <div class="chart-inner"><canvas id="customerChart" role="img" aria-label="Bar chart of units serviced per customer"></canvas></div>
+    </div>
   </div>
 
   <div class="controls">
     <input type="text" id="searchBox" placeholder="Search JO number, customer, or issue">
     <select id="statusFilter"><option value="all">All statuses</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
     <select id="modelFilter"><option value="all">All models</option></select>
+    <select id="customerFilter"><option value="all">All customers</option></select>
+    <select id="repairFilter"><option value="all">All repair types</option></select>
+  </div>
+  <div class="controls">
+    <span class="date-label">From</span>
+    <input type="date" id="dateFrom">
+    <span class="date-label">To</span>
+    <input type="date" id="dateTo">
+    <button class="clear-btn" id="clearFilters">Clear all filters</button>
   </div>
 
   <div style="overflow-x:auto;">
     <table>
-      <thead><tr><th>JO number</th><th>Status</th><th>Model</th><th>Customer</th><th>Date</th><th>Issue</th></tr></thead>
+      <thead><tr><th>JO number</th><th>Status</th><th>Model</th><th>Customer</th><th>Date</th><th>Repair type</th><th>SLA met</th><th>Issue</th></tr></thead>
       <tbody id="tableBody"></tbody>
     </table>
   </div>
   <p class="row-count" id="rowCount"></p>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// ==== SET THIS to your Apps Script Web App URL (ends in /exec) ====
 const API_URL = "https://script.google.com/a/macros/nrdev.ph/s/AKfycbyq1R1w0eR5hZvd7J34I_k-LdJGkWUlgLDJ9yLLStv7Z3qEbEogQDSGoTd1ufncsCCRxA/exec";
 const POLL_SECONDS = 30;
-// ====================================================================
 
 let DATA = [];
-let statusChart, modelChart;
-let modelsPopulated = false;
+let statusChart, modelChart, issueChart, customerChart;
+let filtersPopulated = false;
+const PALETTE = ["#2a78d6","#eb6834","#1baf7a","#eda100","#e87ba4","#008300","#4a3aa7","#e34948"];
 
 async function fetchData() {
   try {
@@ -112,38 +140,44 @@ async function fetchData() {
     DATA = await res.json();
     document.getElementById("errorBox").style.display = "none";
     document.getElementById("liveDot").style.background = "#0ca30c";
-    document.getElementById("lastUpdated").textContent =
-      "Last updated " + new Date().toLocaleTimeString();
-    populateModelFilter();
+    document.getElementById("lastUpdated").textContent = "Last updated " + new Date().toLocaleTimeString();
+    populateFilters();
     applyFilters();
   } catch (err) {
     document.getElementById("liveDot").style.background = "#e24b4a";
     document.getElementById("errorBox").style.display = "block";
-    document.getElementById("errorBox").textContent =
-      "Couldn't reach the data source. Check the API_URL at the top of the file. (" + err.message + ")";
+    document.getElementById("errorBox").textContent = "Couldn't reach the data source. Check the API_URL. (" + err.message + ")";
   }
 }
 
-function populateModelFilter() {
-  if (modelsPopulated) return;
-  const models = [...new Set(DATA.map(d => d.model).filter(Boolean))].sort();
-  const sel = document.getElementById("modelFilter");
-  models.forEach(m => {
-    const o = document.createElement("option");
-    o.value = m; o.textContent = m;
-    sel.appendChild(o);
-  });
-  modelsPopulated = true;
+function populateFilters() {
+  if (filtersPopulated) return;
+  const fill = (id, values) => {
+    const sel = document.getElementById(id);
+    values.forEach(v => {
+      const o = document.createElement("option");
+      o.value = v; o.textContent = v;
+      sel.appendChild(o);
+    });
+  };
+  fill("modelFilter", [...new Set(DATA.map(d => d.model).filter(Boolean))].sort());
+  fill("customerFilter", [...new Set(DATA.map(d => d.customer).filter(Boolean))].sort());
+  fill("repairFilter", [...new Set(DATA.map(d => d.repairType).filter(Boolean))].sort());
+  filtersPopulated = true;
 }
 
 function renderStats(rows) {
   const total = rows.length;
   const done = rows.filter(r => r.status === "Done").length;
   const pending = rows.filter(r => r.status === "Pending").length;
+  const slaRated = rows.filter(r => r.sla === "Yes" || r.sla === "No");
+  const slaMet = rows.filter(r => r.sla === "Yes").length;
+
   document.getElementById("stat-total").textContent = total;
   document.getElementById("stat-done").textContent = done;
   document.getElementById("stat-pending").textContent = pending;
   document.getElementById("stat-rate").textContent = total ? Math.round((done / total) * 100) + "%" : "0%";
+  document.getElementById("stat-sla").textContent = slaRated.length ? Math.round((slaMet / slaRated.length) * 100) + "%" : "-";
 }
 
 function renderTable(rows) {
@@ -152,17 +186,26 @@ function renderTable(rows) {
   rows.forEach(r => {
     const tr = document.createElement("tr");
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-    tr.innerHTML = `
-      <td>${r.jo}</td>
-      <td><span class="badge ${badgeClass}">${r.status}</span></td>
-      <td>${r.model || "-"}</td>
-      <td>${r.customer || "-"}</td>
-      <td>${r.date || "-"}</td>
-      <td style="color:var(--text-secondary);">${r.issue || "-"}</td>
-    `;
+    const slaClass = r.sla === "Yes" ? "badge-sla-yes" : (r.sla === "No" ? "badge-sla-no" : "");
+    const slaHtml = r.sla ? ("<span class=\"badge " + slaClass + "\">" + r.sla + "</span>") : "-";
+    tr.innerHTML =
+      "<td>" + r.jo + "</td>" +
+      "<td><span class=\"badge " + badgeClass + "\">" + r.status + "</span></td>" +
+      "<td>" + (r.model || "-") + "</td>" +
+      "<td>" + (r.customer || "-") + "</td>" +
+      "<td>" + (r.date || "-") + "</td>" +
+      "<td>" + (r.repairType || "-") + "</td>" +
+      "<td>" + slaHtml + "</td>" +
+      "<td style=\"color:var(--text-secondary);\">" + (r.issue || "-") + "</td>";
     body.appendChild(tr);
   });
-  document.getElementById("rowCount").textContent = `Showing ${rows.length} of ${DATA.length} units`;
+  document.getElementById("rowCount").textContent = "Showing " + rows.length + " of " + DATA.length + " units";
+}
+
+function keywordFromIssue(issue) {
+  if (!issue) return null;
+  const first = issue.split(/[\/\n]/)[0].trim();
+  return first.length > 40 ? first.slice(0, 40) + "..." : first;
 }
 
 function renderCharts(rows) {
@@ -172,8 +215,21 @@ function renderCharts(rows) {
   const modelCounts = {};
   rows.forEach(r => { if (r.model) modelCounts[r.model] = (modelCounts[r.model] || 0) + 1; });
 
+  const issueCounts = {};
+  rows.forEach(r => {
+    const k = keywordFromIssue(r.issue);
+    if (k) issueCounts[k] = (issueCounts[k] || 0) + 1;
+  });
+  const topIssues = Object.entries(issueCounts).sort((a,b) => b[1]-a[1]).slice(0, 8);
+
+  const customerCounts = {};
+  rows.forEach(r => { if (r.customer) customerCounts[r.customer] = (customerCounts[r.customer] || 0) + 1; });
+  const topCustomers = Object.entries(customerCounts).sort((a,b) => b[1]-a[1]).slice(0, 10);
+
   if (statusChart) statusChart.destroy();
   if (modelChart) modelChart.destroy();
+  if (issueChart) issueChart.destroy();
+  if (customerChart) customerChart.destroy();
 
   statusChart = new Chart(document.getElementById("statusChart"), {
     type: "doughnut",
@@ -186,15 +242,42 @@ function renderCharts(rows) {
     data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#2a78d6", borderRadius: 4, maxBarThickness: 40 }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
   });
+
+  issueChart = new Chart(document.getElementById("issueChart"), {
+    type: "pie",
+    data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 0 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+  });
+  const legendEl = document.getElementById("issueLegend");
+  legendEl.innerHTML = topIssues.map((x,i) => "<span><span class=\"sw\" style=\"background:" + PALETTE[i % PALETTE.length] + "\"></span>" + x[0] + " (" + x[1] + ")</span>").join("");
+
+  customerChart = new Chart(document.getElementById("customerChart"), {
+    type: "bar",
+    data: { labels: topCustomers.map(x => x[0]), datasets: [{ data: topCustomers.map(x => x[1]), backgroundColor: "#1baf7a", borderRadius: 4, maxBarThickness: 24 }] },
+    options: {
+      indexAxis: "y", responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
 }
 
 function applyFilters() {
   const search = document.getElementById("searchBox").value.toLowerCase();
   const status = document.getElementById("statusFilter").value;
   const model = document.getElementById("modelFilter").value;
+  const customer = document.getElementById("customerFilter").value;
+  const repair = document.getElementById("repairFilter").value;
+  const dateFrom = document.getElementById("dateFrom").value;
+  const dateTo = document.getElementById("dateTo").value;
+
   const rows = DATA.filter(r => {
     if (status !== "all" && r.status !== status) return false;
     if (model !== "all" && r.model !== model) return false;
+    if (customer !== "all" && r.customer !== customer) return false;
+    if (repair !== "all" && r.repairType !== repair) return false;
+    if (dateFrom && (!r.date || r.date < dateFrom)) return false;
+    if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
       const hay = (r.jo + " " + r.customer + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
@@ -207,8 +290,19 @@ function applyFilters() {
 }
 
 document.getElementById("searchBox").addEventListener("input", applyFilters);
-document.getElementById("statusFilter").addEventListener("change", applyFilters);
-document.getElementById("modelFilter").addEventListener("change", applyFilters);
+["statusFilter","modelFilter","customerFilter","repairFilter","dateFrom","dateTo"].forEach(function(id) {
+  document.getElementById(id).addEventListener("change", applyFilters);
+});
+document.getElementById("clearFilters").addEventListener("click", function() {
+  document.getElementById("searchBox").value = "";
+  document.getElementById("statusFilter").value = "all";
+  document.getElementById("modelFilter").value = "all";
+  document.getElementById("customerFilter").value = "all";
+  document.getElementById("repairFilter").value = "all";
+  document.getElementById("dateFrom").value = "";
+  document.getElementById("dateTo").value = "";
+  applyFilters();
+});
 
 fetchData();
 setInterval(fetchData, POLL_SECONDS * 1000);
