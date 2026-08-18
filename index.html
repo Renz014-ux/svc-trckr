@@ -29,6 +29,9 @@
     --warning-bg: #faeeda;
     --danger: #a32d2d;
     --danger-bg: #fcebeb;
+    table.dataTable tbody td {
+  white-space: normal !important;
+  word-wrap: break-word;
   }
   * { box-sizing: border-box; }
   body {
@@ -146,7 +149,7 @@
 
   <!-- DATA TABLE -->
   <div class="table-container">
-    <table id="mainTable" class="display responsive nowrap">
+    <table id="mainTable" class="display responsive">
       <thead><tr><th>JO number</th><th>Status</th><th>Model</th><th>Customer</th><th>Date</th><th>Repair type</th><th>SLA met</th><th>Issue</th></tr></thead>
       <tbody></tbody>
     </table>
