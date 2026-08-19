@@ -26,7 +26,7 @@
     --nrd-orange: #f08a35;
     --nrd-red: #d93838;
 
-    /* Modern UI Colors */
+    /* Light Theme (Default) */
     --surface-bg: #f4f7f9; 
     --surface-card: #ffffff; 
     --border-light: #e2e8f0;
@@ -41,6 +41,20 @@
     --danger: #ef4444;
     --danger-bg: #fee2e2;
   }
+
+  /* Dark Theme Variables */
+  [data-theme="dark"] {
+    --surface-bg: #0f172a; 
+    --surface-card: #1e293b; 
+    --border-light: #334155;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    
+    /* I-adjust ng konti ang background ng badges para hindi masakit sa mata sa dark mode */
+    --success-bg: rgba(16, 185, 129, 0.2);
+    --warning-bg: rgba(245, 158, 11, 0.2);
+    --danger-bg: rgba(239, 68, 68, 0.2);
+  }
   
   * { box-sizing: border-box; }
   body {
@@ -49,11 +63,15 @@
     color: var(--text-main);
     margin: 0;
     padding: 30px 20px;
+    transition: background-color 0.3s, color 0.3s;
   }
   .wrap { max-width: 1280px; margin: 0 auto; }
   
   /* --- HEADER --- */
-  .header-container { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  .header-wrapper { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; gap: 16px;}
+  .header-container { display: flex; align-items: center; gap: 16px; }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  
   .nrd-logo { height: 75px; width: auto; object-fit: contain; }
   h1 { font-size: 28px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; }
   .subtitle { color: var(--text-muted); font-size: 14px; margin: 0 0 24px; }
@@ -68,7 +86,7 @@
     border-radius: 12px; padding: 20px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
     border-top: 4px solid var(--border-light);
-    transition: transform 0.2s;
+    transition: transform 0.2s, background-color 0.3s;
   }
   .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
   .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); }
@@ -87,6 +105,7 @@
     flex: 1; min-width: 300px; background: var(--surface-card); 
     border-radius: 12px; padding: 24px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+    transition: background-color 0.3s;
   }
   .chart-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin: 0 0 20px; }
   .chart-inner { position: relative; height: 240px; }
@@ -98,7 +117,7 @@
   .controls input, .controls select {
     padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px;
     font-size: 13px; font-family: 'Poppins', sans-serif; background: var(--surface-card); color: var(--text-main);
-    outline: none; transition: border-color 0.2s;
+    outline: none; transition: border-color 0.2s, background-color 0.3s, color 0.3s;
   }
   .controls input:focus, .controls select:focus { border-color: var(--nrd-blue); box-shadow: 0 0 0 3px rgba(29, 106, 150, 0.1); }
   #searchBox { flex: 2; min-width: 220px; }
@@ -107,30 +126,34 @@
   .btn-custom { 
     background: var(--surface-card); border: 1px solid var(--border-light); border-radius: 8px; 
     padding: 10px 16px; font-size: 13px; font-weight: 600; font-family: 'Poppins', sans-serif; cursor: pointer; 
-    color: var(--text-muted); transition: all 0.2s;
+    color: var(--text-muted); transition: all 0.2s; text-decoration: none; display: inline-block;
   }
-  .btn-custom:hover { background: #f8fafc; color: var(--text-main); }
+  .btn-custom:hover { background: var(--border-light); color: var(--text-main); }
+  
   .btn-export { background: var(--nrd-orange); color: white; border: none; }
   .btn-export:hover { background: #e07a2a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(240, 138, 53, 0.3); }
+  
+  .btn-pdf { background: var(--nrd-blue); color: white; border: none; }
+  .btn-pdf:hover { background: #15557a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29, 106, 150, 0.3); }
 
   /* --- TABLE & ZEBRA STRIPING --- */
   .table-container { 
     background: var(--surface-card); border-radius: 12px; padding: 24px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow: hidden;
+    transition: background-color 0.3s;
   }
-  table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; }
+  table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
   table.dataTable thead th { 
     text-align: left; padding: 14px 12px; color: var(--text-muted); font-weight: 600; 
     border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; 
   }
   
-  /* ZEBRA STRIPING FOR MAIN TABLE */
-  table.dataTable tbody tr:nth-child(even) { background-color: #f8fafc; }
-  table.dataTable tbody tr:hover { background-color: #e2e8f0; }
+  table.dataTable tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
+  table.dataTable tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
   
   table.dataTable tbody td { 
     padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: middle;
-    white-space: normal !important; word-wrap: break-word; /* Text Wrap Fix */
+    white-space: normal !important; word-wrap: break-word;
   }
   table.dataTable.no-footer { border-bottom: none; }
   
@@ -151,13 +174,13 @@
   /* --- MODAL (POP-UP) --- */
   .modal-overlay {
     display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.5); z-index: 1000; justify-content: center; align-items: center;
+    background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center;
     backdrop-filter: blur(4px);
   }
   .modal-content {
     background: var(--surface-card); padding: 32px; border-radius: 16px;
     width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto;
-    position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+    position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
   }
   .modal-close {
     position: absolute; top: 24px; right: 24px; background: var(--surface-bg); border: none;
@@ -167,13 +190,21 @@
   .modal-close:hover { background: var(--danger-bg); color: var(--danger); transform: rotate(90deg); }
   .modal-title { margin-top: 0; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--nrd-blue); }
   
-  .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
   .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
   .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); white-space: normal !important; word-wrap: break-word; }
-  
-  /* ZEBRA STRIPING FOR MODAL TABLE */
-  .modal-table tbody tr:nth-child(even) { background-color: #f8fafc; }
-  .modal-table tbody tr:hover { background-color: #e2e8f0; }
+  .modal-table tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
+  .modal-table tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
+
+  /* --- PRINT OPTIMIZATION PARA SA PDF --- */
+  @media print {
+    body { background: white; color: black; padding: 0; }
+    .controls, .header-actions, .subtitle, .status-line, .dataTables_paginate, .row-count { display: none !important; }
+    .stat-card, .chart-box, .table-container { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
+    .wrap { max-width: 100%; }
+    h1 { color: black !important; }
+    .badge { border: 1px solid #ccc; }
+  }
 
 </style>
 </head>
@@ -181,10 +212,20 @@
 <div class="wrap">
   
   <!-- HEADER -->
-  <div class="header-container">
-    <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
-    <h1>Service Tracker Dashboard</h1>
+  <div class="header-wrapper">
+    <div class="header-container">
+      <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
+      <h1>Service Tracker Dashboard</h1>
+    </div>
+    
+    <!-- Top Action Buttons -->
+    <div class="header-actions">
+      <!-- PALITAN ANG LINK NA ITO NG TOTOONG GOOGLE SHEET LINK NIYO -->
+      <a href="https://docs.google.com/spreadsheets/" target="_blank" class="btn-custom" title="Open database">✏️ Edit in Sheets</a>
+      <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+    </div>
   </div>
+  
   <p class="subtitle">Live from Google Sheets — updates automatically, no manual refresh</p>
   
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
@@ -207,11 +248,11 @@
       <div class="chart-inner" style="height: 200px;"><canvas id="trendChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Status Breakdown</p>
+      <p class="chart-title">Status Breakdown <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
       <div class="chart-inner"><canvas id="statusChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Units by Model</p>
+      <p class="chart-title">Units by Model <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
       <div class="chart-inner"><canvas id="modelChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
@@ -239,7 +280,8 @@
     <span class="date-label">To</span>
     <input type="date" id="dateTo">
     <button class="btn-custom" id="clearFilters">Clear filters</button>
-    <button class="btn-custom btn-export" id="exportBtn">Export to CSV</button>
+    <button class="btn-custom btn-pdf" onclick="window.print()">🖨️ Save as PDF</button>
+    <button class="btn-custom btn-export" id="exportBtn">⬇️ Export to CSV</button>
   </div>
 
   <!-- DATA TABLE -->
@@ -274,6 +316,30 @@
 </div>
 
 <script>
+// --- DARK MODE LOGIC ---
+const themeToggle = document.getElementById('themeToggle');
+const currentTheme = localStorage.getItem('theme') || 'light';
+
+if (currentTheme === 'dark') {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    themeToggle.textContent = '☀️ Light Mode';
+}
+
+themeToggle.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'dark') {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('theme', 'light');
+        themeToggle.textContent = '🌙 Dark Mode';
+    } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('theme', 'dark');
+        themeToggle.textContent = '☀️ Light Mode';
+    }
+    // Update chart colors based on theme if needed, but current colors work well for both.
+});
+
+// --- MAIN SCRIPT ---
 const API_URL = "https://script.google.com/a/macros/nrdev.ph/s/AKfycbyq1R1w0eR5hZvd7J34I_k-LdJGkWUlgLDJ9yLLStv7Z3qEbEogQDSGoTd1ufncsCCRxA/exec";
 const POLL_SECONDS = 30;
 
@@ -445,6 +511,7 @@ function renderCharts(rows) {
   if (trendChart) trendChart.destroy();
 
   Chart.defaults.font.family = "'Poppins', sans-serif";
+  Chart.defaults.color = "#64748b"; // Works well for light and dark themes
 
   trendChart = new Chart(document.getElementById("trendChart"), {
       type: 'line',
@@ -468,18 +535,44 @@ function renderCharts(rows) {
   statusChart = new Chart(document.getElementById("statusChart"), {
     type: "doughnut",
     data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0, hoverOffset: 4 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
+    options: { 
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%',
+      // CROSS-FILTERING FEATURE
+      onClick: (event, elements) => {
+          if (elements.length > 0) {
+              const clickedStatus = statusChart.data.labels[elements[0].index];
+              document.getElementById("statusFilter").value = clickedStatus;
+              applyFilters();
+          }
+      },
+      onHover: (event, chartElement) => {
+          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+      }
+    }
   });
 
   modelChart = new Chart(document.getElementById("modelChart"), {
     type: "bar",
     data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#1d6a96", borderRadius: 6, maxBarThickness: 45 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
+    options: { 
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } },
+      // CROSS-FILTERING FEATURE
+      onClick: (event, elements) => {
+          if (elements.length > 0) {
+              const clickedModel = modelChart.data.labels[elements[0].index];
+              document.getElementById("modelFilter").value = clickedModel;
+              applyFilters();
+          }
+      },
+      onHover: (event, chartElement) => {
+          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+      }
+    }
   });
 
   issueChart = new Chart(document.getElementById("issueChart"), {
     type: "pie",
-    data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: '#ffffff' }] },
+    data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: 'transparent' }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
   const legendEl = document.getElementById("issueLegend");
@@ -567,7 +660,7 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "emoto_dashboard_filtered_export.csv";
+    link.download = "NRD_Service_Dashboard_Export.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
