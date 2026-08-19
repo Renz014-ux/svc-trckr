@@ -2,14 +2,18 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>E-motorcycle service dashboard</title>
+<title>Service Tracker Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Google Fonts: Poppins -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <!-- Chart.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<!-- jQuery (Required para sa DataTables) -->
+<!-- jQuery & DataTables -->
 <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
-<!-- DataTables CSS & JS (Para sa Sorting, Pagination, Mobile View) -->
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.dataTables.min.css">
 <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
@@ -17,123 +21,172 @@
 
 <style>
   :root {
-    --surface-1: #f5f5f3;
-    --surface-2: #ffffff;
-    --border: #e1e0d9;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --success: #0ca30c;
-    --success-bg: #eaf3de;
-    --warning: #854f0b;
-    --warning-bg: #faeeda;
-    --danger: #a32d2d;
-    --danger-bg: #fcebeb;
-  }
-  
-  /* Naayos na CSS block para sa Text Wrap */
-  table.dataTable tbody td {
-    white-space: normal !important;
-    word-wrap: break-word;
+    /* NRD Brand Colors */
+    --nrd-blue: #1d6a96; 
+    --nrd-orange: #f08a35;
+    --nrd-red: #d93838;
+
+    /* Modern UI Colors */
+    --surface-bg: #f4f7f9; 
+    --surface-card: #ffffff; 
+    --border-light: #e2e8f0;
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    /* Status Colors */
+    --success: #10b981;
+    --success-bg: #d1fae5;
+    --warning: #f59e0b;
+    --warning-bg: #fef3c7;
+    --danger: #ef4444;
+    --danger-bg: #fee2e2;
   }
   
   * { box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    background: var(--surface-1);
-    color: var(--text-primary);
+    font-family: 'Poppins', sans-serif;
+    background: var(--surface-bg);
+    color: var(--text-main);
     margin: 0;
-    padding: 24px;
+    padding: 30px 20px;
   }
-  .wrap { max-width: 1200px; margin: 0 auto; }
-  h1 { font-size: 20px; font-weight: 600; margin: 0 0 4px; }
-  .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0 0 20px; }
-  .status-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
-  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-  .stat-card { flex: 1; min-width: 130px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
-  .stat-label { font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
-  .stat-value { font-size: 24px; font-weight: 600; margin: 0; }
-  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-  .chart-box { flex: 1; min-width: 260px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
-  .chart-title { font-size: 13px; color: var(--text-secondary); margin: 0 0 10px; }
-  .chart-inner { position: relative; height: 220px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); }
-  .legend span.sw { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+  .wrap { max-width: 1280px; margin: 0 auto; }
+  
+  /* --- HEADER --- */
+  .header-container { display: flex; align-items: center; gap: 16px; margin-bottom: 8px; }
+  .nrd-logo { height: 75px; width: auto; object-fit: contain; }
+  h1 { font-size: 28px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; }
+  .subtitle { color: var(--text-muted); font-size: 14px; margin: 0 0 24px; }
+  
+  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500;}
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
+  
+  /* --- STAT CARDS --- */
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-card { 
+    flex: 1; min-width: 150px; background: var(--surface-card); 
+    border-radius: 12px; padding: 20px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+    border-top: 4px solid var(--border-light);
+    transition: transform 0.2s;
+  }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+  .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); }
+  .stat-card:nth-child(2) { border-top-color: var(--success); }
+  .stat-card:nth-child(3) { border-top-color: var(--warning); }
+  .stat-card:nth-child(4) { border-top-color: var(--nrd-orange); }
+  .stat-card:nth-child(5) { border-top-color: var(--nrd-red); }
+  .stat-card:nth-child(6) { border-top-color: #8b5cf6; }
+
+  .stat-label { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;}
+  .stat-value { font-size: 32px; font-weight: 700; margin: 0; color: var(--text-main); line-height: 1; }
+  
+  /* --- CHARTS --- */
+  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .chart-box { 
+    flex: 1; min-width: 300px; background: var(--surface-card); 
+    border-radius: 12px; padding: 24px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
+  }
+  .chart-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin: 0 0 20px; }
+  .chart-inner { position: relative; height: 240px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; font-size: 12px; color: var(--text-muted); }
+  .legend span.sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-2px; }
+  
+  /* --- CONTROLS --- */
+  .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
   .controls input, .controls select {
-    padding: 8px 10px; border: 0.5px solid var(--border); border-radius: 8px;
-    font-size: 13px; background: var(--surface-2);
+    padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px;
+    font-size: 13px; font-family: 'Poppins', sans-serif; background: var(--surface-card); color: var(--text-main);
+    outline: none; transition: border-color 0.2s;
   }
-  #searchBox { flex: 2; min-width: 200px; }
-  .date-label { font-size: 12px; color: var(--text-muted); }
+  .controls input:focus, .controls select:focus { border-color: var(--nrd-blue); box-shadow: 0 0 0 3px rgba(29, 106, 150, 0.1); }
+  #searchBox { flex: 2; min-width: 220px; }
+  .date-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
   
-  /* Table & DataTable Overrides */
-  .table-container { background: var(--surface-2); border-radius: 10px; padding: 16px; border: 0.5px solid var(--border); margin-bottom: 10px;}
+  .btn-custom { 
+    background: var(--surface-card); border: 1px solid var(--border-light); border-radius: 8px; 
+    padding: 10px 16px; font-size: 13px; font-weight: 600; font-family: 'Poppins', sans-serif; cursor: pointer; 
+    color: var(--text-muted); transition: all 0.2s;
+  }
+  .btn-custom:hover { background: #f8fafc; color: var(--text-main); }
+  .btn-export { background: var(--nrd-orange); color: white; border: none; }
+  .btn-export:hover { background: #e07a2a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(240, 138, 53, 0.3); }
+
+  /* --- TABLE & ZEBRA STRIPING --- */
+  .table-container { 
+    background: var(--surface-card); border-radius: 12px; padding: 24px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow: hidden;
+  }
   table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; }
-  table.dataTable thead th { text-align: left; padding: 10px 8px; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border); }
-  table.dataTable tbody td { padding: 10px 8px; border-bottom: 0.5px solid var(--border); }
-  table.dataTable.no-footer { border-bottom: none; }
-  .dataTables_wrapper .dataTables_paginate { margin-top: 10px; font-size: 12px; }
-  .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 4px 10px; margin-left: 4px; border-radius: 6px; border: 0.5px solid transparent; background: transparent; cursor:pointer;}
-  .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--surface-1); border: 0.5px solid var(--border); font-weight: bold; }
+  table.dataTable thead th { 
+    text-align: left; padding: 14px 12px; color: var(--text-muted); font-weight: 600; 
+    border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; 
+  }
   
-  .badge { font-size: 12px; padding: 2px 10px; border-radius: 6px; font-weight: 500; white-space: nowrap; }
+  /* ZEBRA STRIPING FOR MAIN TABLE */
+  table.dataTable tbody tr:nth-child(even) { background-color: #f8fafc; }
+  table.dataTable tbody tr:hover { background-color: #e2e8f0; }
+  
+  table.dataTable tbody td { 
+    padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: middle;
+    white-space: normal !important; word-wrap: break-word; /* Text Wrap Fix */
+  }
+  table.dataTable.no-footer { border-bottom: none; }
+  
+  .dataTables_wrapper .dataTables_paginate { margin-top: 20px; font-size: 13px; font-weight: 500; }
+  .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 6px 12px; margin-left: 4px; border-radius: 6px; border: none !important; color: var(--text-muted) !important; cursor:pointer;}
+  .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--border-light) !important; color: var(--text-main) !important; }
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--nrd-blue) !important; color: white !important; font-weight: 600; box-shadow: 0 4px 10px rgba(29, 106, 150, 0.2); }
+  
+  .badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
   .badge-done { background: var(--success-bg); color: var(--success); }
   .badge-pending { background: var(--warning-bg); color: var(--warning); }
   .badge-sla-yes { background: var(--success-bg); color: var(--success); }
   .badge-sla-no { background: var(--danger-bg); color: var(--danger); }
-  .row-count { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
-  .error-box { background: var(--danger-bg); color: var(--danger); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
-  .btn-custom { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
-  .btn-custom:hover { background: var(--surface-1); }
-  .btn-export { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+  
+  .row-count { font-size: 13px; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
+  .error-box { background: var(--danger-bg); color: var(--danger); padding: 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; display: none; font-weight: 500; }
 
-  /* --- MODAL (POP-UP) STYLES --- */
+  /* --- MODAL (POP-UP) --- */
   .modal-overlay {
-    display: none; 
-    position: fixed; 
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); 
-    z-index: 1000; 
-    justify-content: center; 
-    align-items: center;
-    backdrop-filter: blur(2px);
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(15, 23, 42, 0.5); z-index: 1000; justify-content: center; align-items: center;
+    backdrop-filter: blur(4px);
   }
   .modal-content {
-    background: var(--surface-2); 
-    padding: 24px; 
-    border-radius: 12px;
-    width: 90%; 
-    max-width: 700px; 
-    max-height: 80vh; 
-    overflow-y: auto;
-    position: relative; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    background: var(--surface-card); padding: 32px; border-radius: 16px;
+    width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto;
+    position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.15);
   }
   .modal-close {
-    position: absolute; 
-    top: 16px; right: 16px; 
-    background: var(--surface-1); 
-    border: 0.5px solid var(--border);
-    border-radius: 50%;
-    width: 32px; height: 32px;
-    font-size: 18px; 
-    cursor: pointer; 
-    color: var(--text-secondary);
-    display: flex; justify-content: center; align-items: center;
+    position: absolute; top: 24px; right: 24px; background: var(--surface-bg); border: none;
+    border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; 
+    color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: 0.2s;
   }
-  .modal-close:hover { background: #e1e0d9; color: var(--danger); }
-  .modal-title { margin-top: 0; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .modal-close:hover { background: var(--danger-bg); color: var(--danger); transform: rotate(90deg); }
+  .modal-title { margin-top: 0; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--nrd-blue); }
+  
   .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .modal-table th { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; color: var(--text-secondary); }
-  .modal-table td { padding: 10px; border-bottom: 0.5px solid var(--border); white-space: normal !important; word-wrap: break-word; }
+  .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); white-space: normal !important; word-wrap: break-word; }
+  
+  /* ZEBRA STRIPING FOR MODAL TABLE */
+  .modal-table tbody tr:nth-child(even) { background-color: #f8fafc; }
+  .modal-table tbody tr:hover { background-color: #e2e8f0; }
+
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>E-motorcycle service dashboard</h1>
+  
+  <!-- HEADER -->
+  <div class="header-container">
+    <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
+    <h1>Service Tracker Dashboard</h1>
+  </div>
   <p class="subtitle">Live from Google Sheets — updates automatically, no manual refresh</p>
+  
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
   <div class="error-box" id="errorBox"></div>
 
@@ -141,34 +194,34 @@
   <div class="stats">
     <div class="stat-card"><p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p></div>
     <div class="stat-card"><p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p></div>
-    <div class="stat-card"><p class="stat-label">Pending / in service</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p></div>
-    <div class="stat-card"><p class="stat-label">Completion rate</p><p class="stat-value" id="stat-rate">-</p></div>
-    <div class="stat-card"><p class="stat-label">SLA compliance rate</p><p class="stat-value" id="stat-sla">-</p></div>
-    <div class="stat-card"><p class="stat-label">Avg Turnaround Time</p><p class="stat-value" id="stat-tat">-</p></div>
+    <div class="stat-card"><p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p></div>
+    <div class="stat-card"><p class="stat-label">Completion</p><p class="stat-value" id="stat-rate">-</p></div>
+    <div class="stat-card"><p class="stat-label">SLA Compliant</p><p class="stat-value" id="stat-sla">-</p></div>
+    <div class="stat-card"><p class="stat-label">Avg Turnaround</p><p class="stat-value" id="stat-tat">-</p></div>
   </div>
 
   <!-- CHARTS -->
   <div class="charts">
     <div class="chart-box" style="flex-basis: 100%;">
       <p class="chart-title">Monthly Service Volume</p>
-      <div class="chart-inner" style="height: 180px;"><canvas id="trendChart" role="img" aria-label="Line chart of units serviced per month"></canvas></div>
+      <div class="chart-inner" style="height: 200px;"><canvas id="trendChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Status breakdown</p>
-      <div class="chart-inner"><canvas id="statusChart" role="img" aria-label="Doughnut chart of units by status"></canvas></div>
+      <p class="chart-title">Status Breakdown</p>
+      <div class="chart-inner"><canvas id="statusChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Units by model</p>
-      <div class="chart-inner"><canvas id="modelChart" role="img" aria-label="Bar chart of units by model"></canvas></div>
+      <p class="chart-title">Units by Model</p>
+      <div class="chart-inner"><canvas id="modelChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Top recurring issues</p>
-      <div class="chart-inner"><canvas id="issueChart" role="img" aria-label="Pie chart of the most common reported issues"></canvas></div>
+      <p class="chart-title">Top Recurring Issues</p>
+      <div class="chart-inner"><canvas id="issueChart" role="img"></canvas></div>
       <div class="legend" id="issueLegend"></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Units per customer <span style="font-size: 11px; color: var(--text-muted);">(Click bars to view)</span></p>
-      <div class="chart-inner"><canvas id="customerChart" role="img" aria-label="Bar chart of units serviced per customer"></canvas></div>
+      <p class="chart-title">Units per Customer <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click bars to view)</span></p>
+      <div class="chart-inner"><canvas id="customerChart" role="img"></canvas></div>
     </div>
   </div>
 
@@ -185,7 +238,7 @@
     <input type="date" id="dateFrom">
     <span class="date-label">To</span>
     <input type="date" id="dateTo">
-    <button class="btn-custom" id="clearFilters">Clear all filters</button>
+    <button class="btn-custom" id="clearFilters">Clear filters</button>
     <button class="btn-custom btn-export" id="exportBtn">Export to CSV</button>
   </div>
 
@@ -227,20 +280,21 @@ const POLL_SECONDS = 30;
 let DATA = [];
 let CURRENT_FILTERED_DATA = [];
 let statusChart, modelChart, issueChart, customerChart, trendChart;
-let dtInstance; // DataTables instance
+let dtInstance; 
 let filtersPopulated = false;
-const PALETTE = ["#2a78d6","#eb6834","#1baf7a","#eda100","#e87ba4","#008300","#4a3aa7","#e34948"];
 
-// 1. Initialize DataTable on Page Load
+// Custom NRD Palette + Supporting Modern Colors
+const PALETTE = ["#1d6a96", "#f08a35", "#d93838", "#10b981", "#8b5cf6", "#f43f5e", "#0ea5e9", "#14b8a6"];
+
 $(document).ready(function() {
     dtInstance = $('#mainTable').DataTable({
         responsive: true,
         paging: true,
         pageLength: 10,
-        searching: false, // Turned off default search, we use custom search
+        searching: false, 
         lengthChange: false,
-        info: false, // Turned off default info, we use #rowCount
-        order: [[ 5, "desc" ]], // Sort by Date column
+        info: false, 
+        order: [[ 5, "desc" ]], 
         columns: [
             { data: 'jo' },
             { data: 'plate' },
@@ -254,7 +308,6 @@ $(document).ready(function() {
         ]
     });
     
-    // Fetch data after table init
     fetchData();
     setInterval(fetchData, POLL_SECONDS * 1000);
 });
@@ -265,12 +318,12 @@ async function fetchData() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     DATA = await res.json();
     document.getElementById("errorBox").style.display = "none";
-    document.getElementById("liveDot").style.background = "#0ca30c";
+    document.getElementById("liveDot").style.background = "var(--success)";
     document.getElementById("lastUpdated").textContent = "Last updated " + new Date().toLocaleTimeString();
     populateFilters();
     applyFilters();
   } catch (err) {
-    document.getElementById("liveDot").style.background = "#e24b4a";
+    document.getElementById("liveDot").style.background = "var(--danger)";
     document.getElementById("errorBox").style.display = "block";
     document.getElementById("errorBox").textContent = "Couldn't reach the data source. Check the API_URL. (" + err.message + ")";
   }
@@ -329,7 +382,7 @@ function renderTable(rows) {
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
     return {
-        jo: r.jo || "-",
+        jo: `<strong>${r.jo || "-"}</strong>`,
         plate: r.plate || "-",
         statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`,
         model: r.model || "-",
@@ -337,7 +390,7 @@ function renderTable(rows) {
         date: r.date || "-",
         repairType: r.repairType || "-",
         slaHtml: slaHtml,
-        issue: `<span style="color:var(--text-secondary);">${r.issue || "-"}</span>`
+        issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
     };
   });
 
@@ -391,6 +444,8 @@ function renderCharts(rows) {
   if (customerChart) customerChart.destroy();
   if (trendChart) trendChart.destroy();
 
+  Chart.defaults.font.family = "'Poppins', sans-serif";
+
   trendChart = new Chart(document.getElementById("trendChart"), {
       type: 'line',
       data: { 
@@ -398,45 +453,45 @@ function renderCharts(rows) {
           datasets: [{ 
               label: "Units Serviced", 
               data: trendData, 
-              borderColor: "#2a78d6", 
-              backgroundColor: "rgba(42, 120, 214, 0.1)", 
-              fill: true, tension: 0.2 
+              borderColor: "#1d6a96", /* NRD Blue */
+              backgroundColor: "rgba(29, 106, 150, 0.1)", 
+              fill: true, tension: 0.3, pointBackgroundColor: "#f08a35", pointBorderWidth: 2
           }] 
       },
       options: { 
           responsive: true, maintainAspectRatio: false, 
           plugins: { legend: { display: false } }, 
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } 
+          scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } 
       }
   });
 
   statusChart = new Chart(document.getElementById("statusChart"), {
     type: "doughnut",
-    data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#0ca30c", "#eda100"], borderWidth: 0 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0, hoverOffset: 4 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%' }
   });
 
   modelChart = new Chart(document.getElementById("modelChart"), {
     type: "bar",
-    data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#2a78d6", borderRadius: 4, maxBarThickness: 40 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#1d6a96", borderRadius: 6, maxBarThickness: 45 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
   });
 
   issueChart = new Chart(document.getElementById("issueChart"), {
     type: "pie",
-    data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 0 }] },
+    data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: '#ffffff' }] },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
   });
   const legendEl = document.getElementById("issueLegend");
-  legendEl.innerHTML = topIssues.map((x,i) => "<span><span class=\"sw\" style=\"background:" + PALETTE[i % PALETTE.length] + "\"></span>" + x[0] + " (" + x[1] + ")</span>").join("");
+  legendEl.innerHTML = topIssues.map((x,i) => `<span><span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>${x[0]} (${x[1]})</span>`).join("");
 
   customerChart = new Chart(document.getElementById("customerChart"), {
     type: "bar",
-    data: { labels: topCustomers.map(x => x[0]), datasets: [{ data: topCustomers.map(x => x[1]), backgroundColor: "#1baf7a", borderRadius: 4, maxBarThickness: 24 }] },
+    data: { labels: topCustomers.map(x => x[0]), datasets: [{ data: topCustomers.map(x => x[1]), backgroundColor: "#f08a35", borderRadius: 6, maxBarThickness: 24 }] },
     options: {
       indexAxis: "y", responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } },
       onClick: (event, elements) => {
           if (elements.length > 0) {
               const elementIndex = elements[0].index;
@@ -518,7 +573,6 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     document.body.removeChild(link);
 });
 
-// --- MODAL FUNCTIONS ---
 function openCustomerModal(customerName) {
     document.getElementById("modalCustomerName").textContent = customerName + " - Serviced Units";
     const tbody = document.getElementById("modalTableBody");
@@ -529,14 +583,13 @@ function openCustomerModal(customerName) {
     customerRecords.forEach(r => {
         const tr = document.createElement("tr");
         const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-        // Uunahin niyang ipakita ang Plate Number, kung wala, JO Number ang lalabas
         const identifier = r.plate ? r.plate : (r.jo || "-");
         
         tr.innerHTML = `
             <td><strong>${identifier}</strong></td>
             <td><span class="badge ${badgeClass}">${r.status}</span></td>
             <td>${r.model || "-"}</td>
-            <td><span style="color:var(--text-secondary);">${r.issue || "-"}</span></td>
+            <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
         `;
         tbody.appendChild(tr);
     });
