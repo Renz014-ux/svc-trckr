@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,10 +29,14 @@
     --warning-bg: #faeeda;
     --danger: #a32d2d;
     --danger-bg: #fcebeb;
-    table.dataTable tbody td {
-  white-space: normal !important;
-  word-wrap: break-word;
   }
+  
+  /* Naayos na CSS block para sa Text Wrap */
+  table.dataTable tbody td {
+    white-space: normal !important;
+    word-wrap: break-word;
+  }
+  
   * { box-sizing: border-box; }
   body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -85,6 +88,46 @@
   .btn-custom { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
   .btn-custom:hover { background: var(--surface-1); }
   .btn-export { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+
+  /* --- MODAL (POP-UP) STYLES --- */
+  .modal-overlay {
+    display: none; 
+    position: fixed; 
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6); 
+    z-index: 1000; 
+    justify-content: center; 
+    align-items: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-content {
+    background: var(--surface-2); 
+    padding: 24px; 
+    border-radius: 12px;
+    width: 90%; 
+    max-width: 700px; 
+    max-height: 80vh; 
+    overflow-y: auto;
+    position: relative; 
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  .modal-close {
+    position: absolute; 
+    top: 16px; right: 16px; 
+    background: var(--surface-1); 
+    border: 0.5px solid var(--border);
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    font-size: 18px; 
+    cursor: pointer; 
+    color: var(--text-secondary);
+    display: flex; justify-content: center; align-items: center;
+  }
+  .modal-close:hover { background: #e1e0d9; color: var(--danger); }
+  .modal-title { margin-top: 0; font-size: 18px; font-weight: 600; margin-bottom: 16px; }
+  .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .modal-table th { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; color: var(--text-secondary); }
+  .modal-table td { padding: 10px; border-bottom: 0.5px solid var(--border); white-space: normal !important; word-wrap: break-word; }
 </style>
 </head>
 <body>
@@ -106,12 +149,10 @@
 
   <!-- CHARTS -->
   <div class="charts">
-    <!-- Trend Line Chart -->
     <div class="chart-box" style="flex-basis: 100%;">
       <p class="chart-title">Monthly Service Volume</p>
       <div class="chart-inner" style="height: 180px;"><canvas id="trendChart" role="img" aria-label="Line chart of units serviced per month"></canvas></div>
     </div>
-    
     <div class="chart-box">
       <p class="chart-title">Status breakdown</p>
       <div class="chart-inner"><canvas id="statusChart" role="img" aria-label="Doughnut chart of units by status"></canvas></div>
@@ -126,14 +167,14 @@
       <div class="legend" id="issueLegend"></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Units per customer</p>
+      <p class="chart-title">Units per customer <span style="font-size: 11px; color: var(--text-muted);">(Click bars to view)</span></p>
       <div class="chart-inner"><canvas id="customerChart" role="img" aria-label="Bar chart of units serviced per customer"></canvas></div>
     </div>
   </div>
 
   <!-- CONTROLS -->
   <div class="controls">
-    <input type="text" id="searchBox" placeholder="Search JO number, customer, or issue">
+    <input type="text" id="searchBox" placeholder="Search JO number, plate, customer, or issue">
     <select id="statusFilter"><option value="all">All statuses</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
     <select id="modelFilter"><option value="all">All models</option></select>
     <select id="customerFilter"><option value="all">All customers</option></select>
@@ -151,11 +192,32 @@
   <!-- DATA TABLE -->
   <div class="table-container">
     <table id="mainTable" class="display responsive">
-      <thead><tr><th>JO number</th><th>Status</th><th>Model</th><th>Customer</th><th>Date</th><th>Repair type</th><th>SLA met</th><th>Issue</th></tr></thead>
+      <thead><tr><th>JO number</th><th>Plate Number</th><th>Status</th><th>Model</th><th>Customer</th><th>Date</th><th>Repair type</th><th>SLA met</th><th>Issue</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
   <p class="row-count" id="rowCount"></p>
+</div>
+
+<!-- MODAL HTML -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()" title="Close">&times;</button>
+      <h2 class="modal-title" id="modalCustomerName">Customer Details</h2>
+      <div style="overflow-x: auto;">
+          <table class="modal-table">
+              <thead>
+                  <tr>
+                      <th>Plate / JO Number</th>
+                      <th>Status</th>
+                      <th>Model</th>
+                      <th>Issue Summary</th>
+                  </tr>
+              </thead>
+              <tbody id="modalTableBody"></tbody>
+          </table>
+      </div>
+  </div>
 </div>
 
 <script>
@@ -178,9 +240,10 @@ $(document).ready(function() {
         searching: false, // Turned off default search, we use custom search
         lengthChange: false,
         info: false, // Turned off default info, we use #rowCount
-        order: [[ 4, "desc" ]], // Sort by Date by default
+        order: [[ 5, "desc" ]], // Sort by Date column
         columns: [
             { data: 'jo' },
+            { data: 'plate' },
             { data: 'statusHtml' },
             { data: 'model' },
             { data: 'customer' },
@@ -242,10 +305,8 @@ function renderStats(rows) {
   document.getElementById("stat-rate").textContent = total ? Math.round((done / total) * 100) + "%" : "0%";
   document.getElementById("stat-sla").textContent = slaRated.length ? Math.round((slaMet / slaRated.length) * 100) + "%" : "-";
 
-  // Calculate Average Turnaround Time
   let totalDays = 0, validRecords = 0;
   rows.forEach(r => {
-    // Kinakailangan ang 'dateResolved' update sa Backend Script mo (tulad ng nasa nakaraang sagot) para gumana ito
     if (r.date && r.dateResolved && r.status === "Done") {
       let start = new Date(r.date);
       let end = new Date(r.dateResolved);
@@ -269,6 +330,7 @@ function renderTable(rows) {
     
     return {
         jo: r.jo || "-",
+        plate: r.plate || "-",
         statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`,
         model: r.model || "-",
         customer: r.customer || "-",
@@ -281,7 +343,7 @@ function renderTable(rows) {
 
   dtInstance.clear();
   dtInstance.rows.add(tableData);
-  dtInstance.draw(false); // Draw table while maintaining pagination
+  dtInstance.draw(false);
 
   document.getElementById("rowCount").textContent = "Showing " + rows.length + " of " + DATA.length + " units";
 }
@@ -310,7 +372,6 @@ function renderCharts(rows) {
   rows.forEach(r => { if (r.customer) customerCounts[r.customer] = (customerCounts[r.customer] || 0) + 1; });
   const topCustomers = Object.entries(customerCounts).sort((a,b) => b[1]-a[1]).slice(0, 10);
 
-  // Monthly Trend Logic
   const monthCounts = {};
   rows.forEach(r => {
       if (r.date) {
@@ -330,7 +391,6 @@ function renderCharts(rows) {
   if (customerChart) customerChart.destroy();
   if (trendChart) trendChart.destroy();
 
-  // Monthly Trend Chart Initialization
   trendChart = new Chart(document.getElementById("trendChart"), {
       type: 'line',
       data: { 
@@ -376,7 +436,17 @@ function renderCharts(rows) {
     options: {
       indexAxis: "y", responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } }
+      scales: { x: { beginAtZero: true, ticks: { precision: 0 } } },
+      onClick: (event, elements) => {
+          if (elements.length > 0) {
+              const elementIndex = elements[0].index;
+              const clickedCustomer = customerChart.data.labels[elementIndex];
+              openCustomerModal(clickedCustomer);
+          }
+      },
+      onHover: (event, chartElement) => {
+          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+      }
     }
   });
 }
@@ -398,26 +468,24 @@ function applyFilters() {
     if (dateFrom && (!r.date || r.date < dateFrom)) return false;
     if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
-      const hay = (r.jo + " " + r.customer + " " + r.issue).toLowerCase();
+      const hay = (r.jo + " " + (r.plate||"") + " " + r.customer + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
   });
   
-  CURRENT_FILTERED_DATA = rows; // Pasa ang nasala na data para sa CSV export
+  CURRENT_FILTERED_DATA = rows;
 
   renderStats(rows);
   renderTable(rows);
   renderCharts(rows);
 }
 
-// Event Listeners for Filters
 document.getElementById("searchBox").addEventListener("input", applyFilters);
 ["statusFilter","modelFilter","customerFilter","repairFilter","dateFrom","dateTo"].forEach(function(id) {
   document.getElementById(id).addEventListener("change", applyFilters);
 });
 
-// Clear Filters Event
 document.getElementById("clearFilters").addEventListener("click", function() {
   document.getElementById("searchBox").value = "";
   document.getElementById("statusFilter").value = "all";
@@ -429,16 +497,14 @@ document.getElementById("clearFilters").addEventListener("click", function() {
   applyFilters();
 });
 
-// CSV Export Event
 document.getElementById("exportBtn").addEventListener("click", function() {
-    let csvContent = "JO Number,Status,Model,Customer,Date,Date Resolved,Repair Type,SLA Met,Issue\n";
+    let csvContent = "JO Number,Plate Number,Status,Model,Customer,Date,Date Resolved,Repair Type,SLA Met,Issue\n";
 
     CURRENT_FILTERED_DATA.forEach(r => {
         let rowArray = [
-            r.jo, r.status, r.model, r.customer, 
+            r.jo, r.plate || "-", r.status, r.model, r.customer, 
             r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue
         ];
-        // Clean out quotes/commas sa text data
         let escapedRow = rowArray.map(item => `"${String(item || '').replace(/"/g, '""')}"`);
         csvContent += escapedRow.join(",") + "\n";
     });
@@ -450,6 +516,43 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+});
+
+// --- MODAL FUNCTIONS ---
+function openCustomerModal(customerName) {
+    document.getElementById("modalCustomerName").textContent = customerName + " - Serviced Units";
+    const tbody = document.getElementById("modalTableBody");
+    tbody.innerHTML = "";
+    
+    const customerRecords = CURRENT_FILTERED_DATA.filter(r => r.customer === customerName);
+    
+    customerRecords.forEach(r => {
+        const tr = document.createElement("tr");
+        const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
+        // Uunahin niyang ipakita ang Plate Number, kung wala, JO Number ang lalabas
+        const identifier = r.plate ? r.plate : (r.jo || "-");
+        
+        tr.innerHTML = `
+            <td><strong>${identifier}</strong></td>
+            <td><span class="badge ${badgeClass}">${r.status}</span></td>
+            <td>${r.model || "-"}</td>
+            <td><span style="color:var(--text-secondary);">${r.issue || "-"}</span></td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    document.getElementById("customerModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("customerModal").style.display = "none";
+}
+
+window.addEventListener("click", function(event) {
+    const modal = document.getElementById("customerModal");
+    if (event.target === modal) {
+        closeModal();
+    }
 });
 </script>
 </body>
