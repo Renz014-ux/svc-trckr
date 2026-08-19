@@ -21,22 +21,31 @@
 <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
 
 <style>
+  <style>
   :root {
-    --surface-1: #f5f5f3;
-    --surface-2: #ffffff;
-    --border: #e1e0d9;
-    --text-primary: #0b0b0b;
-    --text-secondary: #52514e;
-    --text-muted: #898781;
-    --success: #0ca30c;
-    --success-bg: #eaf3de;
-    --warning: #854f0b;
-    --warning-bg: #faeeda;
-    --danger: #a32d2d;
-    --danger-bg: #fcebeb;
+    /* NRD Brand Colors */
+    --nrd-blue: #1d6a96; 
+    --nrd-orange: #f08a35;
+    --nrd-red: #d93838;
+
+    /* Modern UI Colors */
+    --surface-1: #f3f6f9; /* Light grayish-blue background */
+    --surface-2: #ffffff; /* White cards */
+    --border: #eaedf1;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    
+    /* Status Badge Colors */
+    --success: #10b981;
+    --success-bg: #d1fae5;
+    --warning: #f59e0b;
+    --warning-bg: #fef3c7;
+    --danger: #ef4444;
+    --danger-bg: #fee2e2;
   }
   
-  /* Naayos na CSS block para sa Text Wrap */
+  /* Text Wrap Fix */
   table.dataTable tbody td {
     white-space: normal !important;
     word-wrap: break-word;
@@ -44,11 +53,11 @@
   
   * { box-sizing: border-box; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Poppins', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background: var(--surface-1);
     color: var(--text-primary);
     margin: 0;
-    padding: 24px;
+    padding: 32px 24px; /* Dinagdagan ang breathing room */
   }
   .wrap { max-width: 1200px; margin: 0 auto; }
   
@@ -56,103 +65,148 @@
   .header-container {
     display: flex;
     align-items: center;
-    gap: 15px;
-    margin-bottom: 4px;
+    gap: 16px;
+    margin-bottom: 8px;
   }
   .nrd-logo {
-    height: 80px; /* Pwede mong liitan o lakihan ito depende sa gusto mo */
+    height: 75px; 
     width: auto;
     object-fit: contain;
   }
   h1 { 
-    font-family: 'Poppins', sans-serif; /* Bagong font para sa header */
-    font-size: 26px; 
+    font-family: 'Poppins', sans-serif;
+    font-size: 28px; 
     font-weight: 700; 
     margin: 0; 
+    color: var(--nrd-blue); /* NRD branding */
     letter-spacing: -0.5px;
   }
-  .subtitle { color: var(--text-secondary); font-size: 13px; margin: 0 0 20px; }
+  .subtitle { color: var(--text-secondary); font-size: 14px; margin: 0 0 24px; font-weight: 500; }
   
-  .status-line { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-muted); margin-bottom: 20px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--success); }
-  .stats { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-  .stat-card { flex: 1; min-width: 130px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
-  .stat-label { font-size: 12px; color: var(--text-secondary); margin: 0 0 6px; }
-  .stat-value { font-size: 24px; font-weight: 600; margin: 0; }
-  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
-  .chart-box { flex: 1; min-width: 260px; background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 10px; padding: 16px; }
-  .chart-title { font-size: 13px; color: var(--text-secondary); margin: 0 0 10px; }
-  .chart-inner { position: relative; height: 220px; }
-  .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; font-size: 11px; color: var(--text-secondary); }
-  .legend span.sw { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; vertical-align:-1px; }
-  .controls { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
-  .controls input, .controls select {
-    padding: 8px 10px; border: 0.5px solid var(--border); border-radius: 8px;
-    font-size: 13px; background: var(--surface-2);
+  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
+  
+  /* --- CARDS (Soft-Shadow Look) --- */
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-card { 
+    flex: 1; 
+    min-width: 140px; 
+    background: var(--surface-2); 
+    border: none; 
+    border-radius: 16px; 
+    padding: 20px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03); /* Soft shadow */
+    transition: transform 0.2s ease;
   }
-  #searchBox { flex: 2; min-width: 200px; }
-  .date-label { font-size: 12px; color: var(--text-muted); }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+  .stat-label { font-size: 13px; color: var(--text-secondary); margin: 0 0 8px; font-weight: 500; }
+  .stat-value { font-size: 28px; font-weight: 700; margin: 0; color: var(--text-primary); }
   
-  /* Table & DataTable Overrides */
-  .table-container { background: var(--surface-2); border-radius: 10px; padding: 16px; border: 0.5px solid var(--border); margin-bottom: 10px;}
+  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .chart-box { 
+    flex: 1; 
+    min-width: 280px; 
+    background: var(--surface-2); 
+    border: none; 
+    border-radius: 16px; 
+    padding: 20px; 
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+  }
+  .chart-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0 0 16px; }
+  .chart-inner { position: relative; height: 240px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 16px; font-size: 12px; color: var(--text-secondary); }
+  .legend span.sw { display:inline-block; width:10px; height:10px; border-radius:3px; margin-right:6px; vertical-align:-1px; }
+  
+  /* --- CONTROLS & BUTTONS --- */
+  .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
+  .controls input, .controls select {
+    padding: 10px 14px; border: 1px solid var(--border); border-radius: 10px;
+    font-size: 13px; background: var(--surface-2); color: var(--text-primary);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    outline: none; transition: border-color 0.2s ease;
+  }
+  .controls input:focus, .controls select:focus { border-color: var(--nrd-blue); }
+  #searchBox { flex: 2; min-width: 220px; }
+  .date-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+  
+  .btn-custom { 
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 10px; 
+    padding: 10px 16px; font-size: 13px; font-weight: 600; cursor: pointer; 
+    color: var(--text-secondary); box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: all 0.2s ease;
+  }
+  .btn-custom:hover { background: var(--surface-1); color: var(--text-primary); }
+  
+  /* Export button uses NRD Orange */
+  .btn-export { background: var(--nrd-orange); color: white; border: none; }
+  .btn-export:hover { background: #e07a2a; color: white; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(240, 138, 53, 0.3); }
+
+  /* --- TABLE UI --- */
+  .table-container { 
+    background: var(--surface-2); border-radius: 16px; padding: 20px; 
+    border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 16px;
+  }
   table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; }
-  table.dataTable thead th { text-align: left; padding: 10px 8px; color: var(--text-secondary); font-weight: 600; border-bottom: 1px solid var(--border); }
-  table.dataTable tbody td { padding: 10px 8px; border-bottom: 0.5px solid var(--border); }
+  table.dataTable thead th { text-align: left; padding: 12px 10px; color: var(--text-secondary); font-weight: 600; border-bottom: 2px solid var(--surface-1); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+  table.dataTable tbody tr { transition: background-color 0.2s ease; }
+  table.dataTable tbody tr:hover { background-color: #f8fafc; /* Subtle hover effect sa table row */ }
+  table.dataTable tbody td { padding: 14px 10px; border-bottom: 1px solid var(--border); vertical-align: middle; }
   table.dataTable.no-footer { border-bottom: none; }
-  .dataTables_wrapper .dataTables_paginate { margin-top: 10px; font-size: 12px; }
-  .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 4px 10px; margin-left: 4px; border-radius: 6px; border: 0.5px solid transparent; background: transparent; cursor:pointer;}
-  .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--surface-1); border: 0.5px solid var(--border); font-weight: bold; }
   
-  .badge { font-size: 12px; padding: 2px 10px; border-radius: 6px; font-weight: 500; white-space: nowrap; }
+  .dataTables_wrapper .dataTables_paginate { margin-top: 16px; font-size: 13px; font-weight: 500; }
+  .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 6px 12px; margin-left: 6px; border-radius: 8px; border: none !important; background: transparent; cursor:pointer; color: var(--text-secondary) !important; }
+  .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--surface-1) !important; color: var(--text-primary) !important; }
+  /* Active pagination button uses NRD Blue */
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--nrd-blue) !important; color: white !important; font-weight: 600; box-shadow: 0 4px 10px rgba(29, 106, 150, 0.2); }
+  
+  .badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
   .badge-done { background: var(--success-bg); color: var(--success); }
   .badge-pending { background: var(--warning-bg); color: var(--warning); }
   .badge-sla-yes { background: var(--success-bg); color: var(--success); }
   .badge-sla-no { background: var(--danger-bg); color: var(--danger); }
-  .row-count { font-size: 12px; color: var(--text-muted); margin-top: 8px; }
-  .error-box { background: var(--danger-bg); color: var(--danger); padding: 12px 16px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
-  .btn-custom { background: var(--surface-2); border: 0.5px solid var(--border); border-radius: 8px; padding: 8px 12px; font-size: 13px; cursor: pointer; }
-  .btn-custom:hover { background: var(--surface-1); }
-  .btn-export { background: var(--success-bg); color: var(--success); border-color: var(--success); }
+  .row-count { font-size: 13px; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
+  .error-box { background: var(--danger-bg); color: var(--danger); padding: 16px 20px; border-radius: 12px; font-size: 14px; margin-bottom: 24px; display: none; font-weight: 500; }
 
   /* --- MODAL (POP-UP) STYLES --- */
   .modal-overlay {
     display: none; 
     position: fixed; 
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6); 
+    background: rgba(15, 23, 42, 0.4); /* Modern dark blur overlay */
     z-index: 1000; 
     justify-content: center; 
     align-items: center;
-    backdrop-filter: blur(2px);
+    backdrop-filter: blur(4px);
   }
   .modal-content {
     background: var(--surface-2); 
-    padding: 24px; 
-    border-radius: 12px;
+    padding: 32px; 
+    border-radius: 20px;
     width: 90%; 
-    max-width: 700px; 
-    max-height: 80vh; 
+    max-width: 750px; 
+    max-height: 85vh; 
     overflow-y: auto;
     position: relative; 
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
   }
   .modal-close {
     position: absolute; 
-    top: 16px; right: 16px; 
+    top: 24px; right: 24px; 
     background: var(--surface-1); 
-    border: 0.5px solid var(--border);
+    border: none;
     border-radius: 50%;
-    width: 32px; height: 32px;
-    font-size: 18px; 
+    width: 36px; height: 36px;
+    font-size: 20px; 
     cursor: pointer; 
     color: var(--text-secondary);
     display: flex; justify-content: center; align-items: center;
+    transition: all 0.2s ease;
   }
-  .modal-close:hover { background: #e1e0d9; color: var(--danger); }
-  .modal-title { margin-top: 0; font-size: 18px; font-weight: 600; margin-bottom: 16px; font-family: 'Poppins', sans-serif; }
+  .modal-close:hover { background: var(--danger-bg); color: var(--danger); transform: rotate(90deg); }
+  .modal-title { margin-top: 0; font-size: 20px; font-weight: 700; margin-bottom: 20px; font-family: 'Poppins', sans-serif; color: var(--nrd-blue); }
   .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .modal-table th { padding: 10px; border-bottom: 1px solid var(--border); text-align: left; color: var(--text-secondary); }
-  .modal-table td { padding: 10px; border-bottom: 0.5px solid var(--border); white-space: normal !important; word-wrap: break-word; }
+  .modal-table th { padding: 12px; border-bottom: 2px solid var(--surface-1); text-align: left; color: var(--text-secondary); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
+  .modal-table td { padding: 14px 12px; border-bottom: 1px solid var(--border); white-space: normal !important; word-wrap: break-word; }
 </style>
 </head>
 <body>
