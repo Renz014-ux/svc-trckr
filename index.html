@@ -191,7 +191,6 @@
     .badge { border: 1px solid #ccc; }
   }
 
-  /* Custom class para sa contact details cell */
   .contact-info { font-size: 12px; line-height: 1.4; color: var(--text-muted); }
   .contact-name { color: var(--text-main); font-weight: 500; font-size: 13px;}
 </style>
@@ -251,7 +250,7 @@
   </div>
 
   <div class="controls">
-    <input type="text" id="searchBox" placeholder="Search JO number, plate, customer, contact, or issue">
+    <input type="text" id="searchBox" placeholder="Search JO number, plate, customer, contact, address or issue">
     <select id="statusFilter"><option value="all">All statuses</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
     <select id="modelFilter"><option value="all">All models</option></select>
     <select id="customerFilter"><option value="all">All customers</option></select>
@@ -269,7 +268,6 @@
 
   <div class="table-container">
     <table id="mainTable" class="display responsive">
-      <!-- BINAGO ANG TABLE HEADERS PARA MAIDAGDAG ANG CONTACT -->
       <thead><tr><th>JO number</th><th>Plate Number</th><th>Status</th><th>Model</th><th>Customer</th><th>Contact Details</th><th>Date</th><th>Repair type</th><th>SLA met</th><th>Issue</th></tr></thead>
       <tbody></tbody>
     </table>
@@ -338,14 +336,14 @@ $(document).ready(function() {
         searching: false, 
         lengthChange: false,
         info: false, 
-        order: [[ 6, "desc" ]], // In-adjust dahil nadagdagan ng column
+        order: [[ 6, "desc" ]],
         columns: [
             { data: 'jo' },
             { data: 'plate' },
             { data: 'statusHtml' },
             { data: 'model' },
             { data: 'customer' },
-            { data: 'contactHtml' }, // BAGONG COLUMN
+            { data: 'contactHtml' },
             { data: 'date' },
             { data: 'repairType' },
             { data: 'slaHtml' },
@@ -426,10 +424,11 @@ function renderTable(rows) {
     const slaClass = r.sla === "Yes" ? "badge-sla-yes" : (r.sla === "No" ? "badge-sla-no" : "");
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
-    // Formatting Contact Info
+    // Formatting Contact Info (Contact Person + Number + Address)
     let contactLines = [];
     if (r.contactPerson) contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
     if (r.contactNumber) contactLines.push(`<div>${r.contactNumber}</div>`);
+    if (r.address) contactLines.push(`<div style="margin-top: 4px; font-size: 11px; color: var(--text-muted);">📍 ${r.address}</div>`);
     const finalContact = contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-";
     
     return {
@@ -438,7 +437,7 @@ function renderTable(rows) {
         statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`,
         model: r.model || "-",
         customer: r.customer || "-",
-        contactHtml: finalContact, // BAGONG COLUMN FORMAT
+        contactHtml: finalContact, // DINAGDAGAN NG ADDRESS
         date: r.date || "-",
         repairType: r.repairType || "-",
         slaHtml: slaHtml,
@@ -600,8 +599,8 @@ function applyFilters() {
     if (dateFrom && (!r.date || r.date < dateFrom)) return false;
     if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
-      // Isinama ang Contact Person at Number sa pwedeng i-search
-      const hay = (r.jo + " " + (r.plate||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + r.issue).toLowerCase();
+      // Isinama ang Address sa pwedeng i-search
+      const hay = (r.jo + " " + (r.plate||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -631,13 +630,13 @@ document.getElementById("clearFilters").addEventListener("click", function() {
 });
 
 document.getElementById("exportBtn").addEventListener("click", function() {
-    // BINAGO ANG HEADERS PARA SA CSV EXPORT
-    let csvContent = "JO Number,Plate Number,Status,Model,Customer,Contact Person,Contact Number,Date,Date Resolved,Repair Type,SLA Met,Issue\n";
+    // BINAGO ANG HEADERS PARA SA CSV EXPORT KASAMA ANG ADDRESS
+    let csvContent = "JO Number,Plate Number,Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Met,Issue\n";
 
     CURRENT_FILTERED_DATA.forEach(r => {
         let rowArray = [
             r.jo, r.plate || "-", r.status, r.model, r.customer, 
-            r.contactPerson || "-", r.contactNumber || "-", 
+            r.contactPerson || "-", r.contactNumber || "-", r.address || "-",
             r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue
         ];
         let escapedRow = rowArray.map(item => `"${String(item || '').replace(/"/g, '""')}"`);
