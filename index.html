@@ -478,9 +478,49 @@ function renderTable(rows) {
 }
 
 function keywordFromIssue(issue) {
-  if (!issue) return null;
-  const first = issue.split(/[\/\n]/)[0].trim();
-  return first.length > 40 ? first.slice(0, 40) + "..." : first;
+  if (!issue) return "Unspecified";
+  
+  // Gawing lowercase lahat para madaling hanapin ang keywords
+  const str = issue.toLowerCase();
+
+  // 1. Dashboard / LCD Panel Issues
+  if (str.includes("panel") || str.includes("lcd") || str.includes("dashboard") || str.includes("moist")) {
+    return "Dashboard / LCD Panel";
+  }
+  
+  // 2. Brakes
+  if (str.includes("brake") || str.includes("break")) {
+    return "Brake Issue";
+  }
+  
+  // 3. PMS / Maintenance
+  if (str.includes("pms") || str.includes("maintenance")) {
+    return "PMS";
+  }
+  
+  // 4. Lights & Signals
+  if (str.includes("signal") || str.includes("light") || str.includes("blink") || str.includes("headlight")) {
+    return "Lights & Signals";
+  }
+  
+  // 5. Buttons & Switches
+  if (str.includes("button") || str.includes("switch") || str.includes("parking")) {
+    return "Buttons & Switches";
+  }
+  
+  // 6. Wheels, Tires, & Hubs
+  if (str.includes("tire") || str.includes("wheel") || str.includes("hub") || str.includes("mag")) {
+    return "Wheel & Tire Issue";
+  }
+  
+  // 7. General Operational Issue
+  if (str.includes("functional") || str.includes("operational")) {
+    return "General System / Operational";
+  }
+
+  // FALLBACK: Kung walang na-detect na keyword sa itaas, kukunin na lang niya yung unang 25 letters.
+  const first = issue.split(/[\/\n-]/)[0].trim();
+  return first.length > 25 ? first.slice(0, 25) + "..." : (first || "Other");
 }
 
 function renderCharts(rows) {
