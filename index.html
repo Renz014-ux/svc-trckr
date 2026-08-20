@@ -502,7 +502,9 @@ function keywordFromIssue(issue) {
   if (str.includes("functional") || str.includes("operational")) {
     return "General System / Operational";
   }
-
+  if (str.includes("chassis") || str.includes("frame") || str.includes("body")) {
+    return "Frame & Body Issue";
+  }
   // Fallback
   const first = issue.split(/[\/\n-]/)[0].trim();
   return first.length > 25 ? first.slice(0, 25) + "..." : (first || "Other");
