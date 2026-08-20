@@ -205,7 +205,7 @@
     </div>
     
     <div class="header-actions">
-      <https://docs.google.com/spreadsheets/d/1JL1ybSEny1t8dZVZduCi8egEIo6L36a2E0YEJagE_ck/edit?gid=0#gid=0>
+      <!-- https://docs.google.com/spreadsheets/d/1JL1ybSEny1t8dZVZduCi8egEIo6L36a2E0YEJagE_ck/edit?gid=0#gid=0 -->
       <a href="https://docs.google.com/spreadsheets/" target="_blank" class="btn-custom" title="Open database">✏️ Edit in Sheets</a>
       <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
     </div>
@@ -239,7 +239,8 @@
       <div class="chart-inner"><canvas id="modelChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Top Recurring Issues</p>
+      <!-- BINAGO ANG TITLE PARA SA CLICKABLE PIE CHART -->
+      <p class="chart-title">Top Recurring Issues <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click slices to view)</span></p>
       <div class="chart-inner"><canvas id="issueChart" role="img"></canvas></div>
       <div class="legend" id="issueLegend"></div>
     </div>
@@ -268,7 +269,6 @@
 
   <div class="table-container">
     <table id="mainTable" class="display responsive">
-      <!-- BINAGO ANG MGA HEADERS BASE SA BAGONG COLUMNS -->
       <thead>
         <tr>
           <th>JO number</th>
@@ -290,10 +290,11 @@
   <p class="row-count" id="rowCount"></p>
 </div>
 
+<!-- SHARED MODAL PARA SA CUSTOMER AT ISSUES -->
 <div class="modal-overlay" id="customerModal">
   <div class="modal-content">
       <button class="modal-close" onclick="closeModal()" title="Close">&times;</button>
-      <h2 class="modal-title" id="modalCustomerName">Customer Details</h2>
+      <h2 class="modal-title" id="modalCustomerName">Details</h2>
       <div style="overflow-x: auto;">
           <table class="modal-table">
               <thead>
@@ -301,7 +302,7 @@
                       <th>Plate / JO Number</th>
                       <th>Repair Status</th>
                       <th>Model</th>
-                      <th>Issue Classification</th>
+                      <th>Issue Summary</th>
                   </tr>
               </thead>
               <tbody id="modalTableBody"></tbody>
@@ -332,8 +333,8 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
-// I-PASTE ANG BAGONG WEB APP URL DITO
-const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec";
+// PALITAN MO ITO NG BAGONG WEB APP URL MO
+const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec"; 
 const POLL_SECONDS = 180;
 
 let DATA = [];
@@ -352,18 +353,18 @@ $(document).ready(function() {
         searching: false, 
         lengthChange: false,
         info: false, 
-        order: [[ 6, "desc" ]], // Naka-sort by Date
+        order: [[ 6, "desc" ]], 
         columns: [
             { data: 'jo' },
             { data: 'plate' },
-            { data: 'statusHtml' },  // Ito ang Repair Status
+            { data: 'statusHtml' }, 
             { data: 'model' },
             { data: 'customer' },
-            { data: 'contactHtml' }, // Name, Number, Address
+            { data: 'contactHtml' },
             { data: 'date' },
-            { data: 'dateResolved' },// BAGONG COLUMN
+            { data: 'dateResolved' },
             { data: 'repairType' },
-            { data: 'slaHtml' },     // Ito ang SLA Status
+            { data: 'slaHtml' },    
             { data: 'issue' }
         ]
     });
@@ -407,11 +408,9 @@ function populateFilters() {
 
 function renderStats(rows) {
   const total = rows.length;
-  // Dito binabasa ang main 'Repair Status'
   const done = rows.filter(r => r.status === "Done").length;
   const pending = rows.filter(r => r.status === "Pending").length;
   
-  // Dito binabasa ang bagong 'SLA Status'
   const slaRated = rows.filter(r => r.sla === "Yes" || r.sla === "No" || r.sla === "Done" || r.sla === "Pending");
   const slaMet = rows.filter(r => r.sla === "Yes" || r.sla === "Done").length;
 
@@ -423,7 +422,6 @@ function renderStats(rows) {
 
   let totalDays = 0, validRecords = 0;
   rows.forEach(r => {
-    // Computed based on Repair Status = Done and Date Resolved
     if (r.date && r.dateResolved && r.status === "Done") {
       let start = new Date(r.date);
       let end = new Date(r.dateResolved);
@@ -441,14 +439,11 @@ function renderTable(rows) {
   if(!dtInstance) return;
 
   const tableData = rows.map(r => {
-    // Repair Status badge
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
     
-    // SLA Status badge (babasahin na ngayon ang 'Done' o 'Pending' bukod sa 'Yes' o 'No')
     const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
-    // Formatting Contact Info (Contact Person + Number + Address)
     let contactLines = [];
     if (r.contactPerson) contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
     if (r.contactNumber) contactLines.push(`<div>${r.contactNumber}</div>`);
@@ -458,14 +453,14 @@ function renderTable(rows) {
     return {
         jo: `<strong>${r.jo || "-"}</strong>`,
         plate: r.plate || "-",
-        statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, // Map to Repair Status
+        statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, 
         model: r.model || "-",
         customer: r.customer || "-",
         contactHtml: finalContact,
         date: r.date || "-",
-        dateResolved: r.dateResolved || "-", // Map to Date Resolved
+        dateResolved: r.dateResolved || "-", 
         repairType: r.repairType || "-",
-        slaHtml: slaHtml,                    // Map to SLA Status
+        slaHtml: slaHtml,                    
         issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
     };
   });
@@ -477,48 +472,38 @@ function renderTable(rows) {
   document.getElementById("rowCount").textContent = "Showing " + rows.length + " of " + DATA.length + " units";
 }
 
+// --- BAGONG DAGDAG: SMART CATEGORIZER ---
 function keywordFromIssue(issue) {
   if (!issue) return "Unspecified";
   
-  // Gawing lowercase lahat para madaling hanapin ang keywords
   const str = issue.toLowerCase();
 
-  // 1. Dashboard / LCD Panel Issues
   if (str.includes("panel") || str.includes("lcd") || str.includes("dashboard") || str.includes("moist")) {
     return "Dashboard / LCD Panel";
   }
-  
-  // 2. Brakes
-  if (str.includes("brake") || str.includes("break")) {
+  if (str.includes("brake") || str.includes("break") || str.includes("pad")) {
     return "Brake Issue";
   }
-  
-  // 3. PMS / Maintenance
   if (str.includes("pms") || str.includes("maintenance")) {
-    return "PMS";
+    return "PMS / Maintenance";
   }
-  
-  // 4. Lights & Signals
   if (str.includes("signal") || str.includes("light") || str.includes("blink") || str.includes("headlight")) {
     return "Lights & Signals";
   }
-  
-  // 5. Buttons & Switches
-  if (str.includes("button") || str.includes("switch") || str.includes("parking")) {
+  if (str.includes("button") || str.includes("switch") || str.includes("parking") || str.includes("horn")) {
     return "Buttons & Switches";
   }
-  
-  // 6. Wheels, Tires, & Hubs
-  if (str.includes("tire") || str.includes("wheel") || str.includes("hub") || str.includes("mag")) {
+  if (str.includes("tire") || str.includes("wheel") || str.includes("hub") || str.includes("mag") || str.includes("flat")) {
     return "Wheel & Tire Issue";
   }
-  
-  // 7. General Operational Issue
+  if (str.includes("motor") || str.includes("power") || str.includes("battery") || str.includes("batt") || str.includes("start")) {
+    return "Motor / Power Issue";
+  }
   if (str.includes("functional") || str.includes("operational")) {
     return "General System / Operational";
   }
 
-  // FALLBACK: Kung walang na-detect na keyword sa itaas, kukunin na lang niya yung unang 25 letters.
+  // Fallback
   const first = issue.split(/[\/\n-]/)[0].trim();
   return first.length > 25 ? first.slice(0, 25) + "..." : (first || "Other");
 }
@@ -618,11 +603,25 @@ function renderCharts(rows) {
     }
   });
 
+  // --- BAGONG DAGDAG: CLICKABLE ISSUE CHART ---
   issueChart = new Chart(document.getElementById("issueChart"), {
     type: "pie",
     data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: 'transparent' }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    options: { 
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+      onClick: (event, elements) => {
+          if (elements.length > 0) {
+              const elementIndex = elements[0].index;
+              const clickedIssue = issueChart.data.labels[elementIndex];
+              openIssueModal(clickedIssue);
+          }
+      },
+      onHover: (event, chartElement) => {
+          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+      }
+    }
   });
+  
   const legendEl = document.getElementById("issueLegend");
   legendEl.innerHTML = topIssues.map((x,i) => `<span><span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>${x[0]} (${x[1]})</span>`).join("");
 
@@ -657,7 +656,6 @@ function applyFilters() {
   const dateTo = document.getElementById("dateTo").value;
 
   const rows = DATA.filter(r => {
-    // Filter sa main Repair Status
     if (status !== "all" && r.status !== status) return false;
     if (model !== "all" && r.model !== model) return false;
     if (customer !== "all" && r.customer !== customer) return false;
@@ -695,8 +693,7 @@ document.getElementById("clearFilters").addEventListener("click", function() {
 });
 
 document.getElementById("exportBtn").addEventListener("click", function() {
-    // EXPORT HEADERS NA NA-UPDATE
-    let csvContent = "JO Number,Plate Number,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Status,Issue Classification\n";
+    let csvContent = "JO Number,Plate Number,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Status,Issue\n";
 
     CURRENT_FILTERED_DATA.forEach(r => {
         let rowArray = [
@@ -717,6 +714,7 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     document.body.removeChild(link);
 });
 
+// MODAL PARA SA CUSTOMER
 function openCustomerModal(customerName) {
     document.getElementById("modalCustomerName").textContent = customerName + " - Serviced Units";
     const tbody = document.getElementById("modalTableBody");
@@ -725,6 +723,31 @@ function openCustomerModal(customerName) {
     const customerRecords = CURRENT_FILTERED_DATA.filter(r => r.customer === customerName);
     
     customerRecords.forEach(r => {
+        const tr = document.createElement("tr");
+        const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
+        const identifier = r.plate ? r.plate : (r.jo || "-");
+        
+        tr.innerHTML = `
+            <td><strong>${identifier}</strong></td>
+            <td><span class="badge ${badgeClass}">${r.status}</span></td>
+            <td>${r.model || "-"}</td>
+            <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
+        `;
+        tbody.appendChild(tr);
+    });
+    
+    document.getElementById("customerModal").style.display = "flex";
+}
+
+// --- BAGONG DAGDAG: MODAL PARA SA ISSUE CHART ---
+function openIssueModal(issueCategory) {
+    document.getElementById("modalCustomerName").textContent = "Issue: " + issueCategory;
+    const tbody = document.getElementById("modalTableBody");
+    tbody.innerHTML = "";
+    
+    const issueRecords = CURRENT_FILTERED_DATA.filter(r => keywordFromIssue(r.issue) === issueCategory);
+    
+    issueRecords.forEach(r => {
         const tr = document.createElement("tr");
         const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
         const identifier = r.plate ? r.plate : (r.jo || "-");
