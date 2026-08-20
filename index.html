@@ -205,7 +205,7 @@
     </div>
     
     <div class="header-actions">
-      <!-- PALITAN ANG LINK NA ITO -->
+      <https://docs.google.com/spreadsheets/d/1JL1ybSEny1t8dZVZduCi8egEIo6L36a2E0YEJagE_ck/edit?gid=0#gid=0>
       <a href="https://docs.google.com/spreadsheets/" target="_blank" class="btn-custom" title="Open database">✏️ Edit in Sheets</a>
       <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
     </div>
@@ -231,7 +231,7 @@
       <div class="chart-inner" style="height: 200px;"><canvas id="trendChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <p class="chart-title">Status Breakdown <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
+      <p class="chart-title">Repair Status Breakdown <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
       <div class="chart-inner"><canvas id="statusChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
@@ -251,7 +251,7 @@
 
   <div class="controls">
     <input type="text" id="searchBox" placeholder="Search JO number, plate, customer, contact, address or issue">
-    <select id="statusFilter"><option value="all">All statuses</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
+    <select id="statusFilter"><option value="all">All Repair Status</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
     <select id="modelFilter"><option value="all">All models</option></select>
     <select id="customerFilter"><option value="all">All customers</option></select>
     <select id="repairFilter"><option value="all">All repair types</option></select>
@@ -268,7 +268,22 @@
 
   <div class="table-container">
     <table id="mainTable" class="display responsive">
-      <thead><tr><th>JO number</th><th>Plate Number</th><th>Status</th><th>Model</th><th>Customer</th><th>Contact Details</th><th>Date</th><th>Repair type</th><th>SLA met</th><th>Issue</th></tr></thead>
+      <!-- BINAGO ANG MGA HEADERS BASE SA BAGONG COLUMNS -->
+      <thead>
+        <tr>
+          <th>JO number</th>
+          <th>Plate Number</th>
+          <th>Repair Status</th>
+          <th>Model</th>
+          <th>Customer</th>
+          <th>Contact Details</th>
+          <th>Date</th>
+          <th>Date Resolved</th>
+          <th>Repair type</th>
+          <th>SLA Status</th>
+          <th>Issue</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     </table>
   </div>
@@ -284,9 +299,9 @@
               <thead>
                   <tr>
                       <th>Plate / JO Number</th>
-                      <th>Status</th>
+                      <th>Repair Status</th>
                       <th>Model</th>
-                      <th>Issue Summary</th>
+                      <th>Issue Classification</th>
                   </tr>
               </thead>
               <tbody id="modalTableBody"></tbody>
@@ -317,7 +332,8 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
-const API_URL = "https://script.google.com/a/macros/nrdev.ph/s/AKfycbyq1R1w0eR5hZvd7J34I_k-LdJGkWUlgLDJ9yLLStv7Z3qEbEogQDSGoTd1ufncsCCRxA/exec";
+// I-PASTE ANG BAGONG WEB APP URL DITO
+const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec";
 const POLL_SECONDS = 180;
 
 let DATA = [];
@@ -336,17 +352,18 @@ $(document).ready(function() {
         searching: false, 
         lengthChange: false,
         info: false, 
-        order: [[ 6, "desc" ]],
+        order: [[ 6, "desc" ]], // Naka-sort by Date
         columns: [
             { data: 'jo' },
             { data: 'plate' },
-            { data: 'statusHtml' },
+            { data: 'statusHtml' },  // Ito ang Repair Status
             { data: 'model' },
             { data: 'customer' },
-            { data: 'contactHtml' },
+            { data: 'contactHtml' }, // Name, Number, Address
             { data: 'date' },
+            { data: 'dateResolved' },// BAGONG COLUMN
             { data: 'repairType' },
-            { data: 'slaHtml' },
+            { data: 'slaHtml' },     // Ito ang SLA Status
             { data: 'issue' }
         ]
     });
@@ -390,10 +407,13 @@ function populateFilters() {
 
 function renderStats(rows) {
   const total = rows.length;
+  // Dito binabasa ang main 'Repair Status'
   const done = rows.filter(r => r.status === "Done").length;
   const pending = rows.filter(r => r.status === "Pending").length;
-  const slaRated = rows.filter(r => r.sla === "Yes" || r.sla === "No");
-  const slaMet = rows.filter(r => r.sla === "Yes").length;
+  
+  // Dito binabasa ang bagong 'SLA Status'
+  const slaRated = rows.filter(r => r.sla === "Yes" || r.sla === "No" || r.sla === "Done" || r.sla === "Pending");
+  const slaMet = rows.filter(r => r.sla === "Yes" || r.sla === "Done").length;
 
   document.getElementById("stat-total").textContent = total;
   document.getElementById("stat-done").textContent = done;
@@ -403,6 +423,7 @@ function renderStats(rows) {
 
   let totalDays = 0, validRecords = 0;
   rows.forEach(r => {
+    // Computed based on Repair Status = Done and Date Resolved
     if (r.date && r.dateResolved && r.status === "Done") {
       let start = new Date(r.date);
       let end = new Date(r.dateResolved);
@@ -420,8 +441,11 @@ function renderTable(rows) {
   if(!dtInstance) return;
 
   const tableData = rows.map(r => {
+    // Repair Status badge
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-    const slaClass = r.sla === "Yes" ? "badge-sla-yes" : (r.sla === "No" ? "badge-sla-no" : "");
+    
+    // SLA Status badge (babasahin na ngayon ang 'Done' o 'Pending' bukod sa 'Yes' o 'No')
+    const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
     // Formatting Contact Info (Contact Person + Number + Address)
@@ -434,13 +458,14 @@ function renderTable(rows) {
     return {
         jo: `<strong>${r.jo || "-"}</strong>`,
         plate: r.plate || "-",
-        statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`,
+        statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, // Map to Repair Status
         model: r.model || "-",
         customer: r.customer || "-",
-        contactHtml: finalContact, // DINAGDAGAN NG ADDRESS
+        contactHtml: finalContact,
         date: r.date || "-",
+        dateResolved: r.dateResolved || "-", // Map to Date Resolved
         repairType: r.repairType || "-",
-        slaHtml: slaHtml,
+        slaHtml: slaHtml,                    // Map to SLA Status
         issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
     };
   });
@@ -592,6 +617,7 @@ function applyFilters() {
   const dateTo = document.getElementById("dateTo").value;
 
   const rows = DATA.filter(r => {
+    // Filter sa main Repair Status
     if (status !== "all" && r.status !== status) return false;
     if (model !== "all" && r.model !== model) return false;
     if (customer !== "all" && r.customer !== customer) return false;
@@ -599,7 +625,6 @@ function applyFilters() {
     if (dateFrom && (!r.date || r.date < dateFrom)) return false;
     if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
-      // Isinama ang Address sa pwedeng i-search
       const hay = (r.jo + " " + (r.plate||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
     }
@@ -630,8 +655,8 @@ document.getElementById("clearFilters").addEventListener("click", function() {
 });
 
 document.getElementById("exportBtn").addEventListener("click", function() {
-    // BINAGO ANG HEADERS PARA SA CSV EXPORT KASAMA ANG ADDRESS
-    let csvContent = "JO Number,Plate Number,Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Met,Issue\n";
+    // EXPORT HEADERS NA NA-UPDATE
+    let csvContent = "JO Number,Plate Number,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Status,Issue Classification\n";
 
     CURRENT_FILTERED_DATA.forEach(r => {
         let rowArray = [
@@ -646,7 +671,7 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "NRD_Service_Dashboard_Export.csv";
+    link.download = "NRD_Production_Dashboard_Export.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
