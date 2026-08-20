@@ -184,7 +184,7 @@
 
   @media print {
     body { background: white; color: black; padding: 0; }
-    .controls, .header-actions, .subtitle, .status-line, .dataTables_paginate, .row-count { display: none !important; }
+    .controls, .header-actions, .nav-tabs, .subtitle, .status-line, .dataTables_paginate, .row-count { display: none !important; }
     .stat-card, .chart-box, .table-container { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
     .wrap { max-width: 100%; }
     h1 { color: black !important; }
@@ -205,30 +205,49 @@
     </div>
     
     <div class="header-actions">
-      <!-- https://docs.google.com/spreadsheets/d/1JL1ybSEny1t8dZVZduCi8egEIo6L36a2E0YEJagE_ck/edit?gid=0#gid=0 -->
+      <!-- PALITAN ANG LINK NA ITO NG TOTOONG MAIN GOOGLE SHEET NYO -->
       <a href="https://docs.google.com/spreadsheets/" target="_blank" class="btn-custom" title="Open database">✏️ Edit in Sheets</a>
       <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
     </div>
   </div>
 
-  <!-- NAVIGATION TABS -->
-<div class="nav-tabs" style="display: flex; gap: 12px; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); padding-bottom: 0;">
-  <a href="index.html" class="nav-tab active" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--nrd-blue); text-decoration: none; border-bottom: 3px solid var(--nrd-blue); background: var(--surface-card); border-radius: 8px 8px 0 0;">📍 Pasig</a>
-  <a href="starosa.html" class="nav-tab" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; border-radius: 8px 8px 0 0;">📍 Sta. Rosa</a>
-</div>
+  <!-- BAGONG DAGDAG: NAVIGATION TABS NA MAY SPACING -->
+  <div class="nav-tabs" style="display: flex; gap: 12px; margin-top: 24px; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); padding-bottom: 0;">
+    <a href="index.html" class="nav-tab active" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--nrd-blue); text-decoration: none; border-bottom: 3px solid var(--nrd-blue); background: var(--surface-card); border-radius: 8px 8px 0 0;">📍 Pasig</a>
+    <a href="starosa.html" class="nav-tab" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; border-radius: 8px 8px 0 0;">📍 Sta. Rosa</a>
+  </div>
   
-  <p class="subtitle">Live from Google Sheets — updates automatically, no manual refresh</p>
+  <p class="subtitle" style="margin-top:-8px;">Live from Google Sheets — updates automatically, no manual refresh</p>
   
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
   <div class="error-box" id="errorBox"></div>
 
+  <!-- BAGONG DAGDAG: SUBTLE ICONS SA STAT CARDS -->
   <div class="stats">
-    <div class="stat-card"><p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p></div>
-    <div class="stat-card"><p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p></div>
-    <div class="stat-card"><p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p></div>
-    <div class="stat-card"><p class="stat-label">Completion</p><p class="stat-value" id="stat-rate">-</p></div>
-    <div class="stat-card"><p class="stat-label">SLA Compliant</p><p class="stat-value" id="stat-sla">-</p></div>
-    <div class="stat-card"><p class="stat-label">Avg Turnaround</p><p class="stat-value" id="stat-tat">-</p></div>
+    <div class="stat-card" style="position: relative;">
+      <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
+      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">📋</span>
+    </div>
+    <div class="stat-card" style="position: relative;">
+      <p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p>
+      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">✅</span>
+    </div>
+    <div class="stat-card" style="position: relative;">
+      <p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p>
+      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⏳</span>
+    </div>
+    <div class="stat-card" style="position: relative;">
+      <p class="stat-label">Completion</p><p class="stat-value" id="stat-rate">-</p>
+      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">📈</span>
+    </div>
+    <div class="stat-card" style="position: relative;">
+      <p class="stat-label">SLA Compliant</p><p class="stat-value" id="stat-sla">-</p>
+      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⭐</span>
+    </div>
+    <div class="stat-card" style="position: relative;">
+      <p class="stat-label">Avg Turnaround</p><p class="stat-value" id="stat-tat">-</p>
+      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⏱️</span>
+    </div>
   </div>
 
   <div class="charts">
@@ -245,7 +264,6 @@
       <div class="chart-inner"><canvas id="modelChart" role="img"></canvas></div>
     </div>
     <div class="chart-box">
-      <!-- BINAGO ANG TITLE PARA SA CLICKABLE PIE CHART -->
       <p class="chart-title">Top Recurring Issues <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click slices to view)</span></p>
       <div class="chart-inner"><canvas id="issueChart" role="img"></canvas></div>
       <div class="legend" id="issueLegend"></div>
@@ -478,7 +496,6 @@ function renderTable(rows) {
   document.getElementById("rowCount").textContent = "Showing " + rows.length + " of " + DATA.length + " units";
 }
 
-// --- BAGONG DAGDAG: SMART CATEGORIZER ---
 function keywordFromIssue(issue) {
   if (!issue) return "Unspecified";
   
@@ -508,10 +525,7 @@ function keywordFromIssue(issue) {
   if (str.includes("functional") || str.includes("operational")) {
     return "General System / Operational";
   }
-  if (str.includes("chassis") || str.includes("frame") || str.includes("body")) {
-    return "Frame & Body Issue";
-  }
-  // Fallback
+
   const first = issue.split(/[\/\n-]/)[0].trim();
   return first.length > 25 ? first.slice(0, 25) + "..." : (first || "Other");
 }
@@ -544,7 +558,16 @@ function renderCharts(rows) {
           }
       }
   });
+  
   const trendLabels = Object.keys(monthCounts).sort();
+  
+  // BAGONG DAGDAG: DATE FORMATTER PARA SA LINE CHART (e.g. "Jun 2026")
+  const formattedTrendLabels = trendLabels.map(l => {
+      const [year, month] = l.split('-');
+      const date = new Date(year, parseInt(month) - 1);
+      return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  });
+  
   const trendData = trendLabels.map(l => monthCounts[l]);
 
   if (statusChart) statusChart.destroy();
@@ -559,7 +582,7 @@ function renderCharts(rows) {
   trendChart = new Chart(document.getElementById("trendChart"), {
       type: 'line',
       data: { 
-          labels: trendLabels, 
+          labels: formattedTrendLabels, // GINAMIT ANG FORMATTED DATES
           datasets: [{ 
               label: "Units Serviced", 
               data: trendData, 
@@ -611,7 +634,6 @@ function renderCharts(rows) {
     }
   });
 
-  // --- BAGONG DAGDAG: CLICKABLE ISSUE CHART ---
   issueChart = new Chart(document.getElementById("issueChart"), {
     type: "pie",
     data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: 'transparent' }] },
@@ -747,7 +769,7 @@ function openCustomerModal(customerName) {
     document.getElementById("customerModal").style.display = "flex";
 }
 
-// --- BAGONG DAGDAG: MODAL PARA SA ISSUE CHART ---
+// MODAL PARA SA ISSUE CHART
 function openIssueModal(issueCategory) {
     document.getElementById("modalCustomerName").textContent = "Issue: " + issueCategory;
     const tbody = document.getElementById("modalTableBody");
