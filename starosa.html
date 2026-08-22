@@ -163,7 +163,6 @@
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting to Sta. Rosa Database...</span></div>
   <div class="error-box" id="errorBox"></div>
 
-  <!-- 4 STAT CARDS (CLEANED UP EMOJIS) -->
   <div class="stats">
     <div class="stat-card">
       <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
@@ -230,7 +229,7 @@
     <button class="btn-custom btn-export" id="exportBtn">⬇️ Export to CSV</button>
   </div>
 
-  <!-- STA ROSA TABLE COLUMNS (WITH VIN) -->
+  <!-- STA ROSA TABLE COLUMNS -->
   <div class="table-container">
     <table id="mainTable" class="display responsive">
       <thead>
@@ -245,6 +244,7 @@
           <th>Under Warranty</th>
           <th>Issue Summary</th>
           <th>Work Done</th>
+          <th>Remarks</th> <!-- BAGONG DAGDAG -->
         </tr>
       </thead>
       <tbody></tbody>
@@ -253,7 +253,7 @@
   <p class="row-count" id="rowCount"></p>
 </div>
 
-<!-- MODAL POPUP (May Customer Name na rin) -->
+<!-- MODAL POPUP -->
 <div class="modal-overlay" id="customerModal">
   <div class="modal-content">
       <button class="modal-close" onclick="closeModal()" title="Close">&times;</button>
@@ -301,7 +301,7 @@ $(document).ready(function() {
         columns: [
             { data: 'jo' }, { data: 'vin' }, { data: 'statusHtml' }, { data: 'model' },
             { data: 'customerName' }, { data: 'scheduleDate' }, { data: 'repairType' }, 
-            { data: 'warranty' }, { data: 'issue' }, { data: 'workDone' }
+            { data: 'warranty' }, { data: 'issue' }, { data: 'workDone' }, { data: 'remarksHtml' }
         ]
     });
     fetchData(); setInterval(fetchData, POLL_SECONDS * 1000);
@@ -358,7 +358,8 @@ function renderTable(rows) {
         scheduleDate: r.scheduleDate || "-", repairType: r.repairType || "-",
         warranty: warrantyBadge,
         issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`,
-        workDone: `<span style="font-size: 11px;">${r.workDone || "-"}</span>`
+        workDone: `<span style="font-size: 11px;">${r.workDone || "-"}</span>`,
+        remarksHtml: `<span style="font-size: 11px; color: var(--nrd-orange); font-weight: 500;">${r.remarks || "-"}</span>`
     };
   });
   dtInstance.clear(); dtInstance.rows.add(tableData); dtInstance.draw(false);
@@ -469,7 +470,7 @@ function applyFilters() {
     if (dateFrom && (!r.scheduleDate || r.scheduleDate < dateFrom)) return false;
     if (dateTo && (!r.scheduleDate || r.scheduleDate > dateTo)) return false;
     if (search) {
-      const hay = (r.jo + " " + (r.vin||"") + " " + (r.customerName||"") + " " + (r.issue||"") + " " + (r.repairType||"") + " " + (r.workDone||"")).toLowerCase();
+      const hay = (r.jo + " " + (r.vin||"") + " " + (r.customerName||"") + " " + (r.issue||"") + " " + (r.repairType||"") + " " + (r.workDone||"") + " " + (r.remarks||"")).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -488,9 +489,9 @@ document.getElementById("clearFilters").addEventListener("click", () => {
 });
 
 document.getElementById("exportBtn").addEventListener("click", () => {
-    let csvContent = "JO Number,VIN,Status,Model,Customer Name,Schedule Date,Repair Type,Under Warranty,Issue Summary,Work Done\n";
+    let csvContent = "JO Number,VIN,Status,Model,Customer Name,Schedule Date,Repair Type,Under Warranty,Issue Summary,Work Done,Remarks\n";
     CURRENT_FILTERED_DATA.forEach(r => {
-        let rowArray = [ r.jo, r.vin || "-", r.status, r.model, r.customerName || "-", r.scheduleDate, r.repairType, r.warranty, r.issue, r.workDone || "-" ];
+        let rowArray = [ r.jo, r.vin || "-", r.status, r.model, r.customerName || "-", r.scheduleDate, r.repairType, r.warranty, r.issue, r.workDone || "-", r.remarks || "-" ];
         let escapedRow = rowArray.map(item => `"${String(item || '').replace(/"/g, '""')}"`);
         csvContent += escapedRow.join(",") + "\n";
     });
