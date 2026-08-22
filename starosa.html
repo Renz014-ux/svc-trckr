@@ -25,22 +25,37 @@
   body { font-family: 'Figtree', sans-serif; background: var(--surface-bg); color: var(--text-main); margin: 0; padding: 30px 20px; transition: background-color 0.3s, color 0.3s; }
   .wrap { max-width: 1280px; margin: 0 auto; }
   
-  .header-wrapper { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; gap: 16px;}
-  .header-container { display: flex; align-items: center; gap: 16px; }
-  .header-actions { display: flex; gap: 10px; align-items: center; }
-  .nrd-logo { height: 75px; width: auto; object-fit: contain; }
-  h1 { font-size: 28px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; }
+  /* UNIFIED HEADER CARD DESIGN */
+  .top-header-card {
+      background: var(--surface-card);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      margin-bottom: 24px;
+      border-top: 5px solid var(--nrd-blue);
+      overflow: hidden;
+      transition: background-color 0.3s;
+  }
+  .top-header-top { padding: 24px 24px 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .top-header-left { display: flex; align-items: center; gap: 16px; }
+  .nrd-logo { height: 44px; width: auto; object-fit: contain; }
+  h1 { font-size: 24px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; line-height: 1.2; }
+  .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
+  
+  .nav-tabs { display: flex; gap: 32px; padding: 0 24px; background: rgba(100, 116, 139, 0.02); border-top: 1px solid var(--border-light); }
+  .nav-tab { padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -1px; }
+  .nav-tab:hover { color: var(--nrd-blue); }
+  .nav-tab.active { color: var(--nrd-blue); border-bottom-color: var(--nrd-blue); }
   
   .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500;}
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
   
   .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-  .stat-card { flex: 1; min-width: 200px; background: var(--surface-card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 4px solid var(--border-light); transition: transform 0.2s, background-color 0.3s; position: relative; }
+  .stat-card { flex: 1; min-width: 200px; background: var(--surface-card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 4px solid var(--border-light); transition: transform 0.2s, background-color 0.3s; }
   .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
   .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); }
   .stat-card:nth-child(2) { border-top-color: var(--success); }
   .stat-card:nth-child(3) { border-top-color: var(--warning); }
-  .stat-card:nth-child(4) { border-top-color: var(--nrd-orange); }
+  .stat-card:nth-child(4) { border-top-color: #8b5cf6; } /* Purple para sa Completion */
 
   .stat-label { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;}
   .stat-value { font-size: 32px; font-weight: 700; margin: 0; color: var(--text-main); line-height: 1; }
@@ -70,13 +85,17 @@
   .btn-pdf { background: var(--nrd-blue); color: white; border: none; }
   .btn-pdf:hover { background: #15557a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29, 106, 150, 0.3); }
 
-  .table-container { background: var(--surface-card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow: hidden; transition: background-color 0.3s; }
+  /* STYLED CLEAR BUTTON */
+  .btn-clear { background: transparent; border: 1px dashed var(--text-muted); color: var(--text-main); }
+  .btn-clear:hover { background: var(--danger-bg); border-style: solid; border-color: var(--danger); color: var(--danger); }
+
+  .table-container { background: var(--surface-card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow-x: auto; transition: background-color 0.3s; }
   table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
   table.dataTable thead th { text-align: left; padding: 14px 12px; color: var(--text-muted); font-weight: 600; border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
   table.dataTable tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
   table.dataTable tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
-  
   table.dataTable tbody td { padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top !important; white-space: normal !important; word-wrap: break-word; }
+  
   /* Para hindi maputol ang Schedule Date sa Column 6 */
   table.dataTable tbody td:nth-child(6) { white-space: nowrap !important; }
   table.dataTable.no-footer { border-bottom: none; }
@@ -109,52 +128,54 @@
 
   @media print {
     body { background: white; color: black; padding: 0; }
-    .controls, .header-actions, .nav-tabs, .status-line, .dataTables_paginate, .row-count { display: none !important; }
+    .controls, .top-header-card .header-actions, .nav-tabs, .status-line, .dataTables_paginate, .row-count { display: none !important; }
     .stat-card, .chart-box, .table-container { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
     .wrap { max-width: 100%; }
+    h1 { color: black !important; }
+    .badge { border: 1px solid #ccc; }
   }
 </style>
 </head>
 <body>
 <div class="wrap">
   
-  <div class="header-wrapper">
-    <div class="header-container">
-      <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
-      <h1>Service Tracker Dashboard</h1>
+  <!-- UNIFIED HEADER CARD -->
+  <div class="top-header-card">
+    <div class="top-header-top">
+        <div class="top-header-left">
+            <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
+            <div>
+                <h1>Service Tracker Dashboard</h1>
+                <p class="subtitle">Real-time Service Analytics</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+        </div>
     </div>
     
-    <div class="header-actions">
-      <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+    <div class="nav-tabs">
+        <a href="index.html" class="nav-tab">Pasig</a>
+        <a href="starosa.html" class="nav-tab active">Sta. Rosa</a>
     </div>
-  </div>
-
-  <!-- NAVIGATION TABS -->
-  <div class="nav-tabs" style="display: flex; gap: 12px; margin-top: 24px; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); padding-bottom: 0;">
-    <a href="index.html" class="nav-tab" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; border-radius: 8px 8px 0 0;">📍 Pasig</a>
-    <a href="starosa.html" class="nav-tab active" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--nrd-blue); text-decoration: none; border-bottom: 3px solid var(--nrd-blue); background: var(--surface-card); border-radius: 8px 8px 0 0;">📍 Sta. Rosa</a>
   </div>
   
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting to Sta. Rosa Database...</span></div>
   <div class="error-box" id="errorBox"></div>
 
-  <!-- INALIS NA ANG SLA AT TAT, DINAGDAG ANG ICONS -->
+  <!-- 4 STAT CARDS (CLEANED UP EMOJIS) -->
   <div class="stats">
     <div class="stat-card">
       <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">📋</span>
     </div>
     <div class="stat-card">
       <p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">✅</span>
     </div>
     <div class="stat-card">
       <p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⏳</span>
     </div>
     <div class="stat-card">
       <p class="stat-label">Completion</p><p class="stat-value" id="stat-rate">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">📈</span>
     </div>
   </div>
 
@@ -194,7 +215,7 @@
   </div>
 
   <div class="controls">
-    <input type="text" id="searchBox" placeholder="Search JO, plate, name, issue, or repair type">
+    <input type="text" id="searchBox" placeholder="Search JO, VIN, name, issue, or repair type">
     <select id="statusFilter"><option value="all">All Status</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
     <select id="modelFilter"><option value="all">All models</option></select>
     <select id="repairFilter"><option value="all">All repair types</option></select>
@@ -204,18 +225,18 @@
     <input type="date" id="dateFrom">
     <span class="date-label">To</span>
     <input type="date" id="dateTo">
-    <button class="btn-custom" id="clearFilters">Clear filters</button>
+    <button class="btn-custom btn-clear" id="clearFilters">Clear filters</button>
     <button class="btn-custom btn-pdf" onclick="window.print()">🖨️ Save as PDF</button>
     <button class="btn-custom btn-export" id="exportBtn">⬇️ Export to CSV</button>
   </div>
 
-  <!-- STA ROSA TABLE COLUMNS -->
+  <!-- STA ROSA TABLE COLUMNS (WITH VIN) -->
   <div class="table-container">
     <table id="mainTable" class="display responsive">
       <thead>
         <tr>
           <th>JO number</th>
-          <th>Plate Number</th>
+          <th>VIN</th>
           <th>Status</th>
           <th>Model</th>
           <th>Customer Name</th>
@@ -241,7 +262,7 @@
           <table class="modal-table">
               <thead>
                   <tr>
-                      <th>Plate / JO Number</th>
+                      <th>VIN / JO Number</th>
                       <th>Repair Status</th>
                       <th>Model</th>
                       <th>Customer Name</th>
@@ -278,7 +299,7 @@ $(document).ready(function() {
         responsive: true, paging: true, pageLength: 10, searching: false, lengthChange: false, info: false, 
         order: [[ 5, "desc" ]], // Sort by Schedule Date
         columns: [
-            { data: 'jo' }, { data: 'plate' }, { data: 'statusHtml' }, { data: 'model' },
+            { data: 'jo' }, { data: 'vin' }, { data: 'statusHtml' }, { data: 'model' },
             { data: 'customerName' }, { data: 'scheduleDate' }, { data: 'repairType' }, 
             { data: 'warranty' }, { data: 'issue' }, { data: 'workDone' }
         ]
@@ -331,7 +352,7 @@ function renderTable(rows) {
     const warrantyBadge = r.warranty ? `<span class="badge ${wClass}">${r.warranty}</span>` : "-";
     
     return {
-        jo: `<strong>${r.jo || "-"}</strong>`, plate: r.plate || "-",
+        jo: `<strong>${r.jo || "-"}</strong>`, vin: r.vin || "-",
         statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, 
         model: r.model || "-", customerName: r.customerName || "-",
         scheduleDate: r.scheduleDate || "-", repairType: r.repairType || "-",
@@ -410,7 +431,22 @@ function renderCharts(rows) {
           onHover: (event, chartElement) => { event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default'; }
       } 
   });
-  statusChart = new Chart(document.getElementById("statusChart"), { type: "doughnut", data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%', onClick: (e, elements) => { if(elements.length > 0){ document.getElementById("statusFilter").value = statusChart.data.labels[elements[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
+  
+  // ENABLE LEGEND PARA SA STATUS CHART
+  statusChart = new Chart(document.getElementById("statusChart"), { 
+      type: "doughnut", 
+      data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0 }] }, 
+      options: { 
+          responsive: true, maintainAspectRatio: false, 
+          plugins: { 
+              legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } 
+          }, 
+          cutout: '70%', 
+          onClick: (e, elements) => { if(elements.length > 0){ document.getElementById("statusFilter").value = statusChart.data.labels[elements[0].index]; applyFilters(); } }, 
+          onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } 
+      } 
+  });
+  
   modelChart = new Chart(document.getElementById("modelChart"), { type: "bar", data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#1d6a96", borderRadius: 6, maxBarThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, elements) => { if(elements.length > 0){ document.getElementById("modelFilter").value = modelChart.data.labels[elements[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
   issueChart = new Chart(document.getElementById("issueChart"), { type: "pie", data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: 'transparent' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, onClick: (e, elements) => { if (elements.length > 0) { openIssueModal(issueChart.data.labels[elements[0].index]); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
   
@@ -433,7 +469,7 @@ function applyFilters() {
     if (dateFrom && (!r.scheduleDate || r.scheduleDate < dateFrom)) return false;
     if (dateTo && (!r.scheduleDate || r.scheduleDate > dateTo)) return false;
     if (search) {
-      const hay = (r.jo + " " + (r.plate||"") + " " + (r.customerName||"") + " " + (r.issue||"") + " " + (r.repairType||"") + " " + (r.workDone||"")).toLowerCase();
+      const hay = (r.jo + " " + (r.vin||"") + " " + (r.customerName||"") + " " + (r.issue||"") + " " + (r.repairType||"") + " " + (r.workDone||"")).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -452,9 +488,9 @@ document.getElementById("clearFilters").addEventListener("click", () => {
 });
 
 document.getElementById("exportBtn").addEventListener("click", () => {
-    let csvContent = "JO Number,Plate Number,Status,Model,Customer Name,Schedule Date,Repair Type,Under Warranty,Issue Summary,Work Done\n";
+    let csvContent = "JO Number,VIN,Status,Model,Customer Name,Schedule Date,Repair Type,Under Warranty,Issue Summary,Work Done\n";
     CURRENT_FILTERED_DATA.forEach(r => {
-        let rowArray = [ r.jo, r.plate || "-", r.status, r.model, r.customerName || "-", r.scheduleDate, r.repairType, r.warranty, r.issue, r.workDone || "-" ];
+        let rowArray = [ r.jo, r.vin || "-", r.status, r.model, r.customerName || "-", r.scheduleDate, r.repairType, r.warranty, r.issue, r.workDone || "-" ];
         let escapedRow = rowArray.map(item => `"${String(item || '').replace(/"/g, '""')}"`);
         csvContent += escapedRow.join(",") + "\n";
     });
@@ -503,7 +539,7 @@ function setTimeframe(type, btn) {
 // MODAL FUNCTIONS
 function buildModalRow(r) {
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-    const identifier = r.plate ? r.plate : (r.jo || "-");
+    const identifier = r.vin ? r.vin : (r.jo || "-");
     return `
         <td><strong>${identifier}</strong></td>
         <td><span class="badge ${badgeClass}">${r.status}</span></td>
