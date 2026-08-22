@@ -139,17 +139,11 @@
   table.dataTable tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
   
   table.dataTable tbody td { 
-    padding: 14px 12px; border-bottom: 1px solid var(--border-light); 
-    vertical-align: top; /* BINAGO: Para naka-align sa itaas ang text */
+    padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top !important;
     white-space: normal !important; word-wrap: break-word;
   }
-  /* BAGONG DAGDAG: Para hindi maputol ang Date */
   table.dataTable tbody td:nth-child(7), table.dataTable tbody td:nth-child(8) {
-    white-space: nowrap !important; 
-  }
-  /* BAGONG DAGDAG: Subtle background sa table header para mas malinaw */
-  table.dataTable thead {
-    background-color: var(--surface-bg);
+    white-space: nowrap !important;
   }
   table.dataTable.no-footer { border-bottom: none; }
   
@@ -214,12 +208,11 @@
     </div>
     
     <div class="header-actions">
-      
+      <!-- TINANGGAL NA ANG EDIT IN SHEETS BUTTON -->
       <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
     </div>
   </div>
 
-  <!-- BAGONG DAGDAG: NAVIGATION TABS NA MAY SPACING -->
   <div class="nav-tabs" style="display: flex; gap: 12px; margin-top: 24px; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); padding-bottom: 0;">
     <a href="index.html" class="nav-tab active" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--nrd-blue); text-decoration: none; border-bottom: 3px solid var(--nrd-blue); background: var(--surface-card); border-radius: 8px 8px 0 0;">📍 Pasig</a>
     <a href="starosa.html" class="nav-tab" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; border-radius: 8px 8px 0 0;">📍 Sta. Rosa</a>
@@ -230,7 +223,6 @@
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
   <div class="error-box" id="errorBox"></div>
 
-  <!-- BAGONG DAGDAG: SUBTLE ICONS SA STAT CARDS -->
   <div class="stats">
     <div class="stat-card" style="position: relative;">
       <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
@@ -322,7 +314,6 @@
   <p class="row-count" id="rowCount"></p>
 </div>
 
-<!-- SHARED MODAL PARA SA CUSTOMER AT ISSUES -->
 <div class="modal-overlay" id="customerModal">
   <div class="modal-content">
       <button class="modal-close" onclick="closeModal()" title="Close">&times;</button>
@@ -569,7 +560,6 @@ function renderCharts(rows) {
   
   const trendLabels = Object.keys(monthCounts).sort();
   
-  // BAGONG DAGDAG: DATE FORMATTER PARA SA LINE CHART (e.g. "Jun 2026")
   const formattedTrendLabels = trendLabels.map(l => {
       const [year, month] = l.split('-');
       const date = new Date(year, parseInt(month) - 1);
@@ -584,13 +574,14 @@ function renderCharts(rows) {
   if (customerChart) customerChart.destroy();
   if (trendChart) trendChart.destroy();
 
+  // NAKA-FIGTREE FONT NA RIN ANG CHARTS
   Chart.defaults.font.family = "'Figtree', sans-serif";
   Chart.defaults.color = "#64748b";
 
   trendChart = new Chart(document.getElementById("trendChart"), {
       type: 'line',
       data: { 
-          labels: formattedTrendLabels, // GINAMIT ANG FORMATTED DATES
+          labels: formattedTrendLabels,
           datasets: [{ 
               label: "Units Serviced", 
               data: trendData, 
@@ -752,7 +743,6 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     document.body.removeChild(link);
 });
 
-// MODAL PARA SA CUSTOMER
 function openCustomerModal(customerName) {
     document.getElementById("modalCustomerName").textContent = customerName + " - Serviced Units";
     const tbody = document.getElementById("modalTableBody");
@@ -777,7 +767,6 @@ function openCustomerModal(customerName) {
     document.getElementById("customerModal").style.display = "flex";
 }
 
-// MODAL PARA SA ISSUE CHART
 function openIssueModal(issueCategory) {
     document.getElementById("modalCustomerName").textContent = "Issue: " + issueCategory;
     const tbody = document.getElementById("modalTableBody");
