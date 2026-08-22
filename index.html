@@ -197,7 +197,7 @@
   
   .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
   .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); white-space: normal !important; word-wrap: break-word; }
+  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); white-space: normal !important; word-wrap: break-word; vertical-align: top; }
   .modal-table tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
   .modal-table tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
 
@@ -352,6 +352,7 @@
                       <th>Plate / JO Number</th>
                       <th>Repair Status</th>
                       <th>Model</th>
+                      <th>Customer</th> <!-- IDINAGDAG ANG CUSTOMER HEADER -->
                       <th>Issue Summary</th>
                   </tr>
               </thead>
@@ -383,7 +384,7 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
-// PALITAN MO ITO NG BAGONG WEB APP URL MO
+// PALITAN MO ITO NG BAGONG WEB APP URL MO MULA SA GOOGLE APPS SCRIPT
 const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec"; 
 const POLL_SECONDS = 180;
 
@@ -834,6 +835,7 @@ function openCustomerModal(customerName) {
             <td><strong>${identifier}</strong></td>
             <td><span class="badge ${badgeClass}">${r.status}</span></td>
             <td>${r.model || "-"}</td>
+            <td><strong>${r.customer || "-"}</strong></td>
             <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
         `;
         tbody.appendChild(tr);
@@ -858,6 +860,7 @@ function openIssueModal(issueCategory) {
             <td><strong>${identifier}</strong></td>
             <td><span class="badge ${badgeClass}">${r.status}</span></td>
             <td>${r.model || "-"}</td>
+            <td><strong>${r.customer || "-"}</strong></td>
             <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
         `;
         tbody.appendChild(tr);
@@ -877,7 +880,7 @@ function openDateModal(displayLabel, rawMonthKey) {
     });
     
     if(monthRecords.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='4' style='text-align:center;'>No records found for this period.</td></tr>";
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No records found for this period.</td></tr>";
     } else {
         monthRecords.forEach(r => {
             const tr = document.createElement("tr");
@@ -888,6 +891,7 @@ function openDateModal(displayLabel, rawMonthKey) {
                 <td><strong>${identifier}</strong></td>
                 <td><span class="badge ${badgeClass}">${r.status}</span></td>
                 <td>${r.model || "-"}</td>
+                <td><strong>${r.customer || "-"}</strong></td>
                 <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
             `;
             tbody.appendChild(tr);
