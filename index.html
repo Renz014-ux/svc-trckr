@@ -140,9 +140,10 @@
   .btn-pdf { background: var(--nrd-blue); color: white; border: none; }
   .btn-pdf:hover { background: #15557a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29, 106, 150, 0.3); }
 
+  /* BINAGO: Inalis ang overflow: hidden at pinalitan ng overflow-x: auto para hindi putulin ang issue */
   .table-container { 
     background: var(--surface-card); border-radius: 12px; padding: 24px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow-x: auto;
     transition: background-color 0.3s;
   }
   table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
@@ -322,12 +323,12 @@
       <thead>
         <tr>
           <th>JO number</th>
-          <th>VIN</th> <!-- BINAGO MULA SA PLATE NUMBER -->
+          <th>VIN</th>
           <th>Repair Status</th>
           <th>Model</th>
           <th>Customer</th>
-          <th>Contact Info</th> <!-- HINIWALAY -->
-          <th>Address</th>      <!-- HINIWALAY -->
+          <th>Contact Info</th>
+          <th>Address</th>
           <th>Date</th>
           <th>Date Resolved</th>
           <th>Repair type</th>
@@ -350,7 +351,7 @@
           <table class="modal-table">
               <thead>
                   <tr>
-                      <th>VIN / JO Number</th> <!-- BINAGO MULA SA PLATE -->
+                      <th>VIN / JO Number</th>
                       <th>Repair Status</th>
                       <th>Model</th>
                       <th>Customer</th> 
@@ -405,7 +406,7 @@ $(document).ready(function() {
         searching: false, 
         lengthChange: false,
         info: false, 
-        order: [[ 7, "desc" ]], // In-adjust ang order index dahil nadagdagan ng column
+        order: [[ 7, "desc" ]], 
         columns: [
             { data: 'jo' },
             { data: 'vin' },
@@ -496,13 +497,13 @@ function renderTable(rows) {
     const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
-    // HINIWALAY ANG CONTACT INFO AT ADDRESS
     let contactLines = [];
     if (r.contactPerson && r.contactPerson !== "-") contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
     if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${r.contactNumber}</div>`);
     const finalContact = contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-";
     
-    const finalAddress = (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted); min-width: 140px;">📍 ${r.address}</div>` : "-";
+    // BINAGO: Tinanggal ang min-width constraint para malayang mag-wrap ang address at issue
+    const finalAddress = (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">📍 ${r.address}</div>` : "-";
 
     return {
         jo: `<strong>${r.jo || "-"}</strong>`,
@@ -516,7 +517,7 @@ function renderTable(rows) {
         dateResolved: r.dateResolved || "-", 
         repairType: r.repairType || "-",
         slaHtml: slaHtml,                    
-        issue: `<span style="color:var(--text-muted); min-width: 120px; display: inline-block;">${r.issue || "-"}</span>`
+        issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
     };
   });
 
