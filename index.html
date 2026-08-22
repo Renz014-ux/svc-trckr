@@ -158,7 +158,7 @@
     padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top !important;
     white-space: normal !important; word-wrap: break-word;
   }
-  table.dataTable tbody td:nth-child(7), table.dataTable tbody td:nth-child(8) {
+  table.dataTable tbody td:nth-child(8), table.dataTable tbody td:nth-child(9) {
     white-space: nowrap !important;
   }
   table.dataTable.no-footer { border-bottom: none; }
@@ -301,7 +301,7 @@
   </div>
 
   <div class="controls">
-    <input type="text" id="searchBox" placeholder="Search JO number, plate, customer, contact, address or issue">
+    <input type="text" id="searchBox" placeholder="Search JO number, VIN, customer, contact, address or issue">
     <select id="statusFilter"><option value="all">All Repair Status</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
     <select id="modelFilter"><option value="all">All models</option></select>
     <select id="customerFilter"><option value="all">All customers</option></select>
@@ -322,11 +322,12 @@
       <thead>
         <tr>
           <th>JO number</th>
-          <th>Plate Number</th>
+          <th>VIN</th> <!-- BINAGO MULA SA PLATE NUMBER -->
           <th>Repair Status</th>
           <th>Model</th>
           <th>Customer</th>
-          <th>Contact Details</th>
+          <th>Contact Info</th> <!-- HINIWALAY -->
+          <th>Address</th>      <!-- HINIWALAY -->
           <th>Date</th>
           <th>Date Resolved</th>
           <th>Repair type</th>
@@ -349,10 +350,10 @@
           <table class="modal-table">
               <thead>
                   <tr>
-                      <th>Plate / JO Number</th>
+                      <th>VIN / JO Number</th> <!-- BINAGO MULA SA PLATE -->
                       <th>Repair Status</th>
                       <th>Model</th>
-                      <th>Customer</th> <!-- IDINAGDAG ANG CUSTOMER HEADER -->
+                      <th>Customer</th> 
                       <th>Issue Summary</th>
                   </tr>
               </thead>
@@ -384,7 +385,7 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
-// PALITAN MO ITO NG BAGONG WEB APP URL MO MULA SA GOOGLE APPS SCRIPT
+// PALITAN MO ITO NG BAGONG WEB APP URL MO
 const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec"; 
 const POLL_SECONDS = 180;
 
@@ -404,14 +405,15 @@ $(document).ready(function() {
         searching: false, 
         lengthChange: false,
         info: false, 
-        order: [[ 6, "desc" ]], 
+        order: [[ 7, "desc" ]], // In-adjust ang order index dahil nadagdagan ng column
         columns: [
             { data: 'jo' },
-            { data: 'plate' },
+            { data: 'vin' },
             { data: 'statusHtml' }, 
             { data: 'model' },
             { data: 'customer' },
-            { data: 'contactHtml' },
+            { data: 'contactInfo' },
+            { data: 'addressHtml' },
             { data: 'date' },
             { data: 'dateResolved' },
             { data: 'repairType' },
@@ -494,24 +496,27 @@ function renderTable(rows) {
     const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
+    // HINIWALAY ANG CONTACT INFO AT ADDRESS
     let contactLines = [];
-    if (r.contactPerson) contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
-    if (r.contactNumber) contactLines.push(`<div>${r.contactNumber}</div>`);
-    if (r.address) contactLines.push(`<div style="margin-top: 4px; font-size: 11px; color: var(--text-muted);">📍 ${r.address}</div>`);
+    if (r.contactPerson && r.contactPerson !== "-") contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
+    if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${r.contactNumber}</div>`);
     const finalContact = contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-";
     
+    const finalAddress = (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted); min-width: 140px;">📍 ${r.address}</div>` : "-";
+
     return {
         jo: `<strong>${r.jo || "-"}</strong>`,
-        plate: r.plate || "-",
+        vin: r.vin || "-",
         statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, 
         model: r.model || "-",
         customer: r.customer || "-",
-        contactHtml: finalContact,
+        contactInfo: finalContact,
+        addressHtml: finalAddress,
         date: r.date || "-",
         dateResolved: r.dateResolved || "-", 
         repairType: r.repairType || "-",
         slaHtml: slaHtml,                    
-        issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
+        issue: `<span style="color:var(--text-muted); min-width: 120px; display: inline-block;">${r.issue || "-"}</span>`
     };
   });
 
@@ -728,7 +733,7 @@ function applyFilters() {
     if (dateFrom && (!r.date || r.date < dateFrom)) return false;
     if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
-      const hay = (r.jo + " " + (r.plate||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + r.issue).toLowerCase();
+      const hay = (r.jo + " " + (r.vin||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -760,11 +765,11 @@ document.getElementById("clearFilters").addEventListener("click", function() {
 });
 
 document.getElementById("exportBtn").addEventListener("click", function() {
-    let csvContent = "JO Number,Plate Number,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Status,Issue\n";
+    let csvContent = "JO Number,VIN,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Status,Issue\n";
 
     CURRENT_FILTERED_DATA.forEach(r => {
         let rowArray = [
-            r.jo, r.plate || "-", r.status, r.model, r.customer, 
+            r.jo, r.vin || "-", r.status, r.model, r.customer, 
             r.contactPerson || "-", r.contactNumber || "-", r.address || "-",
             r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue
         ];
@@ -829,7 +834,7 @@ function openCustomerModal(customerName) {
     customerRecords.forEach(r => {
         const tr = document.createElement("tr");
         const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-        const identifier = r.plate ? r.plate : (r.jo || "-");
+        const identifier = r.vin ? r.vin : (r.jo || "-");
         
         tr.innerHTML = `
             <td><strong>${identifier}</strong></td>
@@ -854,7 +859,7 @@ function openIssueModal(issueCategory) {
     issueRecords.forEach(r => {
         const tr = document.createElement("tr");
         const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-        const identifier = r.plate ? r.plate : (r.jo || "-");
+        const identifier = r.vin ? r.vin : (r.jo || "-");
         
         tr.innerHTML = `
             <td><strong>${identifier}</strong></td>
@@ -885,7 +890,7 @@ function openDateModal(displayLabel, rawMonthKey) {
         monthRecords.forEach(r => {
             const tr = document.createElement("tr");
             const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-            const identifier = r.plate ? r.plate : (r.jo || "-");
+            const identifier = r.vin ? r.vin : (r.jo || "-");
             
             tr.innerHTML = `
                 <td><strong>${identifier}</strong></td>
