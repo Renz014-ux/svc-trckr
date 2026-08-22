@@ -59,13 +59,47 @@
   }
   .wrap { max-width: 1280px; margin: 0 auto; }
   
-  .header-wrapper { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 8px; gap: 16px;}
-  .header-container { display: flex; align-items: center; gap: 16px; }
-  .header-actions { display: flex; gap: 10px; align-items: center; }
+  /* UNIFIED HEADER CARD DESIGN */
+  .top-header-card {
+      background: var(--surface-card);
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+      margin-bottom: 24px;
+      border-top: 5px solid var(--nrd-blue);
+      overflow: hidden;
+      transition: background-color 0.3s;
+  }
+  .top-header-top {
+      padding: 24px 24px 20px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+  }
+  .top-header-left { display: flex; align-items: center; gap: 16px; }
+  .nrd-logo { height: 44px; width: auto; object-fit: contain; }
+  h1 { font-size: 24px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; line-height: 1.2; }
+  .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
   
-  .nrd-logo { height: 75px; width: auto; object-fit: contain; }
-  h1 { font-size: 28px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; }
-  .subtitle { color: var(--text-muted); font-size: 14px; margin: 0 0 24px; }
+  .nav-tabs {
+      display: flex; gap: 32px;
+      padding: 0 24px;
+      background: rgba(100, 116, 139, 0.02);
+      border-top: 1px solid var(--border-light);
+  }
+  .nav-tab {
+      padding: 14px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      margin-bottom: -1px;
+  }
+  .nav-tab:hover { color: var(--nrd-blue); }
+  .nav-tab.active { color: var(--nrd-blue); border-bottom-color: var(--nrd-blue); }
   
   .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500;}
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
@@ -82,9 +116,9 @@
   .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); }
   .stat-card:nth-child(2) { border-top-color: var(--success); }
   .stat-card:nth-child(3) { border-top-color: var(--warning); }
-  .stat-card:nth-child(4) { border-top-color: var(--nrd-orange); }
-  .stat-card:nth-child(5) { border-top-color: var(--nrd-red); }
-  .stat-card:nth-child(6) { border-top-color: #8b5cf6; }
+  .stat-card:nth-child(4) { border-top-color: #8b5cf6; } /* Purple */
+  .stat-card:nth-child(5) { border-top-color: #0ea5e9; } /* Cyan */
+  .stat-card:nth-child(6) { border-top-color: #64748b; } /* Slate */
 
   .stat-label { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;}
   .stat-value { font-size: 32px; font-weight: 700; margin: 0; color: var(--text-main); line-height: 1; }
@@ -101,7 +135,6 @@
   .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; font-size: 12px; color: var(--text-muted); }
   .legend span.sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-2px; }
   
-  /* TIMEFRAME FILTER PILLS */
   .tf-btn {
     background: transparent;
     border: none;
@@ -137,10 +170,19 @@
   .btn-export { background: var(--nrd-orange); color: white; border: none; }
   .btn-export:hover { background: #e07a2a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(240, 138, 53, 0.3); }
   
-  .btn-pdf { background: var(--nrd-blue); color: white; border: none; }
-  .btn-pdf:hover { background: #15557a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(29, 106, 150, 0.3); }
+  /* STYLED CLEAR BUTTON */
+  .btn-clear {
+    background: transparent;
+    border: 1px dashed var(--text-muted);
+    color: var(--text-main);
+  }
+  .btn-clear:hover {
+    background: var(--danger-bg);
+    border-style: solid;
+    border-color: var(--danger);
+    color: var(--danger);
+  }
 
-  /* BINAGO: Inalis ang overflow: hidden at pinalitan ng overflow-x: auto para hindi putulin ang issue */
   .table-container { 
     background: var(--surface-card); border-radius: 12px; padding: 24px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow-x: auto;
@@ -151,10 +193,8 @@
     text-align: left; padding: 14px 12px; color: var(--text-muted); font-weight: 600; 
     border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; 
   }
-  
   table.dataTable tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
   table.dataTable tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
-  
   table.dataTable tbody td { 
     padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top !important;
     white-space: normal !important; word-wrap: break-word;
@@ -204,7 +244,7 @@
 
   @media print {
     body { background: white; color: black; padding: 0; }
-    .controls, .header-actions, .nav-tabs, .subtitle, .status-line, .dataTables_paginate, .row-count { display: none !important; }
+    .controls, .top-header-card .header-actions, .nav-tabs, .status-line, .dataTables_paginate, .row-count { display: none !important; }
     .stat-card, .chart-box, .table-container { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
     .wrap { max-width: 100%; }
     h1 { color: black !important; }
@@ -218,51 +258,48 @@
 <body>
 <div class="wrap">
   
-  <div class="header-wrapper">
-    <div class="header-container">
-      <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
-      <h1>Service Tracker Dashboard</h1>
+  <!-- UNIFIED HEADER CARD -->
+  <div class="top-header-card">
+    <div class="top-header-top">
+        <div class="top-header-left">
+            <img src="nrd-logo.png" alt="NRD Logo" class="nrd-logo">
+            <div>
+                <h1>Service Tracker Dashboard</h1>
+                <p class="subtitle">Real-time Service Analytics</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+        </div>
     </div>
     
-    <div class="header-actions">
-      <button id="themeToggle" class="btn-custom" title="Toggle Dark/Light Mode">🌙 Dark Mode</button>
+    <div class="nav-tabs">
+        <a href="index.html" class="nav-tab active">Pasig</a>
+        <a href="starosa.html" class="nav-tab">Sta. Rosa</a>
     </div>
   </div>
-
-  <div class="nav-tabs" style="display: flex; gap: 12px; margin-top: 24px; margin-bottom: 24px; border-bottom: 2px solid var(--border-light); padding-bottom: 0;">
-    <a href="index.html" class="nav-tab active" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--nrd-blue); text-decoration: none; border-bottom: 3px solid var(--nrd-blue); background: var(--surface-card); border-radius: 8px 8px 0 0;">📍 Pasig</a>
-    <a href="starosa.html" class="nav-tab" style="padding: 12px 24px; font-size: 15px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -2px; border-radius: 8px 8px 0 0;">📍 Sta. Rosa</a>
-  </div>
-  
-  <p class="subtitle" style="margin-top:-8px;">Live from Google Sheets — updates automatically, no manual refresh</p>
   
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
   <div class="error-box" id="errorBox"></div>
 
   <div class="stats">
-    <div class="stat-card" style="position: relative;">
+    <div class="stat-card">
       <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">📋</span>
     </div>
-    <div class="stat-card" style="position: relative;">
+    <div class="stat-card">
       <p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">✅</span>
     </div>
-    <div class="stat-card" style="position: relative;">
+    <div class="stat-card">
       <p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⏳</span>
     </div>
-    <div class="stat-card" style="position: relative;">
+    <div class="stat-card">
       <p class="stat-label">Completion</p><p class="stat-value" id="stat-rate">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">📈</span>
     </div>
-    <div class="stat-card" style="position: relative;">
+    <div class="stat-card">
       <p class="stat-label">SLA Compliant</p><p class="stat-value" id="stat-sla">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⭐</span>
     </div>
-    <div class="stat-card" style="position: relative;">
+    <div class="stat-card">
       <p class="stat-label">Avg Turnaround</p><p class="stat-value" id="stat-tat">-</p>
-      <span style="position: absolute; top: 20px; right: 20px; font-size: 28px; opacity: 0.15;">⏱️</span>
     </div>
   </div>
 
@@ -271,7 +308,6 @@
       <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
         <p class="chart-title" style="margin: 0;">Service Volume <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click dots to view units)</span></p>
         
-        <!-- TIMEFRAME PILLS -->
         <div class="timeframe-pills" style="display: flex; background: var(--surface-bg); padding: 4px; border-radius: 10px; border: 1px solid var(--border-light); gap: 4px;">
           <button class="tf-btn active" onclick="setTimeframe('all', this)">All</button>
           <button class="tf-btn" onclick="setTimeframe('today', this)">Today</button>
@@ -313,7 +349,7 @@
     <input type="date" id="dateFrom">
     <span class="date-label">To</span>
     <input type="date" id="dateTo">
-    <button class="btn-custom" id="clearFilters">Clear filters</button>
+    <button class="btn-custom btn-clear" id="clearFilters">Clear filters</button>
     <button class="btn-custom btn-pdf" onclick="window.print()">🖨️ Save as PDF</button>
     <button class="btn-custom btn-export" id="exportBtn">⬇️ Export to CSV</button>
   </div>
@@ -386,7 +422,7 @@ themeToggle.addEventListener('click', () => {
     }
 });
 
-// PALITAN MO ITO NG BAGONG WEB APP URL MO
+// ILAGAY DITO ANG BAGONG WEB APP URL MO MULA SA APPS SCRIPT
 const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec"; 
 const POLL_SECONDS = 180;
 
@@ -502,8 +538,7 @@ function renderTable(rows) {
     if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${r.contactNumber}</div>`);
     const finalContact = contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-";
     
-    // BINAGO: Tinanggal ang min-width constraint para malayang mag-wrap ang address at issue
-    const finalAddress = (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">📍 ${r.address}</div>` : "-";
+    const finalAddress = (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">${r.address}</div>` : "-";
 
     return {
         jo: `<strong>${r.jo || "-"}</strong>`,
@@ -643,7 +678,12 @@ function renderCharts(rows) {
     type: "doughnut",
     data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0, hoverOffset: 4 }] },
     options: { 
-      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '70%',
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { 
+          // IN-ENABLE ANG LEGEND DITO PARA KITA AGAD ANG DONE/PENDING COLORS
+          legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } 
+      }, 
+      cutout: '70%',
       onClick: (event, elements) => {
           if (elements.length > 0) {
               const clickedStatus = statusChart.data.labels[elements[0].index];
