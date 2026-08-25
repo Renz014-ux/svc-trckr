@@ -137,6 +137,13 @@
   .copy-btn { cursor: pointer; opacity: 0.2; transition: all 0.2s; font-size: 14px; margin-left: 6px; display: inline-block; }
   .copy-btn:hover { opacity: 1; transform: scale(1.1); }
   
+  /* SEARCH HIGHLIGHTER (PHASE 4 UI/UX) */
+  mark { background-color: rgba(245, 158, 11, 0.4); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: bold; }
+  
+  /* NEW BLINKING BADGE (PHASE 4 UI/UX) */
+  .badge-new { font-size: 10px; padding: 2px 6px; background: #d1fae5; color: #10b981; border-radius: 12px; margin-left: 6px; font-weight: 700; vertical-align: middle; animation: pulse-green 2s infinite; display: inline-block; white-space: nowrap; }
+  @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
   .dataTables_wrapper .dataTables_paginate { margin: 20px; font-size: 13px; font-weight: 500; float: right;}
   .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 6px 12px; margin-left: 4px; border-radius: 6px; border: none !important; color: var(--text-muted) !important; cursor:pointer;}
   .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--border-light) !important; color: var(--text-main) !important; }
@@ -201,7 +208,6 @@
     </div>
   </div>
   
-  <!-- UPDATED STATUS LINE W/ TIMER -->
   <div class="status-line">
       <span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span>
       <span class="refresh-timer" id="countdownTimer">Loading...</span>
@@ -267,7 +273,6 @@
         </div>
       </div>
 
-      <!-- COLLAPSIBLE FILTERS SECTION -->
       <div class="controls" style="margin-bottom: 8px;">
         <input type="text" id="searchBox" placeholder="Search JO number, VIN, customer, contact, address or issue" style="flex: 1;">
         <button class="btn-custom btn-primary" onclick="toggleFilters()" id="toggleBtn">⚙️ Show Advanced Filters</button>
@@ -315,7 +320,6 @@
   </div>
 </div>
 
-<!-- FLOATING BUTTON & TOAST -->
 <button onclick="scrollToTop()" id="bttBtn" class="btt-btn" title="Go to top">⬆️</button>
 <div id="toast" class="toast">Text copied!</div>
 
@@ -348,35 +352,40 @@ let dtInstance; let filtersPopulated = false; let initialLoad = true;
 
 const PALETTE = ["#1d6a96", "#f08a35", "#d93838", "#10b981", "#8b5cf6", "#f43f5e", "#0ea5e9", "#14b8a6"];
 
+// PREMIUM CHART.JS TOOLTIP STYLING (PHASE 4 UI/UX)
+Chart.defaults.plugins.tooltip = {
+    backgroundColor: 'rgba(15, 23, 42, 0.90)', // Dark sleek background
+    titleColor: '#ffffff',
+    bodyColor: '#e2e8f0',
+    padding: 12,
+    cornerRadius: 8,
+    displayColors: true,
+    boxPadding: 4,
+    titleFont: { family: "'Figtree', sans-serif", size: 14, weight: '600' },
+    bodyFont: { family: "'Figtree', sans-serif", size: 13 }
+};
+
 function formatBeautifulDate(dateStr) {
     if (!dateStr || dateStr === "-") return "-";
     const d = new Date(dateStr); if (isNaN(d)) return dateStr;
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-// TOGGLE FILTERS FUNCTION
 function toggleFilters() {
-    const filterDiv = document.getElementById("advancedFilters");
-    const toggleBtn = document.getElementById("toggleBtn");
-    if (filterDiv.style.display === "none" || filterDiv.style.display === "") {
-        filterDiv.style.display = "block"; toggleBtn.textContent = "⚙️ Hide Advanced Filters";
-    } else {
-        filterDiv.style.display = "none"; toggleBtn.textContent = "⚙️ Show Advanced Filters";
-    }
+    const filterDiv = document.getElementById("advancedFilters"); const toggleBtn = document.getElementById("toggleBtn");
+    if (filterDiv.style.display === "none" || filterDiv.style.display === "") { filterDiv.style.display = "block"; toggleBtn.textContent = "⚙️ Hide Advanced Filters"; } 
+    else { filterDiv.style.display = "none"; toggleBtn.textContent = "⚙️ Show Advanced Filters"; }
 }
 
-// COPY & TOAST FUNCTION
 function copyText(text, event) {
     event.stopPropagation();
     navigator.clipboard.writeText(text).then(() => {
         const toast = document.getElementById("toast");
-        toast.textContent = "📋 Copied: " + text;
-        toast.className = "toast show";
+        toast.textContent = "📋 Copied: " + text; toast.className = "toast show";
         setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
     });
 }
 
-// BACK TO TOP LOGIC
 window.onscroll = function() {
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { document.getElementById("bttBtn").style.display = "block"; } 
     else { document.getElementById("bttBtn").style.display = "none"; }
@@ -397,7 +406,6 @@ $(document).ready(function() {
     });
     
     fetchData();
-    // TIMER LOGIC
     setInterval(() => {
         timeRemaining--;
         if (timeRemaining <= 0) { fetchData(); timeRemaining = POLL_SECONDS; }
@@ -434,32 +442,52 @@ function renderStats(rows) {
   document.getElementById("stat-tat").textContent = validRecords > 0 ? (totalDays / validRecords).toFixed(1) + " days" : "-";
 }
 
-function renderTable(rows) {
+// SEARCH HIGHLIGHT HELPER
+function highlightText(text, searchTerm) {
+    if (!searchTerm || !text || text === "-") return text;
+    const regex = new RegExp(`(${searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, "gi");
+    return String(text).replace(regex, `<mark>$1</mark>`);
+}
+
+function renderTable(rows, searchTerm = "") {
   if(!dtInstance) return;
+  
+  // Date logic for "NEW" Badge
+  const d = new Date();
+  const todayFormatted = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
+
   const tableData = rows.map(r => {
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
     const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
     const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
     
+    // NEW Badge Check
+    const isNew = (r.date === todayFormatted || r.dateScheduled === todayFormatted);
+    const newBadgeHtml = isNew ? `<span class="badge-new">✨ NEW</span>` : '';
+
     let contactLines = [];
-    if (r.contactPerson && r.contactPerson !== "-") contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
-    if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${r.contactNumber}</div>`);
+    if (r.contactPerson && r.contactPerson !== "-") contactLines.push(`<div class="contact-name">${highlightText(r.contactPerson, searchTerm)}</div>`);
+    if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${highlightText(r.contactNumber, searchTerm)}</div>`);
     
-    // ONE-CLICK COPY IMPLEMENTATION
-    const joContent = r.jo && r.jo !== "-" ? `<strong>${r.jo}</strong> <span class="copy-btn" onclick="copyText('${r.jo}', event)" title="Copy JO">📋</span>` : "-";
-    const vinContent = r.vin && r.vin !== "-" ? `${r.vin} <span class="copy-btn" onclick="copyText('${r.vin}', event)" title="Copy VIN">📋</span>` : "-";
+    const hlJo = highlightText(r.jo, searchTerm);
+    const hlVin = highlightText(r.vin, searchTerm);
+    
+    const joContent = r.jo && r.jo !== "-" ? `<strong>${hlJo}</strong> <span class="copy-btn" onclick="copyText('${r.jo}', event)" title="Copy JO">📋</span> ${newBadgeHtml}` : "-";
+    const vinContent = r.vin && r.vin !== "-" ? `${hlVin} <span class="copy-btn" onclick="copyText('${r.vin}', event)" title="Copy VIN">📋</span>` : "-";
 
     return {
-        // SMART ROW HIGHLIGHTING (Overdue Logic)
         DT_RowClass: (r.status === 'Pending' && r.sla === 'No') ? 'highlight-overdue' : '',
         jo: joContent, vin: vinContent,
-        statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, model: r.model || "-", customer: r.customer || "-", 
+        statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, 
+        model: highlightText(r.model, searchTerm) || "-", 
+        customer: highlightText(r.customer, searchTerm) || "-", 
         contactInfo: contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-", 
-        addressHtml: (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">${r.address}</div>` : "-",
+        addressHtml: (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">${highlightText(r.address, searchTerm)}</div>` : "-",
         dateSchedHtml: r.dateScheduled ? `<span style="display:none;">${r.dateScheduled}</span>${formatBeautifulDate(r.dateScheduled)}` : "-",
         dateHtml: r.date ? `<span style="display:none;">${r.date}</span>${formatBeautifulDate(r.date)}` : "-",
         dateResHtml: r.dateResolved ? `<span style="display:none;">${r.dateResolved}</span>${formatBeautifulDate(r.dateResolved)}` : "-",
-        repairType: r.repairType || "-", slaHtml: slaHtml, issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
+        repairType: r.repairType || "-", slaHtml: slaHtml, 
+        issue: `<span style="color:var(--text-muted);">${highlightText(r.issue, searchTerm) || "-"}</span>`
     };
   });
   dtInstance.clear(); dtInstance.rows.add(tableData); dtInstance.draw(false);
@@ -493,12 +521,18 @@ function renderCharts(rows) {
 }
 
 function applyFilters() {
-  const search = document.getElementById("searchBox").value.toLowerCase(); const status = document.getElementById("statusFilter").value; const model = document.getElementById("modelFilter").value; const customer = document.getElementById("customerFilter").value; const repair = document.getElementById("repairFilter").value; const dateFrom = document.getElementById("dateFrom").value; const dateTo = document.getElementById("dateTo").value;
+  const search = document.getElementById("searchBox").value.trim().toLowerCase(); 
+  const status = document.getElementById("statusFilter").value; const model = document.getElementById("modelFilter").value; const customer = document.getElementById("customerFilter").value; const repair = document.getElementById("repairFilter").value; const dateFrom = document.getElementById("dateFrom").value; const dateTo = document.getElementById("dateTo").value;
+  
   const rows = DATA.filter(r => {
     if (status !== "all" && r.status !== status) return false; if (model !== "all" && r.model !== model) return false; if (customer !== "all" && r.customer !== customer) return false; if (repair !== "all" && r.repairType !== repair) return false; if (dateFrom && (!r.date || r.date < dateFrom)) return false; if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) { const hay = (r.jo + " " + (r.vin||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + (r.dateScheduled||"") + " " + r.issue).toLowerCase(); if (!hay.includes(search)) return false; } return true;
   });
-  CURRENT_FILTERED_DATA = rows; renderStats(rows); renderTable(rows); renderCharts(rows);
+  CURRENT_FILTERED_DATA = rows; 
+  renderStats(rows); 
+  // Pass string search keyword para ma-highlight
+  renderTable(rows, search); 
+  renderCharts(rows);
 }
 
 document.getElementById("searchBox").addEventListener("input", applyFilters);
