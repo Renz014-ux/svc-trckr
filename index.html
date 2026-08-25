@@ -116,9 +116,9 @@
   .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); }
   .stat-card:nth-child(2) { border-top-color: var(--success); }
   .stat-card:nth-child(3) { border-top-color: var(--warning); }
-  .stat-card:nth-child(4) { border-top-color: #8b5cf6; } /* Purple */
-  .stat-card:nth-child(5) { border-top-color: #0ea5e9; } /* Cyan */
-  .stat-card:nth-child(6) { border-top-color: #64748b; } /* Slate */
+  .stat-card:nth-child(4) { border-top-color: #8b5cf6; } 
+  .stat-card:nth-child(5) { border-top-color: #0ea5e9; } 
+  .stat-card:nth-child(6) { border-top-color: #64748b; } 
 
   .stat-label { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;}
   .stat-value { font-size: 32px; font-weight: 700; margin: 0; color: var(--text-main); line-height: 1; }
@@ -135,6 +135,7 @@
   .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; font-size: 12px; color: var(--text-muted); }
   .legend span.sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-2px; }
   
+  /* TIMEFRAME FILTER PILLS */
   .tf-btn {
     background: transparent;
     border: none;
@@ -199,7 +200,8 @@
     padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top !important;
     white-space: normal !important; word-wrap: break-word;
   }
-  table.dataTable tbody td:nth-child(8), table.dataTable tbody td:nth-child(9) {
+  /* In-adjust ang whitespace nowrap para sa mga date columns (Columns 8, 9, 10) */
+  table.dataTable tbody td:nth-child(8), table.dataTable tbody td:nth-child(9), table.dataTable tbody td:nth-child(10) {
     white-space: nowrap !important;
   }
   table.dataTable.no-footer { border-bottom: none; }
@@ -365,6 +367,7 @@
           <th>Customer</th>
           <th>Contact Info</th>
           <th>Address</th>
+          <th>Scheduled Date</th> <!-- BAGONG DAGDAG -->
           <th>Date</th>
           <th>Date Resolved</th>
           <th>Repair type</th>
@@ -442,7 +445,7 @@ $(document).ready(function() {
         searching: false, 
         lengthChange: false,
         info: false, 
-        order: [[ 7, "desc" ]], 
+        order: [[ 8, "desc" ]], // In-update ang sorting index (Date column)
         columns: [
             { data: 'jo' },
             { data: 'vin' },
@@ -451,6 +454,7 @@ $(document).ready(function() {
             { data: 'customer' },
             { data: 'contactInfo' },
             { data: 'addressHtml' },
+            { data: 'dateScheduled' }, // BAGONG DAGDAG
             { data: 'date' },
             { data: 'dateResolved' },
             { data: 'repairType' },
@@ -548,6 +552,7 @@ function renderTable(rows) {
         customer: r.customer || "-",
         contactInfo: finalContact,
         addressHtml: finalAddress,
+        dateScheduled: r.dateScheduled || "-", // BAGONG DAGDAG
         date: r.date || "-",
         dateResolved: r.dateResolved || "-", 
         repairType: r.repairType || "-",
@@ -680,7 +685,6 @@ function renderCharts(rows) {
     options: { 
       responsive: true, maintainAspectRatio: false, 
       plugins: { 
-          // IN-ENABLE ANG LEGEND DITO PARA KITA AGAD ANG DONE/PENDING COLORS
           legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } 
       }, 
       cutout: '70%',
@@ -774,7 +778,8 @@ function applyFilters() {
     if (dateFrom && (!r.date || r.date < dateFrom)) return false;
     if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
-      const hay = (r.jo + " " + (r.vin||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + r.issue).toLowerCase();
+      // Isinama rin ang dateScheduled sa search keywords
+      const hay = (r.jo + " " + (r.vin||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + (r.dateScheduled||"") + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
     }
     return true;
@@ -806,13 +811,13 @@ document.getElementById("clearFilters").addEventListener("click", function() {
 });
 
 document.getElementById("exportBtn").addEventListener("click", function() {
-    let csvContent = "JO Number,VIN,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Date,Date Resolved,Repair Type,SLA Status,Issue\n";
+    let csvContent = "JO Number,VIN,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Scheduled Date,Date,Date Resolved,Repair Type,SLA Status,Issue\n";
 
     CURRENT_FILTERED_DATA.forEach(r => {
         let rowArray = [
             r.jo, r.vin || "-", r.status, r.model, r.customer, 
             r.contactPerson || "-", r.contactNumber || "-", r.address || "-",
-            r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue
+            r.dateScheduled || "-", r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue
         ];
         let escapedRow = rowArray.map(item => `"${String(item || '').replace(/"/g, '""')}"`);
         csvContent += escapedRow.join(",") + "\n";
@@ -821,7 +826,7 @@ document.getElementById("exportBtn").addEventListener("click", function() {
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
-    link.download = "NRD_Production_Dashboard_Export.csv";
+    link.download = "NRD_Pasig_Dashboard_Export.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
