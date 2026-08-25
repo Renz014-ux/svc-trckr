@@ -21,192 +21,132 @@
 
 <style>
   :root {
-    --nrd-blue: #1d6a96; 
-    --nrd-orange: #f08a35;
-    --nrd-red: #d93838;
-    --surface-bg: #f4f7f9; 
-    --surface-card: #ffffff; 
-    --border-light: #e2e8f0;
-    --text-main: #1e293b;
-    --text-muted: #64748b;
-    --success: #10b981;
-    --success-bg: #d1fae5;
-    --warning: #f59e0b;
-    --warning-bg: #fef3c7;
-    --danger: #ef4444;
-    --danger-bg: #fee2e2;
+    --nrd-blue: #1d6a96; --nrd-orange: #f08a35; --nrd-red: #d93838;
+    --surface-bg: #f4f7f9; --surface-card: #ffffff; --border-light: #e2e8f0;
+    --text-main: #1e293b; --text-muted: #64748b;
+    --success: #10b981; --success-bg: #d1fae5;
+    --warning: #f59e0b; --warning-bg: #fef3c7;
+    --danger: #ef4444; --danger-bg: #fee2e2;
   }
 
   [data-theme="dark"] {
-    --surface-bg: #0f172a; 
-    --surface-card: #1e293b; 
-    --border-light: #334155;
-    --text-main: #f8fafc;
-    --text-muted: #94a3b8;
+    --surface-bg: #0f172a; --surface-card: #1e293b; --border-light: #334155;
+    --text-main: #f8fafc; --text-muted: #94a3b8;
     --success-bg: rgba(16, 185, 129, 0.2);
     --warning-bg: rgba(245, 158, 11, 0.2);
     --danger-bg: rgba(239, 68, 68, 0.2);
   }
   
   * { box-sizing: border-box; }
-  body {
-    font-family: 'Figtree', sans-serif;
-    background: var(--surface-bg);
-    color: var(--text-main);
-    margin: 0;
-    padding: 30px 20px;
-    transition: background-color 0.3s, color 0.3s;
-  }
+  body { font-family: 'Figtree', sans-serif; background: var(--surface-bg); color: var(--text-main); margin: 0; padding: 30px 20px; transition: background-color 0.3s, color 0.3s; }
   .wrap { max-width: 1280px; margin: 0 auto; }
   
-  /* UNIFIED HEADER CARD DESIGN */
-  .top-header-card {
-      background: var(--surface-card);
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.03);
-      margin-bottom: 24px;
-      border-top: 5px solid var(--nrd-blue);
-      overflow: hidden;
-      transition: background-color 0.3s;
-  }
-  .top-header-top {
-      padding: 24px 24px 20px 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-  }
+  /* UNIFIED HEADER CARD */
+  .top-header-card { background: var(--surface-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; border-top: 5px solid var(--nrd-blue); overflow: hidden; transition: background-color 0.3s; }
+  .top-header-top { padding: 24px 24px 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .top-header-left { display: flex; align-items: center; gap: 16px; }
   .nrd-logo { height: 44px; width: auto; object-fit: contain; }
   h1 { font-size: 24px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; line-height: 1.2; }
   .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
   
-  .nav-tabs {
-      display: flex; gap: 32px;
-      padding: 0 24px;
-      background: rgba(100, 116, 139, 0.02);
-      border-top: 1px solid var(--border-light);
-  }
-  .nav-tab {
-      padding: 14px 0;
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-muted);
-      text-decoration: none;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s;
-      margin-bottom: -1px;
-  }
+  .nav-tabs { display: flex; gap: 32px; padding: 0 24px; background: rgba(100, 116, 139, 0.02); border-top: 1px solid var(--border-light); }
+  .nav-tab { padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -1px; }
   .nav-tab:hover { color: var(--nrd-blue); }
   .nav-tab.active { color: var(--nrd-blue); border-bottom-color: var(--nrd-blue); }
   
   .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500;}
   .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
   
-  .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-  .stat-card { 
-    flex: 1; min-width: 150px; background: var(--surface-card); 
-    border-radius: 12px; padding: 20px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-    border-top: 4px solid var(--border-light);
-    transition: transform 0.2s, background-color 0.3s;
-  }
-  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
-  .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); }
-  .stat-card:nth-child(2) { border-top-color: var(--success); }
-  .stat-card:nth-child(3) { border-top-color: var(--warning); }
-  .stat-card:nth-child(4) { border-top-color: #8b5cf6; } 
-  .stat-card:nth-child(5) { border-top-color: #0ea5e9; } 
-  .stat-card:nth-child(6) { border-top-color: #64748b; } 
+  /* SKELETON LOADER ANIMATIONS (UI/UX Upgrade) */
+  #skeletonScreen { display: block; }
+  #mainContent { display: none; }
+  .skel { background: linear-gradient(90deg, var(--surface-bg) 25%, var(--border-light) 50%, var(--surface-bg) 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+  @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+  .skel-card { height: 110px; flex: 1; min-width: 150px; background-color: var(--surface-card); padding: 20px; border-radius: 12px; }
+  .skel-chart { height: 320px; flex: 1; min-width: 300px; background-color: var(--surface-card); border-radius: 12px; }
 
-  .stat-label { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;}
+  /* STAT CARDS & TOOLTIPS (UI/UX Upgrade) */
+  .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .stat-card { flex: 1; min-width: 150px; background: var(--surface-card); border-radius: 12px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 4px solid var(--border-light); transition: transform 0.2s, background-color 0.3s; }
+  .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.06); }
+  .stat-card:nth-child(1) { border-top-color: var(--nrd-blue); } .stat-card:nth-child(2) { border-top-color: var(--success); }
+  .stat-card:nth-child(3) { border-top-color: var(--warning); } .stat-card:nth-child(4) { border-top-color: #8b5cf6; } 
+  .stat-card:nth-child(5) { border-top-color: #0ea5e9; } .stat-card:nth-child(6) { border-top-color: #64748b; } 
+
+  .stat-label { font-size: 13px; color: var(--text-muted); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; display: inline-block;}
   .stat-value { font-size: 32px; font-weight: 700; margin: 0; color: var(--text-main); line-height: 1; }
   
-  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
-  .chart-box { 
-    flex: 1; min-width: 300px; background: var(--surface-card); 
-    border-radius: 12px; padding: 24px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03); 
-    transition: background-color 0.3s;
+  /* Tooltip CSS */
+  .tooltip { position: relative; cursor: help; border-bottom: 1px dotted var(--text-muted); }
+  .tooltip:hover::after {
+      content: attr(data-tip); position: absolute; bottom: 130%; left: 50%; transform: translateX(-50%);
+      background: var(--text-main); color: var(--surface-bg); padding: 8px 12px; border-radius: 6px;
+      font-size: 12px; white-space: nowrap; z-index: 100; font-weight: 500; letter-spacing: normal; text-transform: none;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
   }
+  .tooltip:hover::before {
+      content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      border: 5px solid transparent; border-top-color: var(--text-main); z-index: 100;
+  }
+
+  .charts { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
+  .chart-box { flex: 1; min-width: 300px; background: var(--surface-card); border-radius: 12px; padding: 24px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: background-color 0.3s; }
   .chart-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin: 0 0 20px; }
   .chart-inner { position: relative; height: 240px; }
   .legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; font-size: 12px; color: var(--text-muted); }
   .legend span.sw { display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px; vertical-align:-2px; }
   
-  /* TIMEFRAME FILTER PILLS */
-  .tf-btn {
-    background: transparent;
-    border: none;
-    padding: 6px 14px;
-    font-size: 12px;
-    font-weight: 600;
-    font-family: 'Figtree', sans-serif;
-    color: var(--text-muted);
-    border-radius: 7px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
+  .tf-btn { background: transparent; border: none; padding: 6px 14px; font-size: 12px; font-weight: 600; font-family: 'Figtree', sans-serif; color: var(--text-muted); border-radius: 7px; cursor: pointer; transition: all 0.2s; }
   .tf-btn:hover { color: var(--text-main); }
   .tf-btn.active { background: var(--surface-card); color: var(--nrd-blue); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 
   .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; }
-  .controls input, .controls select {
-    padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px;
-    font-size: 13px; font-family: 'Figtree', sans-serif; background: var(--surface-card); color: var(--text-main);
-    outline: none; transition: border-color 0.2s, background-color 0.3s, color 0.3s;
-  }
+  .controls input, .controls select { padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 13px; font-family: 'Figtree', sans-serif; background: var(--surface-card); color: var(--text-main); outline: none; transition: border-color 0.2s, background-color 0.3s, color 0.3s; }
   .controls input:focus, .controls select:focus { border-color: var(--nrd-blue); box-shadow: 0 0 0 3px rgba(29, 106, 150, 0.1); }
   #searchBox { flex: 2; min-width: 220px; }
-  .date-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
   
-  .btn-custom { 
-    background: var(--surface-card); border: 1px solid var(--border-light); border-radius: 8px; 
-    padding: 10px 16px; font-size: 13px; font-weight: 600; font-family: 'Figtree', sans-serif; cursor: pointer; 
-    color: var(--text-muted); transition: all 0.2s; text-decoration: none; display: inline-block;
-  }
+  .btn-custom { background: var(--surface-card); border: 1px solid var(--border-light); border-radius: 8px; padding: 10px 16px; font-size: 13px; font-weight: 600; font-family: 'Figtree', sans-serif; cursor: pointer; color: var(--text-muted); transition: all 0.2s; text-decoration: none; display: inline-block; }
   .btn-custom:hover { background: var(--border-light); color: var(--text-main); }
-  
   .btn-export { background: var(--nrd-orange); color: white; border: none; }
   .btn-export:hover { background: #e07a2a; color: white; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(240, 138, 53, 0.3); }
-  
-  /* STYLED CLEAR BUTTON */
-  .btn-clear {
-    background: transparent;
-    border: 1px dashed var(--text-muted);
-    color: var(--text-main);
+  .btn-clear { background: transparent; border: 1px dashed var(--text-muted); color: var(--text-main); }
+  .btn-clear:hover { background: var(--danger-bg); border-style: solid; border-color: var(--danger); color: var(--danger); }
+
+  /* TABLE CSS (Sticky Header & Frozen Column UI/UX Upgrade) */
+  .table-container { 
+    background: var(--surface-card); border-radius: 12px; padding: 0; /* Padding removed for sticky header */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; 
+    overflow-y: auto; overflow-x: auto; max-height: 600px; /* Fixed height for scrolling inside */
+    transition: background-color 0.3s; position: relative;
   }
-  .btn-clear:hover {
-    background: var(--danger-bg);
-    border-style: solid;
-    border-color: var(--danger);
-    color: var(--danger);
+  
+  table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; color: var(--text-main); margin-top: 0 !important;}
+  
+  /* Sticky Header */
+  table.dataTable thead th { 
+    text-align: left; padding: 16px 14px; color: var(--text-muted); font-weight: 600; 
+    border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; 
+    position: sticky; top: 0; background: var(--surface-card); z-index: 10;
+  }
+  
+  /* Frozen Left Column (For Desktop) */
+  @media (min-width: 1024px) {
+    table.dataTable tbody td:first-child, table.dataTable thead th:first-child {
+      position: sticky; left: 0; background: var(--surface-card); z-index: 5; border-right: 1px solid var(--border-light);
+    }
+    table.dataTable thead th:first-child { z-index: 11; }
+    /* Fix row striping overlap on frozen column */
+    table.dataTable tbody tr:nth-child(even) td:first-child { background: var(--surface-bg); }
   }
 
-  .table-container { 
-    background: var(--surface-card); border-radius: 12px; padding: 24px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03); margin-bottom: 16px; overflow-x: auto;
-    transition: background-color 0.3s;
-  }
-  table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
-  table.dataTable thead th { 
-    text-align: left; padding: 14px 12px; color: var(--text-muted); font-weight: 600; 
-    border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; 
-  }
   table.dataTable tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
-  table.dataTable tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
-  table.dataTable tbody td { 
-    padding: 14px 12px; border-bottom: 1px solid var(--border-light); vertical-align: top !important;
-    white-space: normal !important; word-wrap: break-word;
-  }
-  /* In-adjust ang whitespace nowrap para sa mga date columns (Columns 8, 9, 10) */
-  table.dataTable tbody td:nth-child(8), table.dataTable tbody td:nth-child(9), table.dataTable tbody td:nth-child(10) {
-    white-space: nowrap !important;
-  }
+  table.dataTable tbody tr:hover td { background-color: rgba(100,116,139, 0.1) !important; }
+  table.dataTable tbody td { padding: 14px; border-bottom: 1px solid var(--border-light); vertical-align: top !important; white-space: normal !important; word-wrap: break-word; }
+  
+  table.dataTable tbody td:nth-child(8), table.dataTable tbody td:nth-child(9), table.dataTable tbody td:nth-child(10) { white-space: nowrap !important; }
   table.dataTable.no-footer { border-bottom: none; }
   
-  .dataTables_wrapper .dataTables_paginate { margin-top: 20px; font-size: 13px; font-weight: 500; }
+  .dataTables_wrapper .dataTables_paginate { margin: 20px; font-size: 13px; font-weight: 500; float: right;}
   .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 6px 12px; margin-left: 4px; border-radius: 6px; border: none !important; color: var(--text-muted) !important; cursor:pointer;}
   .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--border-light) !important; color: var(--text-main) !important; }
   .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--nrd-blue) !important; color: white !important; font-weight: 600; box-shadow: 0 4px 10px rgba(29, 106, 150, 0.2); }
@@ -220,41 +160,15 @@
   .row-count { font-size: 13px; color: var(--text-muted); margin-top: 12px; font-weight: 500; }
   .error-box { background: var(--danger-bg); color: var(--danger); padding: 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; display: none; font-weight: 500; }
 
-  .modal-overlay {
-    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center;
-    backdrop-filter: blur(4px);
-  }
-  .modal-content {
-    background: var(--surface-card); padding: 32px; border-radius: 16px;
-    width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto;
-    position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-  }
-  .modal-close {
-    position: absolute; top: 24px; right: 24px; background: var(--surface-bg); border: none;
-    border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; 
-    color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: 0.2s;
-  }
+  /* Modal */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+  .modal-close { position: absolute; top: 24px; right: 24px; background: var(--surface-bg); border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
   .modal-close:hover { background: var(--danger-bg); color: var(--danger); transform: rotate(90deg); }
   .modal-title { margin-top: 0; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--nrd-blue); }
-  
   .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
-  .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; letter-spacing: 0.5px; }
-  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); white-space: normal !important; word-wrap: break-word; vertical-align: top; }
-  .modal-table tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
-  .modal-table tbody tr:hover { background-color: rgba(100,116,139, 0.1); }
-
-  @media print {
-    body { background: white; color: black; padding: 0; }
-    .controls, .top-header-card .header-actions, .nav-tabs, .status-line, .dataTables_paginate, .row-count { display: none !important; }
-    .stat-card, .chart-box, .table-container { box-shadow: none; border: 1px solid #ccc; page-break-inside: avoid; }
-    .wrap { max-width: 100%; }
-    h1 { color: black !important; }
-    .badge { border: 1px solid #ccc; }
-  }
-
-  .contact-info { font-size: 12px; line-height: 1.4; color: var(--text-muted); }
-  .contact-name { color: var(--text-main); font-weight: 500; font-size: 13px;}
+  .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
 </style>
 </head>
 <body>
@@ -284,101 +198,121 @@
   <div class="status-line"><span class="dot" id="liveDot"></span><span id="lastUpdated">Connecting...</span></div>
   <div class="error-box" id="errorBox"></div>
 
-  <div class="stats">
-    <div class="stat-card">
-      <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
-    </div>
-    <div class="stat-card">
-      <p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p>
-    </div>
-    <div class="stat-card">
-      <p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p>
-    </div>
-    <div class="stat-card">
-      <p class="stat-label">Completion</p><p class="stat-value" id="stat-rate">-</p>
-    </div>
-    <div class="stat-card">
-      <p class="stat-label">SLA Compliant</p><p class="stat-value" id="stat-sla">-</p>
-    </div>
-    <div class="stat-card">
-      <p class="stat-label">Avg Turnaround</p><p class="stat-value" id="stat-tat">-</p>
-    </div>
+  <!-- SKELETON LOADER SCREEN -->
+  <div id="skeletonScreen">
+      <div class="stats">
+          <div class="skel-card"><div class="skel" style="height:15px; width:60%; margin-bottom:15px;"></div><div class="skel" style="height:35px; width:40%;"></div></div>
+          <div class="skel-card"><div class="skel" style="height:15px; width:60%; margin-bottom:15px;"></div><div class="skel" style="height:35px; width:40%;"></div></div>
+          <div class="skel-card"><div class="skel" style="height:15px; width:60%; margin-bottom:15px;"></div><div class="skel" style="height:35px; width:40%;"></div></div>
+          <div class="skel-card"><div class="skel" style="height:15px; width:60%; margin-bottom:15px;"></div><div class="skel" style="height:35px; width:40%;"></div></div>
+      </div>
+      <div class="charts">
+          <div class="skel-chart" style="flex-basis:100%;"><div class="skel" style="height:100%; width:100%;"></div></div>
+      </div>
+      <div class="skel-chart" style="height: 400px;"><div class="skel" style="height:100%; width:100%;"></div></div>
   </div>
 
-  <div class="charts">
-    <div class="chart-box" style="flex-basis: 100%;">
-      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
-        <p class="chart-title" style="margin: 0;">Service Volume <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click dots to view units)</span></p>
-        
-        <div class="timeframe-pills" style="display: flex; background: var(--surface-bg); padding: 4px; border-radius: 10px; border: 1px solid var(--border-light); gap: 4px;">
-          <button class="tf-btn active" onclick="setTimeframe('all', this)">All</button>
-          <button class="tf-btn" onclick="setTimeframe('today', this)">Today</button>
-          <button class="tf-btn" onclick="setTimeframe('yesterday', this)">Yesterday</button>
-          <button class="tf-btn" onclick="setTimeframe('wtd', this)">Week to Date</button>
-          <button class="tf-btn" onclick="setTimeframe('mtd', this)">Month to Date</button>
+  <!-- MAIN DASHBOARD CONTENT (Hidden until load) -->
+  <div id="mainContent">
+      <div class="stats">
+        <div class="stat-card">
+          <p class="stat-label">Total units</p><p class="stat-value" id="stat-total">-</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Done</p><p class="stat-value" id="stat-done" style="color:var(--success);">-</p>
+        </div>
+        <div class="stat-card">
+          <p class="stat-label">Pending</p><p class="stat-value" id="stat-pending" style="color:var(--warning);">-</p>
+        </div>
+        <div class="stat-card">
+          <!-- HOVER TOOLTIP ADDED HERE -->
+          <p class="stat-label tooltip" data-tip="Percentage of completely resolved units">Completion</p><p class="stat-value" id="stat-rate">-</p>
+        </div>
+        <div class="stat-card">
+          <!-- HOVER TOOLTIP ADDED HERE -->
+          <p class="stat-label tooltip" data-tip="Units repaired within target target time">SLA Compliant</p><p class="stat-value" id="stat-sla">-</p>
+        </div>
+        <div class="stat-card">
+          <!-- HOVER TOOLTIP ADDED HERE -->
+          <p class="stat-label tooltip" data-tip="Average days from entry to resolution">Avg Turnaround</p><p class="stat-value" id="stat-tat">-</p>
         </div>
       </div>
-      <div class="chart-inner" style="height: 220px;"><canvas id="trendChart" role="img"></canvas></div>
-    </div>
-    <div class="chart-box">
-      <p class="chart-title">Repair Status Breakdown <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
-      <div class="chart-inner"><canvas id="statusChart" role="img"></canvas></div>
-    </div>
-    <div class="chart-box">
-      <p class="chart-title">Units by Model <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
-      <div class="chart-inner"><canvas id="modelChart" role="img"></canvas></div>
-    </div>
-    <div class="chart-box">
-      <p class="chart-title">Top Recurring Issues <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click slices to view)</span></p>
-      <div class="chart-inner"><canvas id="issueChart" role="img"></canvas></div>
-      <div class="legend" id="issueLegend"></div>
-    </div>
-    <div class="chart-box">
-      <p class="chart-title">Units per Customer <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click bars to view)</span></p>
-      <div class="chart-inner"><canvas id="customerChart" role="img"></canvas></div>
-    </div>
-  </div>
 
-  <div class="controls">
-    <input type="text" id="searchBox" placeholder="Search JO number, VIN, customer, contact, address or issue">
-    <select id="statusFilter"><option value="all">All Repair Status</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
-    <select id="modelFilter"><option value="all">All models</option></select>
-    <select id="customerFilter"><option value="all">All customers</option></select>
-    <select id="repairFilter"><option value="all">All repair types</option></select>
-  </div>
-  <div class="controls">
-    <span class="date-label">From</span>
-    <input type="date" id="dateFrom">
-    <span class="date-label">To</span>
-    <input type="date" id="dateTo">
-    <button class="btn-custom btn-clear" id="clearFilters">Clear filters</button>
-    <button class="btn-custom btn-pdf" onclick="window.print()">🖨️ Save as PDF</button>
-    <button class="btn-custom btn-export" id="exportBtn">⬇️ Export to CSV</button>
-  </div>
+      <div class="charts">
+        <div class="chart-box" style="flex-basis: 100%;">
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+            <p class="chart-title" style="margin: 0;">Service Volume <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click dots to view units)</span></p>
+            
+            <div class="timeframe-pills" style="display: flex; background: var(--surface-bg); padding: 4px; border-radius: 10px; border: 1px solid var(--border-light); gap: 4px;">
+              <button class="tf-btn active" onclick="setTimeframe('all', this)">All</button>
+              <button class="tf-btn" onclick="setTimeframe('today', this)">Today</button>
+              <button class="tf-btn" onclick="setTimeframe('yesterday', this)">Yesterday</button>
+              <button class="tf-btn" onclick="setTimeframe('wtd', this)">Week to Date</button>
+              <button class="tf-btn" onclick="setTimeframe('mtd', this)">Month to Date</button>
+            </div>
+          </div>
+          <div class="chart-inner" style="height: 220px;"><canvas id="trendChart" role="img"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <p class="chart-title">Repair Status Breakdown <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
+          <div class="chart-inner"><canvas id="statusChart" role="img"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <p class="chart-title">Units by Model <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click to filter)</span></p>
+          <div class="chart-inner"><canvas id="modelChart" role="img"></canvas></div>
+        </div>
+        <div class="chart-box">
+          <p class="chart-title">Top Recurring Issues <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click slices to view)</span></p>
+          <div class="chart-inner"><canvas id="issueChart" role="img"></canvas></div>
+          <div class="legend" id="issueLegend"></div>
+        </div>
+        <div class="chart-box">
+          <p class="chart-title">Units per Customer <span style="font-size: 11px; color: var(--text-muted); font-weight:normal;">(Click bars to view)</span></p>
+          <div class="chart-inner"><canvas id="customerChart" role="img"></canvas></div>
+        </div>
+      </div>
 
-  <div class="table-container">
-    <table id="mainTable" class="display responsive">
-      <thead>
-        <tr>
-          <th>JO number</th>
-          <th>VIN</th>
-          <th>Repair Status</th>
-          <th>Model</th>
-          <th>Customer</th>
-          <th>Contact Info</th>
-          <th>Address</th>
-          <th>Scheduled Date</th> <!-- BAGONG DAGDAG -->
-          <th>Date</th>
-          <th>Date Resolved</th>
-          <th>Repair type</th>
-          <th>SLA Status</th>
-          <th>Issue</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+      <div class="controls">
+        <input type="text" id="searchBox" placeholder="Search JO number, VIN, customer, contact, address or issue">
+        <select id="statusFilter"><option value="all">All Repair Status</option><option value="Done">Done</option><option value="Pending">Pending</option></select>
+        <select id="modelFilter"><option value="all">All models</option></select>
+        <select id="customerFilter"><option value="all">All customers</option></select>
+        <select id="repairFilter"><option value="all">All repair types</option></select>
+      </div>
+      <div class="controls">
+        <span class="date-label">From</span>
+        <input type="date" id="dateFrom">
+        <span class="date-label">To</span>
+        <input type="date" id="dateTo">
+        <button class="btn-custom btn-clear" id="clearFilters">Clear filters</button>
+        <button class="btn-custom btn-pdf" onclick="window.print()">🖨️ Save as PDF</button>
+        <button class="btn-custom btn-export" id="exportBtn">⬇️ Export to CSV</button>
+      </div>
+
+      <div class="table-container">
+        <table id="mainTable" class="display responsive">
+          <thead>
+            <tr>
+              <th>JO number</th>
+              <th>VIN</th>
+              <th>Repair Status</th>
+              <th>Model</th>
+              <th>Customer</th>
+              <th>Contact Info</th>
+              <th>Address</th>
+              <th>Scheduled Date</th>
+              <th>Date</th>
+              <th>Date Resolved</th>
+              <th>Repair type</th>
+              <th>SLA Status</th>
+              <th>Issue</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="row-count" id="rowCount"></p>
   </div>
-  <p class="row-count" id="rowCount"></p>
 </div>
 
 <!-- MODAL POPUP -->
@@ -406,65 +340,48 @@
 <script>
 const themeToggle = document.getElementById('themeToggle');
 const currentTheme = localStorage.getItem('theme') || 'light';
-
-if (currentTheme === 'dark') {
-    document.documentElement.setAttribute('data-theme', 'dark');
-    themeToggle.textContent = '☀️ Light Mode';
-}
-
+if (currentTheme === 'dark') { document.documentElement.setAttribute('data-theme', 'dark'); themeToggle.textContent = '☀️ Light Mode'; }
 themeToggle.addEventListener('click', () => {
     let theme = document.documentElement.getAttribute('data-theme');
-    if (theme === 'dark') {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('theme', 'light');
-        themeToggle.textContent = '🌙 Dark Mode';
-    } else {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('theme', 'dark');
-        themeToggle.textContent = '☀️ Light Mode';
-    }
+    if (theme === 'dark') { document.documentElement.removeAttribute('data-theme'); localStorage.setItem('theme', 'light'); themeToggle.textContent = '🌙 Dark Mode'; } 
+    else { document.documentElement.setAttribute('data-theme', 'dark'); localStorage.setItem('theme', 'dark'); themeToggle.textContent = '☀️ Light Mode'; }
 });
 
 // ILAGAY DITO ANG BAGONG WEB APP URL MO MULA SA APPS SCRIPT
-const API_URL = "https://script.google.com/macros/s/AKfycbzaEzPN8dFhyyQbD5phC9gJV6_otRydBgQOCWTYlGluc_8KdM71igHUfdNtWgbXsrFs/exec"; 
+const API_URL = "https://script.google.com/macros/s/.../exec"; 
 const POLL_SECONDS = 180;
 
-let DATA = [];
-let CURRENT_FILTERED_DATA = [];
+let DATA = []; let CURRENT_FILTERED_DATA = [];
 let statusChart, modelChart, issueChart, customerChart, trendChart;
-let dtInstance; 
-let filtersPopulated = false;
+let dtInstance; let filtersPopulated = false; let initialLoad = true;
 
 const PALETTE = ["#1d6a96", "#f08a35", "#d93838", "#10b981", "#8b5cf6", "#f43f5e", "#0ea5e9", "#14b8a6"];
 
+// DATE FORMATTER FUNCTION (UI/UX Upgrade)
+function formatBeautifulDate(dateStr) {
+    if (!dateStr || dateStr === "-") return "-";
+    const d = new Date(dateStr);
+    if (isNaN(d)) return dateStr;
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
 $(document).ready(function() {
     dtInstance = $('#mainTable').DataTable({
-        responsive: true,
-        paging: true,
-        pageLength: 10,
-        searching: false, 
-        lengthChange: false,
-        info: false, 
-        order: [[ 8, "desc" ]], // In-update ang sorting index (Date column)
+        responsive: true, paging: true, pageLength: 10, searching: false, lengthChange: false, info: false, 
+        order: [[ 8, "desc" ]], 
+        // CUSTOM EMPTY STATE (UI/UX Upgrade)
+        language: {
+            emptyTable: `<div style="padding: 40px; text-align: center; color: var(--text-muted);"><div style="font-size: 40px; margin-bottom: 10px;">🔍</div><div style="font-size: 16px; font-weight: 600;">No records found</div><div style="font-size: 13px;">Waiting for data or database is empty.</div></div>`,
+            zeroRecords: `<div style="padding: 40px; text-align: center; color: var(--text-muted);"><div style="font-size: 40px; margin-bottom: 10px;">🔍</div><div style="font-size: 16px; font-weight: 600;">No matching records</div><div style="font-size: 13px;">Please check your search keyword or filters.</div></div>`
+        },
         columns: [
-            { data: 'jo' },
-            { data: 'vin' },
-            { data: 'statusHtml' }, 
-            { data: 'model' },
-            { data: 'customer' },
-            { data: 'contactInfo' },
-            { data: 'addressHtml' },
-            { data: 'dateScheduled' }, // BAGONG DAGDAG
-            { data: 'date' },
-            { data: 'dateResolved' },
-            { data: 'repairType' },
-            { data: 'slaHtml' },    
-            { data: 'issue' }
+            { data: 'jo' }, { data: 'vin' }, { data: 'statusHtml' }, { data: 'model' },
+            { data: 'customer' }, { data: 'contactInfo' }, { data: 'addressHtml' },
+            { data: 'dateSchedHtml' }, { data: 'dateHtml' }, { data: 'dateResHtml' },
+            { data: 'repairType' }, { data: 'slaHtml' }, { data: 'issue' }
         ]
     });
-    
-    fetchData();
-    setInterval(fetchData, POLL_SECONDS * 1000);
+    fetchData(); setInterval(fetchData, POLL_SECONDS * 1000);
 });
 
 async function fetchData() {
@@ -475,8 +392,15 @@ async function fetchData() {
     document.getElementById("errorBox").style.display = "none";
     document.getElementById("liveDot").style.background = "var(--success)";
     document.getElementById("lastUpdated").textContent = "Last updated " + new Date().toLocaleTimeString();
-    populateFilters();
-    applyFilters();
+    
+    // HIDE SKELETON AFTER FIRST SUCCESSFUL LOAD
+    if (initialLoad) {
+        document.getElementById("skeletonScreen").style.display = "none";
+        document.getElementById("mainContent").style.display = "block";
+        initialLoad = false;
+    }
+    
+    populateFilters(); applyFilters();
   } catch (err) {
     document.getElementById("liveDot").style.background = "var(--danger)";
     document.getElementById("errorBox").style.display = "block";
@@ -488,11 +412,7 @@ function populateFilters() {
   if (filtersPopulated) return;
   const fill = (id, values) => {
     const sel = document.getElementById(id);
-    values.forEach(v => {
-      const o = document.createElement("option");
-      o.value = v; o.textContent = v;
-      sel.appendChild(o);
-    });
+    values.forEach(v => { const o = document.createElement("option"); o.value = v; o.textContent = v; sel.appendChild(o); });
   };
   fill("modelFilter", [...new Set(DATA.map(d => d.model).filter(Boolean))].sort());
   fill("customerFilter", [...new Set(DATA.map(d => d.customer).filter(Boolean))].sort());
@@ -504,7 +424,6 @@ function renderStats(rows) {
   const total = rows.length;
   const done = rows.filter(r => r.status === "Done").length;
   const pending = rows.filter(r => r.status === "Pending").length;
-  
   const slaRated = rows.filter(r => r.sla === "Yes" || r.sla === "No" || r.sla === "Done" || r.sla === "Pending");
   const slaMet = rows.filter(r => r.sla === "Yes" || r.sla === "Done").length;
 
@@ -517,12 +436,9 @@ function renderStats(rows) {
   let totalDays = 0, validRecords = 0;
   rows.forEach(r => {
     if (r.date && r.dateResolved && r.status === "Done") {
-      let start = new Date(r.date);
-      let end = new Date(r.dateResolved);
+      let start = new Date(r.date); let end = new Date(r.dateResolved);
       if (!isNaN(start) && !isNaN(end)) {
-        let diffTime = Math.abs(end - start);
-        totalDays += Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        validRecords++;
+        totalDays += Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)); validRecords++;
       }
     }
   });
@@ -531,7 +447,6 @@ function renderStats(rows) {
 
 function renderTable(rows) {
   if(!dtInstance) return;
-
   const tableData = rows.map(r => {
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
     const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
@@ -541,427 +456,147 @@ function renderTable(rows) {
     if (r.contactPerson && r.contactPerson !== "-") contactLines.push(`<div class="contact-name">${r.contactPerson}</div>`);
     if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${r.contactNumber}</div>`);
     const finalContact = contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-";
-    
     const finalAddress = (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">${r.address}</div>` : "-";
 
     return {
         jo: `<strong>${r.jo || "-"}</strong>`,
         vin: r.vin || "-",
         statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, 
-        model: r.model || "-",
-        customer: r.customer || "-",
-        contactInfo: finalContact,
-        addressHtml: finalAddress,
-        dateScheduled: r.dateScheduled || "-", // BAGONG DAGDAG
-        date: r.date || "-",
-        dateResolved: r.dateResolved || "-", 
-        repairType: r.repairType || "-",
-        slaHtml: slaHtml,                    
-        issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
+        model: r.model || "-", customer: r.customer || "-", contactInfo: finalContact, addressHtml: finalAddress,
+        // Hidden ISO date for sorting + Beautiful Date for reading
+        dateSchedHtml: r.dateScheduled ? `<span style="display:none;">${r.dateScheduled}</span>${formatBeautifulDate(r.dateScheduled)}` : "-",
+        dateHtml: r.date ? `<span style="display:none;">${r.date}</span>${formatBeautifulDate(r.date)}` : "-",
+        dateResHtml: r.dateResolved ? `<span style="display:none;">${r.dateResolved}</span>${formatBeautifulDate(r.dateResolved)}` : "-",
+        
+        repairType: r.repairType || "-", slaHtml: slaHtml, issue: `<span style="color:var(--text-muted);">${r.issue || "-"}</span>`
     };
   });
-
-  dtInstance.clear();
-  dtInstance.rows.add(tableData);
-  dtInstance.draw(false);
-
+  dtInstance.clear(); dtInstance.rows.add(tableData); dtInstance.draw(false);
   document.getElementById("rowCount").textContent = "Showing " + rows.length + " of " + DATA.length + " units";
 }
 
 function keywordFromIssue(issue) {
   if (!issue) return "Unspecified";
-  
   const str = issue.toLowerCase();
-
-  if (str.includes("panel") || str.includes("lcd") || str.includes("dashboard") || str.includes("moist")) {
-    return "Dashboard / LCD Panel";
-  }
-  if (str.includes("brake") || str.includes("break") || str.includes("pad")) {
-    return "Brake Issue";
-  }
-  if (str.includes("pms") || str.includes("maintenance")) {
-    return "PMS / Maintenance";
-  }
-  if (str.includes("signal") || str.includes("light") || str.includes("blink") || str.includes("headlight")) {
-    return "Lights & Signals";
-  }
-  if (str.includes("button") || str.includes("switch") || str.includes("parking") || str.includes("horn")) {
-    return "Buttons & Switches";
-  }
-  if (str.includes("tire") || str.includes("wheel") || str.includes("hub") || str.includes("mag") || str.includes("flat")) {
-    return "Wheel & Tire Issue";
-  }
-  if (str.includes("motor") || str.includes("power") || str.includes("battery") || str.includes("batt") || str.includes("start")) {
-    return "Motor / Power Issue";
-  }
-  if (str.includes("functional") || str.includes("operational")) {
-    return "General System / Operational";
-  }
-
-  const first = issue.split(/[\/\n-]/)[0].trim();
-  return first.length > 25 ? first.slice(0, 25) + "..." : (first || "Other");
+  if (str.includes("panel") || str.includes("lcd") || str.includes("dashboard") || str.includes("moist")) return "Dashboard / LCD Panel";
+  if (str.includes("brake") || str.includes("break") || str.includes("pad")) return "Brake Issue";
+  if (str.includes("pms") || str.includes("maintenance")) return "PMS / Maintenance";
+  if (str.includes("signal") || str.includes("light") || str.includes("blink") || str.includes("headlight")) return "Lights & Signals";
+  if (str.includes("button") || str.includes("switch") || str.includes("parking") || str.includes("horn")) return "Buttons & Switches";
+  if (str.includes("tire") || str.includes("wheel") || str.includes("hub") || str.includes("mag") || str.includes("flat")) return "Wheel & Tire Issue";
+  if (str.includes("motor") || str.includes("power") || str.includes("battery") || str.includes("batt") || str.includes("start")) return "Motor / Power Issue";
+  if (str.includes("functional") || str.includes("operational")) return "General System / Operational";
+  const first = issue.split(/[\/\n-]/)[0].trim(); return first.length > 25 ? first.slice(0, 25) + "..." : (first || "Other");
 }
 
 function renderCharts(rows) {
-  const done = rows.filter(r => r.status === "Done").length;
-  const pending = rows.filter(r => r.status === "Pending").length;
-
-  const modelCounts = {};
-  rows.forEach(r => { if (r.model) modelCounts[r.model] = (modelCounts[r.model] || 0) + 1; });
-
-  const issueCounts = {};
-  rows.forEach(r => {
-    const k = keywordFromIssue(r.issue);
-    if (k) issueCounts[k] = (issueCounts[k] || 0) + 1;
-  });
+  const done = rows.filter(r => r.status === "Done").length; const pending = rows.filter(r => r.status === "Pending").length;
+  const modelCounts = {}; rows.forEach(r => { if (r.model) modelCounts[r.model] = (modelCounts[r.model] || 0) + 1; });
+  const issueCounts = {}; rows.forEach(r => { const k = keywordFromIssue(r.issue); if (k) issueCounts[k] = (issueCounts[k] || 0) + 1; });
   const topIssues = Object.entries(issueCounts).sort((a,b) => b[1]-a[1]).slice(0, 8);
-
-  const customerCounts = {};
-  rows.forEach(r => { if (r.customer) customerCounts[r.customer] = (customerCounts[r.customer] || 0) + 1; });
+  const customerCounts = {}; rows.forEach(r => { if (r.customer) customerCounts[r.customer] = (customerCounts[r.customer] || 0) + 1; });
   const topCustomers = Object.entries(customerCounts).sort((a,b) => b[1]-a[1]).slice(0, 10);
-
   const monthCounts = {};
   rows.forEach(r => {
       if (r.date) {
           const d = new Date(r.date);
-          if (!isNaN(d)) {
-              const m = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0');
-              monthCounts[m] = (monthCounts[m] || 0) + 1;
-          }
+          if (!isNaN(d)) { const m = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0'); monthCounts[m] = (monthCounts[m] || 0) + 1; }
       }
   });
   
   const trendLabels = Object.keys(monthCounts).sort();
   const formattedTrendLabels = trendLabels.map(l => {
-      const [year, month] = l.split('-');
-      const date = new Date(year, parseInt(month) - 1);
+      const [year, month] = l.split('-'); const date = new Date(year, parseInt(month) - 1);
       return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
   });
-  
   const trendData = trendLabels.map(l => monthCounts[l]);
 
-  if (statusChart) statusChart.destroy();
-  if (modelChart) modelChart.destroy();
-  if (issueChart) issueChart.destroy();
-  if (customerChart) customerChart.destroy();
-  if (trendChart) trendChart.destroy();
-
-  Chart.defaults.font.family = "'Figtree', sans-serif";
-  Chart.defaults.color = "#64748b";
+  if (statusChart) statusChart.destroy(); if (modelChart) modelChart.destroy(); if (issueChart) issueChart.destroy(); if (customerChart) customerChart.destroy(); if (trendChart) trendChart.destroy();
+  Chart.defaults.font.family = "'Figtree', sans-serif"; Chart.defaults.color = "#64748b";
 
   trendChart = new Chart(document.getElementById("trendChart"), {
-      type: 'line',
-      data: { 
-          labels: formattedTrendLabels,
-          datasets: [{ 
-              label: "Units Serviced", 
-              data: trendData, 
-              borderColor: "#1d6a96", 
-              backgroundColor: "rgba(29, 106, 150, 0.1)", 
-              fill: true, tension: 0.3, pointBackgroundColor: "#f08a35", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8
-          }] 
-      },
+      type: 'line', data: { labels: formattedTrendLabels, datasets: [{ label: "Units Serviced", data: trendData, borderColor: "#1d6a96", backgroundColor: "rgba(29, 106, 150, 0.1)", fill: true, tension: 0.3, pointBackgroundColor: "#f08a35", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8 }] },
       options: { 
-          responsive: true, maintainAspectRatio: false, 
-          plugins: { legend: { display: false } }, 
-          scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } },
-          onClick: (event, elements) => {
-              if (elements.length > 0) {
-                  const elementIndex = elements[0].index;
-                  const clickedLabel = trendChart.data.labels[elementIndex];
-                  const rawMonthKey = trendLabels[elementIndex];
-                  openDateModal(clickedLabel, rawMonthKey);
-              }
-          },
-          onHover: (event, chartElement) => {
-              event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-          }
+          responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } },
+          onClick: (e, els) => { if (els.length > 0) openDateModal(trendChart.data.labels[els[0].index], trendLabels[els[0].index]); },
+          onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; }
       }
   });
 
   statusChart = new Chart(document.getElementById("statusChart"), {
-    type: "doughnut",
-    data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0, hoverOffset: 4 }] },
+    type: "doughnut", data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0, hoverOffset: 4 }] },
     options: { 
-      responsive: true, maintainAspectRatio: false, 
-      plugins: { 
-          legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } 
-      }, 
-      cutout: '70%',
-      onClick: (event, elements) => {
-          if (elements.length > 0) {
-              const clickedStatus = statusChart.data.labels[elements[0].index];
-              document.getElementById("statusFilter").value = clickedStatus;
-              applyFilters();
-          }
-      },
-      onHover: (event, chartElement) => {
-          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-      }
+      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } }, cutout: '70%',
+      onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = statusChart.data.labels[els[0].index]; applyFilters(); } },
+      onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; }
     }
   });
 
-  modelChart = new Chart(document.getElementById("modelChart"), {
-    type: "bar",
-    data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#1d6a96", borderRadius: 6, maxBarThickness: 45 }] },
-    options: { 
-      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } },
-      onClick: (event, elements) => {
-          if (elements.length > 0) {
-              const clickedModel = modelChart.data.labels[elements[0].index];
-              document.getElementById("modelFilter").value = clickedModel;
-              applyFilters();
-          }
-      },
-      onHover: (event, chartElement) => {
-          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-      }
-    }
-  });
-
-  issueChart = new Chart(document.getElementById("issueChart"), {
-    type: "pie",
-    data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: 'transparent' }] },
-    options: { 
-      responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
-      onClick: (event, elements) => {
-          if (elements.length > 0) {
-              const elementIndex = elements[0].index;
-              const clickedIssue = issueChart.data.labels[elementIndex];
-              openIssueModal(clickedIssue);
-          }
-      },
-      onHover: (event, chartElement) => {
-          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-      }
-    }
-  });
-  
-  const legendEl = document.getElementById("issueLegend");
-  legendEl.innerHTML = topIssues.map((x,i) => `<span><span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>${x[0]} (${x[1]})</span>`).join("");
-
-  customerChart = new Chart(document.getElementById("customerChart"), {
-    type: "bar",
-    data: { labels: topCustomers.map(x => x[0]), datasets: [{ data: topCustomers.map(x => x[1]), backgroundColor: "#f08a35", borderRadius: 6, maxBarThickness: 24 }] },
-    options: {
-      indexAxis: "y", responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false } },
-      scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } },
-      onClick: (event, elements) => {
-          if (elements.length > 0) {
-              const elementIndex = elements[0].index;
-              const clickedCustomer = customerChart.data.labels[elementIndex];
-              openCustomerModal(clickedCustomer);
-          }
-      },
-      onHover: (event, chartElement) => {
-          event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-      }
-    }
-  });
+  modelChart = new Chart(document.getElementById("modelChart"), { type: "bar", data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#1d6a96", borderRadius: 6, maxBarThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) { document.getElementById("modelFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
+  issueChart = new Chart(document.getElementById("issueChart"), { type: "pie", data: { labels: topIssues.map(x => x[0]), datasets: [{ data: topIssues.map(x => x[1]), backgroundColor: PALETTE, borderWidth: 2, borderColor: 'transparent' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, onClick: (e, els) => { if (els.length > 0) openIssueModal(issueChart.data.labels[els[0].index]); }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
+  const legendEl = document.getElementById("issueLegend"); legendEl.innerHTML = topIssues.map((x,i) => `<span><span class="sw" style="background:${PALETTE[i % PALETTE.length]}"></span>${x[0]} (${x[1]})</span>`).join("");
+  customerChart = new Chart(document.getElementById("customerChart"), { type: "bar", data: { labels: topCustomers.map(x => x[0]), datasets: [{ data: topCustomers.map(x => x[1]), backgroundColor: "#f08a35", borderRadius: 6, maxBarThickness: 24 }] }, options: { indexAxis: "y", responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, ticks: { precision: 0 } }, y: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) openCustomerModal(customerChart.data.labels[els[0].index]); }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
 }
 
 function applyFilters() {
-  const search = document.getElementById("searchBox").value.toLowerCase();
-  const status = document.getElementById("statusFilter").value;
-  const model = document.getElementById("modelFilter").value;
-  const customer = document.getElementById("customerFilter").value;
-  const repair = document.getElementById("repairFilter").value;
-  const dateFrom = document.getElementById("dateFrom").value;
-  const dateTo = document.getElementById("dateTo").value;
-
+  const search = document.getElementById("searchBox").value.toLowerCase(); const status = document.getElementById("statusFilter").value; const model = document.getElementById("modelFilter").value; const customer = document.getElementById("customerFilter").value; const repair = document.getElementById("repairFilter").value; const dateFrom = document.getElementById("dateFrom").value; const dateTo = document.getElementById("dateTo").value;
   const rows = DATA.filter(r => {
-    if (status !== "all" && r.status !== status) return false;
-    if (model !== "all" && r.model !== model) return false;
-    if (customer !== "all" && r.customer !== customer) return false;
-    if (repair !== "all" && r.repairType !== repair) return false;
-    if (dateFrom && (!r.date || r.date < dateFrom)) return false;
-    if (dateTo && (!r.date || r.date > dateTo)) return false;
+    if (status !== "all" && r.status !== status) return false; if (model !== "all" && r.model !== model) return false; if (customer !== "all" && r.customer !== customer) return false; if (repair !== "all" && r.repairType !== repair) return false; if (dateFrom && (!r.date || r.date < dateFrom)) return false; if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) {
-      // Isinama rin ang dateScheduled sa search keywords
       const hay = (r.jo + " " + (r.vin||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + (r.dateScheduled||"") + " " + r.issue).toLowerCase();
       if (!hay.includes(search)) return false;
-    }
-    return true;
+    } return true;
   });
-  
-  CURRENT_FILTERED_DATA = rows;
-
-  renderStats(rows);
-  renderTable(rows);
-  renderCharts(rows);
+  CURRENT_FILTERED_DATA = rows; renderStats(rows); renderTable(rows); renderCharts(rows);
 }
 
 document.getElementById("searchBox").addEventListener("input", applyFilters);
-["statusFilter","modelFilter","customerFilter","repairFilter","dateFrom","dateTo"].forEach(function(id) {
-  document.getElementById(id).addEventListener("change", applyFilters);
+["statusFilter","modelFilter","customerFilter","repairFilter","dateFrom","dateTo"].forEach(id => document.getElementById(id).addEventListener("change", applyFilters));
+document.getElementById("clearFilters").addEventListener("click", () => {
+  document.getElementById("searchBox").value = ""; document.getElementById("statusFilter").value = "all"; document.getElementById("modelFilter").value = "all"; document.getElementById("customerFilter").value = "all"; document.getElementById("repairFilter").value = "all"; document.getElementById("dateFrom").value = ""; document.getElementById("dateTo").value = "";
+  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active')); document.querySelector('.tf-btn').classList.add('active'); applyFilters();
 });
 
-document.getElementById("clearFilters").addEventListener("click", function() {
-  document.getElementById("searchBox").value = "";
-  document.getElementById("statusFilter").value = "all";
-  document.getElementById("modelFilter").value = "all";
-  document.getElementById("customerFilter").value = "all";
-  document.getElementById("repairFilter").value = "all";
-  document.getElementById("dateFrom").value = "";
-  document.getElementById("dateTo").value = "";
-  document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-  document.querySelector('.tf-btn').classList.add('active');
-  applyFilters();
-});
-
-document.getElementById("exportBtn").addEventListener("click", function() {
+document.getElementById("exportBtn").addEventListener("click", () => {
     let csvContent = "JO Number,VIN,Repair Status,Model,Customer,Contact Person,Contact Number,Address,Scheduled Date,Date,Date Resolved,Repair Type,SLA Status,Issue\n";
-
     CURRENT_FILTERED_DATA.forEach(r => {
-        let rowArray = [
-            r.jo, r.vin || "-", r.status, r.model, r.customer, 
-            r.contactPerson || "-", r.contactNumber || "-", r.address || "-",
-            r.dateScheduled || "-", r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue
-        ];
+        let rowArray = [ r.jo, r.vin || "-", r.status, r.model, r.customer, r.contactPerson || "-", r.contactNumber || "-", r.address || "-", r.dateScheduled || "-", r.date, r.dateResolved || "-", r.repairType, r.sla, r.issue ];
         let escapedRow = rowArray.map(item => `"${String(item || '').replace(/"/g, '""')}"`);
         csvContent += escapedRow.join(",") + "\n";
     });
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "NRD_Pasig_Dashboard_Export.csv";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' }); const link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "NRD_Pasig_Dashboard_Export.csv"; document.body.appendChild(link); link.click(); document.body.removeChild(link);
 });
 
-// TIMEFRAME PILL LOGIC
 function setTimeframe(type, btn) {
-    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-
-    const now = new Date();
-    let fromDate = '', toDate = '';
-
-    const formatDateInput = (d) => {
-        let year = d.getFullYear();
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        let day = String(d.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    };
-
-    if (type === 'today') {
-        fromDate = toDate = formatDateInput(now);
-    } else if (type === 'yesterday') {
-        let yest = new Date(now);
-        yest.setDate(now.getDate() - 1);
-        fromDate = toDate = formatDateInput(yest);
-    } else if (type === 'wtd') {
-        let startOfWeek = new Date(now);
-        let day = now.getDay() || 7; 
-        startOfWeek.setDate(now.getDate() - day + 1);
-        fromDate = formatDateInput(startOfWeek);
-        toDate = formatDateInput(now);
-    } else if (type === 'mtd') {
-        let startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        fromDate = formatDateInput(startOfMonth);
-        toDate = formatDateInput(now);
-    }
-
-    document.getElementById("dateFrom").value = fromDate;
-    document.getElementById("dateTo").value = toDate;
-    applyFilters();
+    document.querySelectorAll('.tf-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+    const now = new Date(); let fromDate = '', toDate = '';
+    const formatDateInput = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    if (type === 'today') { fromDate = toDate = formatDateInput(now); } else if (type === 'yesterday') { let yest = new Date(now); yest.setDate(now.getDate() - 1); fromDate = toDate = formatDateInput(yest); } else if (type === 'wtd') { let startOfWeek = new Date(now); let day = now.getDay() || 7; startOfWeek.setDate(now.getDate() - day + 1); fromDate = formatDateInput(startOfWeek); toDate = formatDateInput(now); } else if (type === 'mtd') { let startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); fromDate = formatDateInput(startOfMonth); toDate = formatDateInput(now); }
+    document.getElementById("dateFrom").value = fromDate; document.getElementById("dateTo").value = toDate; applyFilters();
 }
 
+function buildModalRow(r) {
+    const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending"; const identifier = r.vin ? r.vin : (r.jo || "-");
+    return `<td><strong>${identifier}</strong></td><td><span class="badge ${badgeClass}">${r.status}</span></td><td>${r.model || "-"}</td><td><strong>${r.customer || "-"}</strong></td><td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>`;
+}
 function openCustomerModal(customerName) {
-    document.getElementById("modalCustomerName").textContent = customerName + " - Serviced Units";
-    const tbody = document.getElementById("modalTableBody");
-    tbody.innerHTML = "";
-    
-    const customerRecords = CURRENT_FILTERED_DATA.filter(r => r.customer === customerName);
-    
-    customerRecords.forEach(r => {
-        const tr = document.createElement("tr");
-        const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-        const identifier = r.vin ? r.vin : (r.jo || "-");
-        
-        tr.innerHTML = `
-            <td><strong>${identifier}</strong></td>
-            <td><span class="badge ${badgeClass}">${r.status}</span></td>
-            <td>${r.model || "-"}</td>
-            <td><strong>${r.customer || "-"}</strong></td>
-            <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
+    document.getElementById("modalCustomerName").textContent = customerName + " - Serviced Units"; const tbody = document.getElementById("modalTableBody"); tbody.innerHTML = "";
+    const records = CURRENT_FILTERED_DATA.filter(r => r.customer === customerName); records.forEach(r => { const tr = document.createElement("tr"); tr.innerHTML = buildModalRow(r); tbody.appendChild(tr); });
     document.getElementById("customerModal").style.display = "flex";
 }
-
 function openIssueModal(issueCategory) {
-    document.getElementById("modalCustomerName").textContent = "Issue: " + issueCategory;
-    const tbody = document.getElementById("modalTableBody");
-    tbody.innerHTML = "";
-    
-    const issueRecords = CURRENT_FILTERED_DATA.filter(r => keywordFromIssue(r.issue) === issueCategory);
-    
-    issueRecords.forEach(r => {
-        const tr = document.createElement("tr");
-        const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-        const identifier = r.vin ? r.vin : (r.jo || "-");
-        
-        tr.innerHTML = `
-            <td><strong>${identifier}</strong></td>
-            <td><span class="badge ${badgeClass}">${r.status}</span></td>
-            <td>${r.model || "-"}</td>
-            <td><strong>${r.customer || "-"}</strong></td>
-            <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
-        `;
-        tbody.appendChild(tr);
-    });
-    
+    document.getElementById("modalCustomerName").textContent = "Issue: " + issueCategory; const tbody = document.getElementById("modalTableBody"); tbody.innerHTML = "";
+    const records = CURRENT_FILTERED_DATA.filter(r => keywordFromIssue(r.issue) === issueCategory); records.forEach(r => { const tr = document.createElement("tr"); tr.innerHTML = buildModalRow(r); tbody.appendChild(tr); });
     document.getElementById("customerModal").style.display = "flex";
 }
-
 function openDateModal(displayLabel, rawMonthKey) {
-    document.getElementById("modalCustomerName").textContent = "Serviced Units (" + displayLabel + ")";
-    const tbody = document.getElementById("modalTableBody");
-    tbody.innerHTML = "";
-    
-    const monthRecords = CURRENT_FILTERED_DATA.filter(r => {
-        if (!r.date) return false;
-        return r.date.startsWith(rawMonthKey);
-    });
-    
-    if(monthRecords.length === 0) {
-        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No records found for this period.</td></tr>";
-    } else {
-        monthRecords.forEach(r => {
-            const tr = document.createElement("tr");
-            const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
-            const identifier = r.vin ? r.vin : (r.jo || "-");
-            
-            tr.innerHTML = `
-                <td><strong>${identifier}</strong></td>
-                <td><span class="badge ${badgeClass}">${r.status}</span></td>
-                <td>${r.model || "-"}</td>
-                <td><strong>${r.customer || "-"}</strong></td>
-                <td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-    
+    document.getElementById("modalCustomerName").textContent = "Serviced Units (" + displayLabel + ")"; const tbody = document.getElementById("modalTableBody"); tbody.innerHTML = "";
+    const records = CURRENT_FILTERED_DATA.filter(r => r.date && r.date.startsWith(rawMonthKey));
+    if(records.length === 0) { tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No records found.</td></tr>"; } else { records.forEach(r => { const tr = document.createElement("tr"); tr.innerHTML = buildModalRow(r); tbody.appendChild(tr); }); }
     document.getElementById("customerModal").style.display = "flex";
 }
-
-function closeModal() {
-    document.getElementById("customerModal").style.display = "none";
-}
-
-window.addEventListener("click", function(event) {
-    const modal = document.getElementById("customerModal");
-    if (event.target === modal) {
-        closeModal();
-    }
-});
+function closeModal() { document.getElementById("customerModal").style.display = "none"; }
+window.addEventListener("click", function(e) { if (e.target === document.getElementById("customerModal")) closeModal(); });
 </script>
 </body>
 </html>
