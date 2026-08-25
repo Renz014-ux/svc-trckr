@@ -60,8 +60,12 @@
   .nav-tab:hover { color: var(--nrd-blue); }
   .nav-tab.active { color: var(--nrd-blue); border-bottom-color: var(--nrd-blue); }
   
+  /* BREATHING STATUS INDICATOR */
   .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 24px; font-weight: 500;}
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); animation: pulse-dot 2s infinite ease-in-out; }
+  @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+  .dot.error { background: var(--danger); animation: none; box-shadow: 0 0 0 3px var(--danger-bg); }
+  
   .refresh-timer { margin-left: auto; font-size: 12px; font-family: monospace; font-weight: 600; background: var(--surface-card); padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border-light); }
 
   /* SKELETON LOADER ANIMATIONS */
@@ -72,11 +76,8 @@
   .skel-card { height: 110px; flex: 1; min-width: 150px; background-color: var(--surface-card); padding: 20px; border-radius: 12px; }
   .skel-chart { height: 320px; flex: 1; min-width: 300px; background-color: var(--surface-card); border-radius: 12px; }
 
-  /* FADE-UP ANIMATIONS (Aesthetics) */
-  @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-  }
+  /* FADE-UP ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
   /* STAT CARDS & TOOLTIPS */
   .stats { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
@@ -84,10 +85,8 @@
       flex: 1; min-width: 150px; background: var(--surface-card); border-radius: 12px; padding: 20px; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 4px solid var(--border-light); 
       transition: transform 0.2s, background-color 0.3s;
-      /* Animation Applied */
       opacity: 0; animation: fadeUp 0.6s ease-out forwards;
   }
-  /* Animation Delays for Cascading Effect */
   .stat-card:nth-child(1) { animation-delay: 0.05s; border-top-color: var(--nrd-blue); }
   .stat-card:nth-child(2) { animation-delay: 0.10s; border-top-color: var(--success); }
   .stat-card:nth-child(3) { animation-delay: 0.15s; border-top-color: var(--warning); }
@@ -112,7 +111,6 @@
   .chart-box { 
       flex: 1; min-width: 300px; background: var(--surface-card); border-radius: 12px; padding: 24px; 
       box-shadow: 0 4px 15px rgba(0,0,0,0.03); transition: background-color 0.3s;
-      /* Animation Applied */
       opacity: 0; animation: fadeUp 0.6s ease-out forwards; animation-delay: 0.35s;
   }
   .chart-title { font-size: 15px; font-weight: 600; color: var(--text-main); margin: 0 0 20px; }
@@ -152,26 +150,24 @@
   
   table.dataTable { width: 100% !important; border-collapse: collapse; font-size: 13px; color: var(--text-main); margin-top: 0 !important;}
   
-  /* FROSTED GLASS TABLE HEADER (Aesthetics) */
+  /* FROSTED GLASS TABLE HEADER */
   table.dataTable thead th { 
       text-align: left; padding: 16px 14px; color: var(--text-muted); font-weight: 600; 
       border-bottom: 2px solid var(--border-light); text-transform: uppercase; font-size: 11px; 
       letter-spacing: 0.5px; position: sticky; top: 0; z-index: 10;
-      /* Glassmorphism applied */
-      background: rgba(255, 255, 255, 0.85);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
   }
-  [data-theme="dark"] table.dataTable thead th {
-      background: rgba(30, 41, 59, 0.85); /* Dark mode glass */
-  }
+  [data-theme="dark"] table.dataTable thead th { background: rgba(30, 41, 59, 0.85); }
   
   @media (min-width: 1024px) {
-    /* Frozen first column */
     table.dataTable tbody td:first-child { position: sticky; left: 0; background: var(--surface-card); z-index: 5; border-right: 1px solid var(--border-light); }
     table.dataTable thead th:first-child { position: sticky; left: 0; z-index: 11; }
     table.dataTable tbody tr:nth-child(even) td:first-child { background: var(--surface-bg); }
   }
+
+  /* SLIDE-IN ANIMATION FOR TABLE ROWS */
+  @keyframes rowSlideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  table.dataTable tbody tr { animation: rowSlideIn 0.3s ease-out forwards; }
 
   table.dataTable tbody tr:nth-child(even) { background-color: rgba(100,116,139, 0.05); }
   table.dataTable tbody tr:hover td { background-color: rgba(100,116,139, 0.1) !important; }
@@ -187,6 +183,13 @@
   
   mark { background-color: rgba(245, 158, 11, 0.4); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: bold; }
   
+  /* GLOWING BADGES WITH ICONS */
+  .badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .badge-done { background: var(--success-bg); color: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
+  .badge-pending { background: var(--warning-bg); color: var(--warning); box-shadow: 0 0 8px rgba(245, 158, 11, 0.3); }
+  .badge-sla-yes { background: var(--success-bg); color: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
+  .badge-sla-no { background: var(--danger-bg); color: var(--danger); box-shadow: 0 0 8px rgba(239, 68, 68, 0.3); }
+
   .badge-new { font-size: 10px; padding: 2px 6px; background: #d1fae5; color: #10b981; border-radius: 12px; margin-left: 6px; font-weight: 700; vertical-align: middle; animation: pulse-green 2s infinite; display: inline-block; white-space: nowrap; }
   @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
@@ -195,14 +198,12 @@
   .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--border-light) !important; color: var(--text-main) !important; }
   .dataTables_wrapper .dataTables_paginate .paginate_button.current { background: var(--nrd-blue) !important; color: white !important; font-weight: 600; box-shadow: 0 4px 10px rgba(29, 106, 150, 0.2); }
   
-  .badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
-  .badge-done { background: var(--success-bg); color: var(--success); }
-  .badge-pending { background: var(--warning-bg); color: var(--warning); }
-  .badge-sla-yes { background: var(--success-bg); color: var(--success); }
-  .badge-sla-no { background: var(--danger-bg); color: var(--danger); }
-  
   .row-count { font-size: 13px; color: var(--text-muted); margin-top: 12px; font-weight: 500; opacity: 0; animation: fadeUp 0.6s ease-out forwards; animation-delay: 0.6s;}
   .error-box { background: var(--danger-bg); color: var(--danger); padding: 16px; border-radius: 8px; font-size: 14px; margin-bottom: 24px; display: none; font-weight: 500; }
+
+  /* INTERACTIVE EMPTY STATE ICON */
+  .empty-icon { font-size: 40px; margin-bottom: 10px; display: inline-block; transition: transform 0.3s ease; cursor: default; }
+  .empty-state-wrapper:hover .empty-icon { transform: rotate(15deg) scale(1.1); }
 
   /* Toast Notification */
   .toast { visibility: hidden; min-width: 250px; background-color: var(--nrd-blue); color: #fff; text-align: center; border-radius: 8px; padding: 12px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
@@ -389,15 +390,10 @@ let dtInstance; let filtersPopulated = false; let initialLoad = true;
 
 const PALETTE = ["#1d6a96", "#f08a35", "#d93838", "#10b981", "#8b5cf6", "#f43f5e", "#0ea5e9", "#14b8a6"];
 
-// PREMIUM CHART.JS TOOLTIP FIX (Correct Object.assign method)
+// PREMIUM CHART.JS TOOLTIP FIX
 Object.assign(Chart.defaults.plugins.tooltip, {
     backgroundColor: 'rgba(15, 23, 42, 0.90)', 
-    titleColor: '#ffffff',
-    bodyColor: '#e2e8f0',
-    padding: 12,
-    cornerRadius: 8,
-    displayColors: true,
-    boxPadding: 4
+    titleColor: '#ffffff', bodyColor: '#e2e8f0', padding: 12, cornerRadius: 8, displayColors: true, boxPadding: 4
 });
 Chart.defaults.plugins.tooltip.titleFont = { family: "'Figtree', sans-serif", size: 14, weight: '600' };
 Chart.defaults.plugins.tooltip.bodyFont = { family: "'Figtree', sans-serif", size: 13 };
@@ -433,8 +429,8 @@ $(document).ready(function() {
     dtInstance = $('#mainTable').DataTable({
         responsive: true, paging: true, pageLength: 10, searching: false, lengthChange: false, info: false, order: [[ 8, "desc" ]], 
         language: {
-            emptyTable: `<div style="padding: 40px; text-align: center; color: var(--text-muted);"><div style="font-size: 40px; margin-bottom: 10px;">🔍</div><div style="font-size: 16px; font-weight: 600;">No records found</div></div>`,
-            zeroRecords: `<div style="padding: 40px; text-align: center; color: var(--text-muted);"><div style="font-size: 40px; margin-bottom: 10px;">🔍</div><div style="font-size: 16px; font-weight: 600;">No matching records</div></div>`
+            emptyTable: `<div class="empty-state-wrapper" style="padding: 40px; text-align: center; color: var(--text-muted);"><div class="empty-icon">🔍</div><div style="font-size: 16px; font-weight: 600;">No records found</div></div>`,
+            zeroRecords: `<div class="empty-state-wrapper" style="padding: 40px; text-align: center; color: var(--text-muted);"><div class="empty-icon">🔍</div><div style="font-size: 16px; font-weight: 600;">No matching records</div></div>`
         },
         columns: [
             { data: 'jo' }, { data: 'vin' }, { data: 'statusHtml' }, { data: 'model' }, { data: 'customer' }, { data: 'contactInfo' }, { data: 'addressHtml' },
@@ -456,11 +452,18 @@ async function fetchData() {
     const res = await fetch(API_URL, { cache: "no-store" });
     if (!res.ok) throw new Error("HTTP " + res.status);
     DATA = await res.json();
-    document.getElementById("errorBox").style.display = "none"; document.getElementById("liveDot").style.background = "var(--success)"; document.getElementById("lastUpdated").textContent = "Last fetched " + new Date().toLocaleTimeString();
+    document.getElementById("errorBox").style.display = "none"; 
+    
+    const liveDot = document.getElementById("liveDot");
+    liveDot.classList.remove("error");
+    document.getElementById("lastUpdated").textContent = "Last fetched " + new Date().toLocaleTimeString();
+    
     if (initialLoad) { document.getElementById("skeletonScreen").style.display = "none"; document.getElementById("mainContent").style.display = "block"; initialLoad = false; }
     populateFilters(); applyFilters();
   } catch (err) {
-    document.getElementById("liveDot").style.background = "var(--danger)"; document.getElementById("errorBox").style.display = "block"; document.getElementById("errorBox").textContent = "Couldn't reach the data source. (" + err.message + ")";
+    const liveDot = document.getElementById("liveDot");
+    liveDot.classList.add("error");
+    document.getElementById("errorBox").style.display = "block"; document.getElementById("errorBox").textContent = "Couldn't reach the data source. (" + err.message + ")";
   }
 }
 
@@ -490,9 +493,14 @@ function renderTable(rows, searchTerm = "") {
   const d = new Date(); const todayFormatted = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
 
   const tableData = rows.map(r => {
+    // GLOWING ICONS LOGIC
+    const badgeText = r.status === "Done" ? "✓ Done" : "⏳ Pending";
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
+    
     const slaClass = (r.sla === "Yes" || r.sla === "Done") ? "badge-sla-yes" : ((r.sla === "No" || r.sla === "Pending") ? "badge-sla-no" : "");
-    const slaHtml = r.sla ? `<span class="badge ${slaClass}">${r.sla}</span>` : "-";
+    const slaText = (r.sla === "Yes" || r.sla === "Done") ? "✓ " + r.sla : ((r.sla === "No" || r.sla === "Pending") ? "⚠️ " + r.sla : r.sla);
+    
+    const slaHtml = r.sla ? `<span class="badge ${slaClass}">${slaText}</span>` : "-";
     const isNew = (r.date === todayFormatted || r.dateScheduled === todayFormatted);
     const newBadgeHtml = isNew ? `<span class="badge-new">✨ NEW</span>` : '';
 
@@ -506,7 +514,8 @@ function renderTable(rows, searchTerm = "") {
 
     return {
         DT_RowClass: (r.status === 'Pending' && r.sla === 'No') ? 'highlight-overdue' : '',
-        jo: joContent, vin: vinContent, statusHtml: `<span class="badge ${badgeClass}">${r.status}</span>`, 
+        jo: joContent, vin: vinContent, 
+        statusHtml: `<span class="badge ${badgeClass}">${badgeText}</span>`, 
         model: highlightText(r.model, searchTerm) || "-", customer: highlightText(r.customer, searchTerm) || "-", 
         contactInfo: contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-", 
         addressHtml: (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">${highlightText(r.address, searchTerm)}</div>` : "-",
@@ -554,7 +563,8 @@ function applyFilters() {
     if (status !== "all" && r.status !== status) return false; if (model !== "all" && r.model !== model) return false; if (customer !== "all" && r.customer !== customer) return false; if (repair !== "all" && r.repairType !== repair) return false; if (dateFrom && (!r.date || r.date < dateFrom)) return false; if (dateTo && (!r.date || r.date > dateTo)) return false;
     if (search) { const hay = (r.jo + " " + (r.vin||"") + " " + r.customer + " " + (r.contactPerson||"") + " " + (r.contactNumber||"") + " " + (r.address||"") + " " + (r.dateScheduled||"") + " " + r.issue).toLowerCase(); if (!hay.includes(search)) return false; } return true;
   });
-  CURRENT_FILTERED_DATA = rows; renderStats(rows); renderTable(rows, search); renderCharts(rows);
+  CURRENT_FILTERED_DATA = rows; 
+  renderStats(rows); renderTable(rows, search); renderCharts(rows);
 }
 
 document.getElementById("searchBox").addEventListener("input", applyFilters);
