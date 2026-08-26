@@ -29,12 +29,12 @@
     --danger: #ef4444; --danger-bg: #fee2e2;
   }
 
-  [data-theme="dark"] {
-    --surface-bg: #0f172a; --surface-card: #1e293b; --border-light: #334155;
-    --text-main: #f8fafc; --text-muted: #94a3b8;
-    --success-bg: rgba(16, 185, 129, 0.2);
-    --warning-bg: rgba(245, 158, 11, 0.2);
-    --danger-bg: rgba(239, 68, 68, 0.2);
+  /* DARK MODE AURORA GLOW (Tinaasan ang opacity at spread) */
+  [data-theme="dark"] body {
+      background-image: 
+          radial-gradient(circle at 0% 0%, rgba(29, 106, 150, 0.25) 0%, transparent 60%),
+          radial-gradient(circle at 100% 0%, rgba(240, 138, 53, 0.15) 0%, transparent 60%),
+          radial-gradient(circle at 100% 100%, rgba(217, 56, 56, 0.15) 0%, transparent 60%);
   }
   
   /* DARK MODE AURORA GLOW */
@@ -53,7 +53,7 @@
   
   * { box-sizing: border-box; }
   
-  /* LIGHT MODE AURORA GLOW (Base Body) */
+  /* LIGHT MODE AURORA GLOW (Tinaasan ang opacity at spread) */
   body { 
       font-family: 'Figtree', sans-serif; 
       color: var(--text-main); 
@@ -63,9 +63,9 @@
       
       background-color: var(--surface-bg);
       background-image: 
-          radial-gradient(at 0% 0%, rgba(29, 106, 150, 0.06) 0px, transparent 50%),
-          radial-gradient(at 100% 0%, rgba(240, 138, 53, 0.04) 0px, transparent 50%),
-          radial-gradient(at 100% 100%, rgba(217, 56, 56, 0.03) 0px, transparent 50%);
+          radial-gradient(circle at 0% 0%, rgba(29, 106, 150, 0.15) 0%, transparent 60%),
+          radial-gradient(circle at 100% 0%, rgba(240, 138, 53, 0.12) 0%, transparent 60%),
+          radial-gradient(circle at 100% 100%, rgba(217, 56, 56, 0.10) 0%, transparent 60%);
       background-attachment: fixed;
   }
   
