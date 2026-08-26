@@ -49,15 +49,22 @@
   /* 1280px WRAPPER */
   .wrap { max-width: 1280px; margin: 0 auto; } 
   
-  /* UNIFIED HEADER CARD */
-  .top-header-card { background: var(--surface-card); border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); margin-bottom: 24px; border-top: 5px solid var(--nrd-blue); overflow: hidden; transition: background-color 0.3s; }
+  /* DOT GRID HEADER CARD (Premium Aesthetics) */
+  .top-header-card { 
+      background-color: var(--surface-card); 
+      background-image: radial-gradient(rgba(100, 116, 139, 0.1) 1px, transparent 1px);
+      background-size: 16px 16px;
+      border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
+      margin-bottom: 24px; border-top: 5px solid var(--nrd-blue); 
+      overflow: hidden; transition: background-color 0.3s; 
+  }
   .top-header-top { padding: 24px 24px 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
   .top-header-left { display: flex; align-items: center; gap: 16px; }
   .nrd-logo { height: 44px; width: auto; object-fit: contain; }
   h1 { font-size: 24px; font-weight: 700; margin: 0; color: var(--nrd-blue); letter-spacing: -0.5px; line-height: 1.2; }
   .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
   
-  .nav-tabs { display: flex; gap: 32px; padding: 0 24px; background: rgba(100, 116, 139, 0.02); border-top: 1px solid var(--border-light); }
+  .nav-tabs { display: flex; gap: 32px; padding: 0 24px; background: rgba(100, 116, 139, 0.03); border-top: 1px solid var(--border-light); backdrop-filter: blur(4px);}
   .nav-tab { padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; border-bottom: 3px solid transparent; transition: all 0.2s; margin-bottom: -1px; }
   .nav-tab:hover { color: var(--nrd-blue); }
   .nav-tab.active { color: var(--nrd-blue); border-bottom-color: var(--nrd-blue); }
@@ -120,13 +127,21 @@
   .tf-btn:hover { color: var(--text-main); }
   .tf-btn.active { background: var(--surface-card); color: var(--nrd-blue); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 
-  /* FILTERS & CONTROLS */
+  /* FOCUS RINGS PARA SA CONTROLS (Premium Aesthetics) */
   .controls { 
       display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; 
       opacity: 0; animation: fadeUp 0.6s ease-out forwards; animation-delay: 0.4s;
   }
-  .controls input, .controls select { padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 13px; font-family: 'Figtree', sans-serif; background: var(--surface-card); color: var(--text-main); outline: none; transition: border-color 0.2s; }
-  .controls input:focus, .controls select:focus { border-color: var(--nrd-blue); box-shadow: 0 0 0 3px rgba(29, 106, 150, 0.1); }
+  .controls input, .controls select { 
+      padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; 
+      font-size: 13px; font-family: 'Figtree', sans-serif; background: var(--surface-card); 
+      color: var(--text-main); outline: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); 
+  }
+  .controls input:focus, .controls select:focus { 
+      border-color: var(--nrd-blue); 
+      box-shadow: 0 0 0 4px rgba(29, 106, 150, 0.15); 
+      transform: translateY(-1px);
+  }
   #searchBox { flex: 2; min-width: 220px; }
   .date-label { font-size: 13px; color: var(--text-muted); font-weight: 500; }
   
@@ -160,6 +175,13 @@
   }
   [data-theme="dark"] table.dataTable thead th { background: rgba(30, 41, 59, 0.85); }
   
+  /* VERTICAL DIVIDERS IN TABLE (Premium Aesthetics) */
+  table.dataTable tbody td:nth-child(2), table.dataTable thead th:nth-child(2),
+  table.dataTable tbody td:nth-child(7), table.dataTable thead th:nth-child(7),
+  table.dataTable tbody td:nth-child(10), table.dataTable thead th:nth-child(10) {
+      border-right: 1px dashed var(--border-light);
+  }
+  
   @media (min-width: 1024px) {
     table.dataTable tbody td:first-child { position: sticky; left: 0; background: var(--surface-card); z-index: 5; border-right: 1px solid var(--border-light); }
     table.dataTable thead th:first-child { position: sticky; left: 0; z-index: 11; }
@@ -174,17 +196,14 @@
   table.dataTable tbody tr:hover td { background-color: rgba(100,116,139, 0.1) !important; }
   
   table.dataTable tbody td { padding: 14px; border-bottom: 1px solid var(--border-light); vertical-align: top !important; white-space: normal !important; word-wrap: break-word; }
-  table.dataTable thead th:nth-child(7), table.dataTable tbody td:nth-child(7) { min-width: 160px; } /* Address Column */
-  table.dataTable thead th:nth-child(13), table.dataTable tbody td:nth-child(13) { min-width: 240px; } /* Issue Column */
+  table.dataTable thead th:nth-child(7), table.dataTable tbody td:nth-child(7) { min-width: 160px; } 
+  table.dataTable thead th:nth-child(13), table.dataTable tbody td:nth-child(13) { min-width: 240px; }
   
   table.dataTable tbody td:nth-child(8), table.dataTable tbody td:nth-child(9), table.dataTable tbody td:nth-child(10) { white-space: nowrap !important; }
   table.dataTable.no-footer { border-bottom: none; }
 
   table.dataTable tbody tr.highlight-overdue td { background-color: rgba(239, 68, 68, 0.06) !important; }
   table.dataTable tbody tr.highlight-overdue:hover td { background-color: rgba(239, 68, 68, 0.12) !important; }
-  
-  .copy-btn { cursor: pointer; opacity: 0.2; transition: all 0.2s; font-size: 14px; margin-left: 6px; display: inline-block; }
-  .copy-btn:hover { opacity: 1; transform: scale(1.1); }
   
   mark { background-color: rgba(245, 158, 11, 0.4); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: bold; }
   
@@ -197,6 +216,13 @@
 
   .badge-new { font-size: 10px; padding: 3px 8px; background: #d1fae5; color: #10b981; border-radius: 12px; margin-left: 6px; font-weight: 700; vertical-align: middle; animation: pulse-green 2s infinite; display: inline-block; white-space: nowrap; }
   
+  /* PILL TAGS (Premium Aesthetics) */
+  .pill-tag {
+      background: rgba(100, 116, 139, 0.08); color: var(--text-main);
+      padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
+      border: 1px solid rgba(100, 116, 139, 0.15); display: inline-block; white-space: nowrap;
+  }
+
   .dataTables_wrapper .dataTables_paginate { margin: 20px 0; font-size: 13px; font-weight: 500; float: right; opacity: 0; animation: fadeUp 0.6s ease-out forwards; animation-delay: 0.6s;}
   .dataTables_wrapper .dataTables_paginate .paginate_button { padding: 6px 12px; margin-left: 4px; border-radius: 6px; border: none !important; color: var(--text-muted) !important; cursor:pointer;}
   .dataTables_wrapper .dataTables_paginate .paginate_button:hover { background: var(--border-light) !important; color: var(--text-main) !important; }
@@ -209,23 +235,10 @@
   .empty-icon { font-size: 40px; margin-bottom: 10px; display: inline-block; transition: transform 0.3s ease; cursor: default; }
   .empty-state-wrapper:hover .empty-icon { transform: rotate(15deg) scale(1.1); }
 
-  /* Toast Notification */
-  .toast { visibility: hidden; min-width: 250px; background-color: var(--nrd-blue); color: #fff; text-align: center; border-radius: 8px; padding: 12px 20px; position: fixed; z-index: 9999; left: 50%; bottom: 30px; transform: translateX(-50%); font-size: 14px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
-  .toast.show { visibility: visible; opacity: 1; bottom: 50px; }
-
   /* Floating Back to Top Button */
   .btt-btn { display: none; position: fixed; bottom: 30px; right: 30px; z-index: 99; border: none; outline: none; background-color: var(--nrd-blue); color: white; cursor: pointer; padding: 12px 14px; border-radius: 50%; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; }
   .btt-btn:hover { background-color: #15557a; transform: translateY(-3px); }
 
-  /* Modal */
-  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
-  .modal-close { position: absolute; top: 24px; right: 24px; background: var(--surface-bg); border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
-  .modal-close:hover { background: var(--danger-bg); color: var(--danger); transform: rotate(90deg); }
-  .modal-title { margin-top: 0; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--nrd-blue); }
-  .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
-  .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
-  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
 </style>
 </head>
 <body>
@@ -370,15 +383,6 @@
 </div>
 
 <button onclick="scrollToTop()" id="bttBtn" class="btt-btn" title="Go to top">⬆️</button>
-<div id="toast" class="toast">Text copied!</div>
-
-<div class="modal-overlay" id="customerModal">
-  <div class="modal-content">
-      <button class="modal-close" onclick="closeModal()">&times;</button>
-      <h2 class="modal-title" id="modalCustomerName">Details</h2>
-      <div style="overflow-x: auto;"><table class="modal-table"><thead><tr><th>VIN / JO Number</th><th>Repair Status</th><th>Model</th><th>Customer</th><th>Issue Summary</th></tr></thead><tbody id="modalTableBody"></tbody></table></div>
-  </div>
-</div>
 
 <script>
 const themeToggle = document.getElementById('themeToggle');
@@ -420,15 +424,6 @@ function toggleFilters() {
     else { filterDiv.style.display = "none"; toggleBtn.textContent = "⚙️ Show Advanced Filters"; }
 }
 
-function copyText(text, event) {
-    event.stopPropagation();
-    navigator.clipboard.writeText(text).then(() => {
-        const toast = document.getElementById("toast");
-        toast.textContent = "📋 Copied: " + text; toast.className = "toast show";
-        setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
-    });
-}
-
 window.onscroll = function() {
     if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) { document.getElementById("bttBtn").style.display = "block"; } 
     else { document.getElementById("bttBtn").style.display = "none"; }
@@ -449,7 +444,7 @@ $(document).ready(function() {
     });
     
     fetchData();
-    setInterval(fetchData, POLL_SECONDS * 1000); // Simple auto-refresh in the background without timer
+    setInterval(fetchData, POLL_SECONDS * 1000); 
 });
 
 async function fetchData() {
@@ -498,7 +493,6 @@ function renderTable(rows, searchTerm = "") {
   const d = new Date(); const todayFormatted = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, '0') + "-" + String(d.getDate()).padStart(2, '0');
 
   const tableData = rows.map(r => {
-    // TEXT LANG WALANG EMOJI
     const badgeText = r.status;
     const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending";
     
@@ -514,20 +508,25 @@ function renderTable(rows, searchTerm = "") {
     if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${highlightText(r.contactNumber, searchTerm)}</div>`);
     
     const hlJo = highlightText(r.jo, searchTerm); const hlVin = highlightText(r.vin, searchTerm);
+    
     const joContent = r.jo && r.jo !== "-" ? `<strong>${hlJo}</strong> ${newBadgeHtml}` : "-";
-const vinContent = r.vin && r.vin !== "-" ? `${hlVin}` : "-";
+    const vinContent = r.vin && r.vin !== "-" ? `${hlVin}` : "-";
 
     return {
         DT_RowClass: (r.status === 'Pending' && r.sla === 'No') ? 'highlight-overdue' : '',
         jo: joContent, vin: vinContent, 
         statusHtml: `<span class="badge ${badgeClass}">${badgeText}</span>`, 
-        model: highlightText(r.model, searchTerm) || "-", customer: highlightText(r.customer, searchTerm) || "-", 
+        // PILL TAGS ADDED HERE
+        model: r.model && r.model !== "-" ? `<span class="pill-tag">${highlightText(r.model, searchTerm)}</span>` : "-", 
+        customer: highlightText(r.customer, searchTerm) || "-", 
         contactInfo: contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-", 
         addressHtml: (r.address && r.address !== "-") ? `<div style="font-size: 11px; color: var(--text-muted);">${highlightText(r.address, searchTerm)}</div>` : "-",
         dateSchedHtml: r.dateScheduled ? `<span style="display:none;">${r.dateScheduled}</span>${formatBeautifulDate(r.dateScheduled)}` : "-",
         dateHtml: r.date ? `<span style="display:none;">${r.date}</span>${formatBeautifulDate(r.date)}` : "-",
         dateResHtml: r.dateResolved ? `<span style="display:none;">${r.dateResolved}</span>${formatBeautifulDate(r.dateResolved)}` : "-",
-        repairType: r.repairType || "-", slaHtml: slaHtml, issue: `<span style="color:var(--text-muted);">${highlightText(r.issue, searchTerm) || "-"}</span>`
+        // PILL TAGS ADDED HERE
+        repairType: r.repairType && r.repairType !== "-" ? `<span class="pill-tag">${highlightText(r.repairType, searchTerm)}</span>` : "-", 
+        slaHtml: slaHtml, issue: `<span style="color:var(--text-muted);">${highlightText(r.issue, searchTerm) || "-"}</span>`
     };
   });
   dtInstance.clear(); dtInstance.rows.add(tableData); dtInstance.draw(false);
@@ -547,17 +546,28 @@ function renderCharts(rows) {
   if (statusChart) statusChart.destroy(); if (modelChart) modelChart.destroy(); if (trendChart) trendChart.destroy();
   Chart.defaults.font.family = "'Figtree', sans-serif"; Chart.defaults.color = "#64748b";
 
+  // GRADIENT SETUP FOR CHARTS
+  const trendCtx = document.getElementById("trendChart").getContext("2d");
+  const gradientTrend = trendCtx.createLinearGradient(0, 0, 0, 220);
+  gradientTrend.addColorStop(0, "rgba(29, 106, 150, 0.3)");
+  gradientTrend.addColorStop(1, "rgba(29, 106, 150, 0.0)");
+
+  const modelCtx = document.getElementById("modelChart").getContext("2d");
+  const gradientModel = modelCtx.createLinearGradient(0, 0, 0, 240);
+  gradientModel.addColorStop(0, "rgba(29, 106, 150, 0.8)");
+  gradientModel.addColorStop(1, "rgba(29, 106, 150, 0.2)");
+
   trendChart = new Chart(document.getElementById("trendChart"), {
-      type: 'line', data: { labels: formattedTrendLabels, datasets: [{ label: "Units Serviced", data: trendData, borderColor: "#1d6a96", backgroundColor: "rgba(29, 106, 150, 0.1)", fill: true, tension: 0.3, pointBackgroundColor: "#f08a35", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) openDateModal(trendChart.data.labels[els[0].index], trendLabels[els[0].index]); }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } }
+      type: 'line', data: { labels: formattedTrendLabels, datasets: [{ label: "Units Serviced", data: trendData, borderColor: "#1d6a96", backgroundColor: gradientTrend, fill: true, tension: 0.3, pointBackgroundColor: "#f08a35", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8 }] },
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
   });
 
   statusChart = new Chart(document.getElementById("statusChart"), {
     type: "doughnut", data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } }, cutout: '70%', onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = statusChart.data.labels[els[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } }, cutout: '70%', onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = statusChart.data.labels[els[0].index]; applyFilters(); } } }
   });
 
-  modelChart = new Chart(document.getElementById("modelChart"), { type: "bar", data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: "#1d6a96", borderRadius: 6, maxBarThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) { document.getElementById("modelFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
+  modelChart = new Chart(document.getElementById("modelChart"), { type: "bar", data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: gradientModel, borderRadius: 6, maxBarThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) { document.getElementById("modelFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } } } });
 }
 
 function applyFilters() {
@@ -592,16 +602,6 @@ function setTimeframe(type, btn) {
     if (type === 'today') { fromDate = toDate = formatDateInput(now); } else if (type === 'yesterday') { let yest = new Date(now); yest.setDate(now.getDate() - 1); fromDate = toDate = formatDateInput(yest); } else if (type === 'wtd') { let startOfWeek = new Date(now); let day = now.getDay() || 7; startOfWeek.setDate(now.getDate() - day + 1); fromDate = formatDateInput(startOfWeek); toDate = formatDateInput(now); } else if (type === 'mtd') { let startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); fromDate = formatDateInput(startOfMonth); toDate = formatDateInput(now); }
     document.getElementById("dateFrom").value = fromDate; document.getElementById("dateTo").value = toDate; applyFilters();
 }
-
-function buildModalRow(r) { const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending"; const identifier = r.vin ? r.vin : (r.jo || "-"); return `<td><strong>${identifier}</strong></td><td><span class="badge ${badgeClass}">${r.status}</span></td><td>${r.model || "-"}</td><td><strong>${r.customer || "-"}</strong></td><td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>`; }
-function openDateModal(displayLabel, rawMonthKey) {
-    document.getElementById("modalCustomerName").textContent = "Serviced Units (" + displayLabel + ")"; const tbody = document.getElementById("modalTableBody"); tbody.innerHTML = "";
-    const records = CURRENT_FILTERED_DATA.filter(r => r.date && r.date.startsWith(rawMonthKey));
-    if(records.length === 0) { tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No records found.</td></tr>"; } else { records.forEach(r => { const tr = document.createElement("tr"); tr.innerHTML = buildModalRow(r); tbody.appendChild(tr); }); }
-    document.getElementById("customerModal").style.display = "flex";
-}
-function closeModal() { document.getElementById("customerModal").style.display = "none"; }
-window.addEventListener("click", function(e) { if (e.target === document.getElementById("customerModal")) closeModal(); });
 </script>
 </body>
 </html>
