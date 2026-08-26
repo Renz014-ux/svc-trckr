@@ -94,7 +94,7 @@
   }
   .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
   
-  /* PILL THEME SWITCH (Option 2 Applied) */
+  /* PILL THEME SWITCH */
   .theme-switch {
       position: relative; display: inline-block; width: 64px; height: 32px;
       background: rgba(100, 116, 139, 0.1); border-radius: 30px;
@@ -259,7 +259,7 @@
   table.dataTable tbody tr.highlight-overdue:hover td { background-color: rgba(239, 68, 68, 0.12) !important; }
   mark { background-color: rgba(245, 158, 11, 0.4); color: inherit; padding: 0 2px; border-radius: 3px; font-weight: bold; }
   
-  /* GLOWING BADGES WITH "URGENT PULSE" (Option 6 Applied) */
+  /* GLOWING BADGES WITH "URGENT PULSE" */
   .badge { font-size: 12px; padding: 4px 12px; border-radius: 20px; font-weight: 600; white-space: nowrap; display: inline-block;}
   .badge-done { background: var(--success-bg); color: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
   .badge-sla-yes { background: var(--success-bg); color: var(--success); box-shadow: 0 0 8px rgba(16, 185, 129, 0.3); }
@@ -286,6 +286,16 @@
   .empty-state-wrapper:hover .empty-icon { transform: rotate(15deg) scale(1.1); }
   .btt-btn { display: none; position: fixed; bottom: 30px; right: 30px; z-index: 99; border: none; outline: none; background-color: var(--nrd-blue); color: white; cursor: pointer; padding: 12px 14px; border-radius: 50%; font-size: 18px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.3s; }
   .btt-btn:hover { background-color: #15557a; transform: translateY(-3px); }
+
+  /* POPUP MODAL CSS (RESTORED) */
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 800px; max-height: 85vh; overflow-y: auto; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+  .modal-close { position: absolute; top: 24px; right: 24px; background: var(--surface-bg); border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 20px; cursor: pointer; color: var(--text-muted); display: flex; justify-content: center; align-items: center; transition: 0.2s; }
+  .modal-close:hover { background: var(--danger-bg); color: var(--danger); transform: rotate(90deg); }
+  .modal-title { margin-top: 0; font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--nrd-blue); }
+  .modal-table { width: 100%; border-collapse: collapse; font-size: 13px; color: var(--text-main); }
+  .modal-table th { padding: 14px; border-bottom: 2px solid var(--border-light); text-align: left; color: var(--text-muted); text-transform: uppercase; font-size: 11px; }
+  .modal-table td { padding: 14px; border-bottom: 1px solid var(--border-light); vertical-align: top; }
 </style>
 </head>
 <body>
@@ -433,6 +443,22 @@
 </div>
 
 <button onclick="scrollToTop()" id="bttBtn" class="btt-btn" title="Go to top">⬆️</button>
+
+<!-- POPUP MODAL (RESTORED!) -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <h2 class="modal-title" id="modalCustomerName">Details</h2>
+      <div style="overflow-x: auto;">
+          <table class="modal-table">
+              <thead>
+                  <tr><th>VIN / JO Number</th><th>Repair Status</th><th>Model</th><th>Customer</th><th>Issue Summary</th></tr>
+              </thead>
+              <tbody id="modalTableBody"></tbody>
+          </table>
+      </div>
+  </div>
+</div>
 
 <script>
 // THEME SWITCH LOGIC
@@ -617,8 +643,8 @@ function renderCharts(rows) {
       options: { 
           responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
           scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } },
-          /* CINEMATIC DRAW-IN ANIMATION (Option 4 Applied) */
-          animation: { duration: 1500, easing: 'easeInOutQuart' }
+          animation: { duration: 1500, easing: 'easeInOutQuart' },
+          onClick: (e, els) => { if (els.length > 0) openDateModal(trendChart.data.labels[els[0].index], trendLabels[els[0].index]); }
       }
   });
 
@@ -628,7 +654,6 @@ function renderCharts(rows) {
         responsive: true, maintainAspectRatio: false, 
         plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } }, 
         cutout: '70%', onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = statusChart.data.labels[els[0].index]; applyFilters(); } },
-        /* CINEMATIC DRAW-IN ANIMATION (Option 4 Applied) */
         animation: { duration: 1500, easing: 'easeOutBounce' }
     }
   });
@@ -638,8 +663,8 @@ function renderCharts(rows) {
       options: { 
           responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
           scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, 
-          onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } },
-          /* CINEMATIC DRAW-IN ANIMATION (Option 4 Applied) */
+          // FIXED: Ito ay dapat na modelFilter, hindi statusFilter!
+          onClick: (e, els) => { if (els.length > 0) { document.getElementById("modelFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } },
           animation: { duration: 1500, easing: 'easeOutQuart' }
       } 
   });
@@ -677,6 +702,27 @@ function setTimeframe(type, btn) {
     if (type === 'today') { fromDate = toDate = formatDateInput(now); } else if (type === 'yesterday') { let yest = new Date(now); yest.setDate(now.getDate() - 1); fromDate = toDate = formatDateInput(yest); } else if (type === 'wtd') { let startOfWeek = new Date(now); let day = now.getDay() || 7; startOfWeek.setDate(now.getDate() - day + 1); fromDate = formatDateInput(startOfWeek); toDate = formatDateInput(now); } else if (type === 'mtd') { let startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1); fromDate = formatDateInput(startOfMonth); toDate = formatDateInput(now); }
     document.getElementById("dateFrom").value = fromDate; document.getElementById("dateTo").value = toDate; applyFilters();
 }
+
+// RESTORED: MODAL POPUP LOGIC FOR TREND CHART
+function buildModalRow(r) { 
+    const badgeClass = r.status === "Done" ? "badge-done" : "badge-pending"; 
+    const identifier = r.vin ? r.vin : (r.jo || "-"); 
+    return `<td><strong>${identifier}</strong></td><td><span class="badge ${badgeClass}">${r.status}</span></td><td>${r.model || "-"}</td><td><strong>${r.customer || "-"}</strong></td><td><span style="color:var(--text-muted);">${r.issue || "-"}</span></td>`; 
+}
+function openDateModal(displayLabel, rawMonthKey) {
+    document.getElementById("modalCustomerName").textContent = "Serviced Units (" + displayLabel + ")"; 
+    const tbody = document.getElementById("modalTableBody"); tbody.innerHTML = "";
+    const records = CURRENT_FILTERED_DATA.filter(r => r.date && r.date.startsWith(rawMonthKey));
+    if(records.length === 0) { 
+        tbody.innerHTML = "<tr><td colspan='5' style='text-align:center;'>No records found.</td></tr>"; 
+    } else { 
+        records.forEach(r => { const tr = document.createElement("tr"); tr.innerHTML = buildModalRow(r); tbody.appendChild(tr); }); 
+    }
+    document.getElementById("customerModal").style.display = "flex";
+}
+function closeModal() { document.getElementById("customerModal").style.display = "none"; }
+window.addEventListener("click", function(e) { if (e.target === document.getElementById("customerModal")) closeModal(); });
+
 </script>
 </body>
 </html>
