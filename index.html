@@ -514,8 +514,8 @@ function renderTable(rows, searchTerm = "") {
     if (r.contactNumber && r.contactNumber !== "-") contactLines.push(`<div>${highlightText(r.contactNumber, searchTerm)}</div>`);
     
     const hlJo = highlightText(r.jo, searchTerm); const hlVin = highlightText(r.vin, searchTerm);
-    const joContent = r.jo && r.jo !== "-" ? `<strong>${hlJo}</strong> <span class="copy-btn" onclick="copyText('${r.jo}', event)" title="Copy JO">📋</span> ${newBadgeHtml}` : "-";
-    const vinContent = r.vin && r.vin !== "-" ? `${hlVin} <span class="copy-btn" onclick="copyText('${r.vin}', event)" title="Copy VIN">📋</span>` : "-";
+    const joContent = r.jo && r.jo !== "-" ? `<strong>${hlJo}</strong> ${newBadgeHtml}` : "-";
+const vinContent = r.vin && r.vin !== "-" ? `${hlVin}` : "-";
 
     return {
         DT_RowClass: (r.status === 'Pending' && r.sla === 'No') ? 'highlight-overdue' : '',
