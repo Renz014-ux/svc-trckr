@@ -35,6 +35,13 @@
     --success-bg: rgba(16, 185, 129, 0.2);
     --warning-bg: rgba(245, 158, 11, 0.2);
     --danger-bg: rgba(239, 68, 68, 0.2);
+
+    /* IDAGDAG MO ITO PARA SA DARK MODE GLOW */
+  [data-theme="dark"] body {
+      background-image: 
+          radial-gradient(at 0% 0%, rgba(29, 106, 150, 0.15) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(240, 138, 53, 0.08) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(217, 56, 56, 0.06) 0px, transparent 50%);
   }
   
   /* CUSTOM SCROLLBAR */
@@ -44,7 +51,19 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
   
   * { box-sizing: border-box; }
-  body { font-family: 'Figtree', sans-serif; background: var(--surface-bg); color: var(--text-main); margin: 0; padding: 30px 20px; transition: background-color 0.3s, color 0.3s; }
+  body { font-family: 'Figtree', sans-serif; 
+      color: var(--text-main); 
+      margin: 0; 
+      padding: 30px 20px; 
+      transition: background-color 0.3s, color 0.3s;
+      
+      /* THE AURORA BRAND GLOW (NRD Colors) */
+      background-color: var(--surface-bg);
+      background-image: 
+          radial-gradient(at 0% 0%, rgba(29, 106, 150, 0.06) 0px, transparent 50%),
+          radial-gradient(at 100% 0%, rgba(240, 138, 53, 0.04) 0px, transparent 50%),
+          radial-gradient(at 100% 100%, rgba(217, 56, 56, 0.03) 0px, transparent 50%);
+      background-attachment: fixed; }
   
   /* 1280px WRAPPER */
   .wrap { max-width: 1280px; margin: 0 auto; } 
