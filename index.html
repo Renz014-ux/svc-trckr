@@ -35,8 +35,9 @@
     --success-bg: rgba(16, 185, 129, 0.2);
     --warning-bg: rgba(245, 158, 11, 0.2);
     --danger-bg: rgba(239, 68, 68, 0.2);
-
-    /* IDAGDAG MO ITO PARA SA DARK MODE GLOW */
+  }
+  
+  /* DARK MODE AURORA GLOW */
   [data-theme="dark"] body {
       background-image: 
           radial-gradient(at 0% 0%, rgba(29, 106, 150, 0.15) 0px, transparent 50%),
@@ -51,19 +52,22 @@
   ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
   
   * { box-sizing: border-box; }
-  body { font-family: 'Figtree', sans-serif; 
+  
+  /* LIGHT MODE AURORA GLOW (Base Body) */
+  body { 
+      font-family: 'Figtree', sans-serif; 
       color: var(--text-main); 
       margin: 0; 
       padding: 30px 20px; 
       transition: background-color 0.3s, color 0.3s;
       
-      /* THE AURORA BRAND GLOW (NRD Colors) */
       background-color: var(--surface-bg);
       background-image: 
           radial-gradient(at 0% 0%, rgba(29, 106, 150, 0.06) 0px, transparent 50%),
           radial-gradient(at 100% 0%, rgba(240, 138, 53, 0.04) 0px, transparent 50%),
           radial-gradient(at 100% 100%, rgba(217, 56, 56, 0.03) 0px, transparent 50%);
-      background-attachment: fixed; }
+      background-attachment: fixed;
+  }
   
   /* 1280px WRAPPER */
   .wrap { max-width: 1280px; margin: 0 auto; } 
@@ -146,7 +150,7 @@
   .tf-btn:hover { color: var(--text-main); }
   .tf-btn.active { background: var(--surface-card); color: var(--nrd-blue); box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 
-  /* FOCUS RINGS PARA SA CONTROLS (Premium Aesthetics) */
+  /* FOCUS RINGS PARA SA CONTROLS */
   .controls { 
       display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 16px; align-items: center; 
       opacity: 0; animation: fadeUp 0.6s ease-out forwards; animation-delay: 0.4s;
@@ -194,7 +198,7 @@
   }
   [data-theme="dark"] table.dataTable thead th { background: rgba(30, 41, 59, 0.85); }
   
-  /* VERTICAL DIVIDERS IN TABLE (Premium Aesthetics) */
+  /* VERTICAL DIVIDERS IN TABLE */
   table.dataTable tbody td:nth-child(2), table.dataTable thead th:nth-child(2),
   table.dataTable tbody td:nth-child(7), table.dataTable thead th:nth-child(7),
   table.dataTable tbody td:nth-child(10), table.dataTable thead th:nth-child(10) {
@@ -235,7 +239,7 @@
 
   .badge-new { font-size: 10px; padding: 3px 8px; background: #d1fae5; color: #10b981; border-radius: 12px; margin-left: 6px; font-weight: 700; vertical-align: middle; animation: pulse-green 2s infinite; display: inline-block; white-space: nowrap; }
   
-  /* PILL TAGS (Premium Aesthetics) */
+  /* PILL TAGS */
   .pill-tag {
       background: rgba(100, 116, 139, 0.08); color: var(--text-main);
       padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 600;
@@ -403,6 +407,17 @@
 
 <button onclick="scrollToTop()" id="bttBtn" class="btt-btn" title="Go to top">⬆️</button>
 
+<!-- GOOGLE ANALYTICS CODE (Optional) -->
+<!-- 
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script> 
+-->
+
 <script>
 const themeToggle = document.getElementById('themeToggle');
 const currentTheme = localStorage.getItem('theme') || 'light';
@@ -535,7 +550,6 @@ function renderTable(rows, searchTerm = "") {
         DT_RowClass: (r.status === 'Pending' && r.sla === 'No') ? 'highlight-overdue' : '',
         jo: joContent, vin: vinContent, 
         statusHtml: `<span class="badge ${badgeClass}">${badgeText}</span>`, 
-        // PILL TAGS ADDED HERE
         model: r.model && r.model !== "-" ? `<span class="pill-tag">${highlightText(r.model, searchTerm)}</span>` : "-", 
         customer: highlightText(r.customer, searchTerm) || "-", 
         contactInfo: contactLines.length > 0 ? `<div class="contact-info">${contactLines.join('')}</div>` : "-", 
@@ -543,7 +557,6 @@ function renderTable(rows, searchTerm = "") {
         dateSchedHtml: r.dateScheduled ? `<span style="display:none;">${r.dateScheduled}</span>${formatBeautifulDate(r.dateScheduled)}` : "-",
         dateHtml: r.date ? `<span style="display:none;">${r.date}</span>${formatBeautifulDate(r.date)}` : "-",
         dateResHtml: r.dateResolved ? `<span style="display:none;">${r.dateResolved}</span>${formatBeautifulDate(r.dateResolved)}` : "-",
-        // PILL TAGS ADDED HERE
         repairType: r.repairType && r.repairType !== "-" ? `<span class="pill-tag">${highlightText(r.repairType, searchTerm)}</span>` : "-", 
         slaHtml: slaHtml, issue: `<span style="color:var(--text-muted);">${highlightText(r.issue, searchTerm) || "-"}</span>`
     };
@@ -578,15 +591,15 @@ function renderCharts(rows) {
 
   trendChart = new Chart(document.getElementById("trendChart"), {
       type: 'line', data: { labels: formattedTrendLabels, datasets: [{ label: "Units Serviced", data: trendData, borderColor: "#1d6a96", backgroundColor: gradientTrend, fill: true, tension: 0.3, pointBackgroundColor: "#f08a35", pointBorderWidth: 2, pointRadius: 5, pointHoverRadius: 8 }] },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } } }
+      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) openDateModal(trendChart.data.labels[els[0].index], trendLabels[els[0].index]); }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } }
   });
 
   statusChart = new Chart(document.getElementById("statusChart"), {
     type: "doughnut", data: { labels: ["Done", "Pending"], datasets: [{ data: [done, pending], backgroundColor: ["#10b981", "#f59e0b"], borderWidth: 0 }] },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } }, cutout: '70%', onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = statusChart.data.labels[els[0].index]; applyFilters(); } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { usePointStyle: true, boxWidth: 8, font: { family: "'Figtree', sans-serif", size: 12 } } } }, cutout: '70%', onClick: (e, els) => { if (els.length > 0) { document.getElementById("statusFilter").value = statusChart.data.labels[els[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } }
   });
 
-  modelChart = new Chart(document.getElementById("modelChart"), { type: "bar", data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: gradientModel, borderRadius: 6, maxBarThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) { document.getElementById("modelFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } } } });
+  modelChart = new Chart(document.getElementById("modelChart"), { type: "bar", data: { labels: Object.keys(modelCounts), datasets: [{ data: Object.values(modelCounts), backgroundColor: gradientModel, borderRadius: 6, maxBarThickness: 45 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } }, x: { grid: { display: false } } }, onClick: (e, els) => { if (els.length > 0) { document.getElementById("modelFilter").value = modelChart.data.labels[els[0].index]; applyFilters(); } }, onHover: (e, el) => { e.native.target.style.cursor = el[0] ? 'pointer' : 'default'; } } });
 }
 
 function applyFilters() {
