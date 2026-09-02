@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Scheduling Calendar | Service Tracker</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!-- Google Fonts: Figtree -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- FullCalendar.js & SweetAlert2 -->
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js'></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style>
+  :root {
+    --nrd-blue: #1d6a96; --nrd-orange: #f08a35; --nrd-red: #d93838;
+    --surface-bg: #f4f7f9; --surface-card: #ffffff; --border-light: #e2e8f0;
+    --text-main: #1e293b; --text-muted: #64748b;
+    --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
+  }
+
+  [data-theme="dark"] {
+    --surface-bg: #0f172a; --surface-card: #1e293b; --border-light: #334155;
+    --text-main: #f8fafc; --text-muted: #94a3b8;
+  }
+  
+  [data-theme="dark"] body {
+      background-image: 
+          radial-gradient(circle at 0% 0%, rgba(29, 106, 150, 0.25) 0%, transparent 60%),
+          radial-gradient(circle at 100% 0%, rgba(240, 138, 53, 0.15) 0%, transparent 60%),
+          radial-gradient(circle at 100% 100%, rgba(217, 56, 56, 0.15) 0%, transparent 60%);
+  }
+  
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+  ::selection { background: var(--nrd-orange); color: #ffffff; }
+  
+  * { box-sizing: border-box; }
+  
+  body { 
+      font-family: 'Figtree', sans-serif; color: var(--text-main); 
+      margin: 0; padding: 20px 20px 40px 20px; transition: background-color 0.3s, color 0.3s;
+      background-color: var(--surface-bg);
+      background-image: 
+          radial-gradient(circle at 0% 0%, rgba(29, 106, 150, 0.15) 0%, transparent 60%),
+          radial-gradient(circle at 100% 0%, rgba(240, 138, 53, 0.12) 0%, transparent 60%),
+          radial-gradient(circle at 100% 100%, rgba(217, 56, 56, 0.10) 0%, transparent 60%);
+      background-attachment: fixed;
+  }
+  
+  .wrap { max-width: 1280px; margin: 0 auto; } 
+  
+  .top-header-card { 
+      position: sticky; top: 10px; z-index: 100;
+      background-color: rgba(255, 255, 255, 0.80); 
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      background-image: radial-gradient(rgba(100, 116, 139, 0.1) 1px, transparent 1px);
+      background-size: 16px 16px;
+      border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+      margin-bottom: 24px; border-top: 5px solid var(--nrd-blue); 
+  }
+  [data-theme="dark"] .top-header-card { background-color: rgba(30, 41, 59, 0.80); }
+
+  .top-header-top { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+  .top-header-left { display: flex; align-items: center; gap: 16px; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0; background: linear-gradient(135deg, var(--nrd-blue), var(--nrd-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; line-height: 1.2; }
+  .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
+  
+  .nav-tabs { display: flex; gap: 32px; padding: 0 24px; background: rgba(100, 116, 139, 0.03); border-top: 1px solid var(--border-light); border-radius: 0 0 16px 16px;}
+  .nav-tab { padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: all 0.2s; position: relative; }
+  .nav-tab:hover { color: var(--nrd-blue); }
+  .nav-tab.active { color: var(--nrd-blue); }
+  .nav-tab::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 3px; background: var(--nrd-blue); transition: width 0.3s; border-radius: 3px 3px 0 0; }
+  .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+
+  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 16px; font-weight: 500;}
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); animation: pulse-dot 2s infinite ease-in-out; }
+  @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+  .dot.error { background: var(--danger); animation: none; box-shadow: 0 0 0 3px var(--danger-bg); }
+
+  /* CALENDAR CONTAINER */
+  .calendar-card {
+      background: var(--surface-card); border-radius: 16px; padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid var(--border-light);
+      opacity: 0; animation: fadeUp 0.6s ease-out forwards;
+  }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* FULLCALENDAR OVERRIDES */
+  .fc { font-family: 'Figtree', sans-serif; }
+  .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); border-radius: 12px; overflow: hidden; }
+  .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
+  .fc-col-header-cell { padding: 12px 0; background: rgba(100, 116, 139, 0.03); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;}
+  .fc-daygrid-day-number { color: var(--text-main); font-weight: 500; padding: 8px !important; }
+  .fc-event { border-radius: 6px; padding: 2px 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: transform 0.2s; border: none;}
+  .fc-event:hover { transform: scale(1.02); z-index: 5; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
+  .fc-button-primary { background-color: var(--nrd-blue) !important; border-color: var(--nrd-blue) !important; text-transform: capitalize; font-weight: 600 !important; border-radius: 8px !important; padding: 8px 16px !important;}
+  .fc-button-primary:hover { background-color: #15557a !important; }
+  .fc-today-button { background-color: var(--surface-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-light) !important; }
+  .fc-toolbar-title { font-weight: 700 !important; color: var(--text-main); font-size: 20px !important;}
+
+  /* BUTTONS & MODALS */
+  .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif; box-shadow: 0 4px 10px rgba(240, 138, 53, 0.2);}
+  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(240, 138, 53, 0.4); }
+
+  .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
+  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); animation: fadeUp 0.3s ease-out forwards; }
+  .modal-title { font-size: 20px; font-weight: 700; margin: 0 0 20px 0; color: var(--text-main); }
+  
+  .form-group { margin-bottom: 16px; }
+  .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
+  .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; font-family: 'Figtree', sans-serif; background: var(--surface-bg); color: var(--text-main); outline: none; transition: 0.2s; }
+  .form-control:focus { border-color: var(--nrd-blue); box-shadow: 0 0 0 3px rgba(29, 106, 150, 0.15); }
+  
+  .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+  .btn-cancel { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
+  .btn-save { background: var(--nrd-blue); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+  .btn-save:hover { background: #15557a; transform: translateY(-1px); }
+
+  /* MECHANIC LEGEND */
+  .legend { display: flex; gap: 16px; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .legend-color { width: 12px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="top-header-card">
+    <div class="top-header-top">
+        <div class="top-header-left">
+            <div>
+                <h1>Service Tracker Dashboard</h1>
+                <p class="subtitle">Operations & Scheduling</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="btn-action" onclick="openScheduleModal()">+ Schedule a JO</button>
+        </div>
+    </div>
+    <div class="nav-tabs">
+        <!-- UPDATE LINKS HERE PARA KONEKTADO SA MAIN DASHBOARD -->
+        <a href="index.html" class="nav-tab">Pasig</a>
+        <a href="starosa.html" class="nav-tab">Sta. Rosa</a>
+        <a href="calendar.html" class="nav-tab active">🗓️ Scheduling</a>
+    </div>
+  </div>
+  
+  <div class="status-line">
+      <span class="dot" id="liveDot"></span><span id="lastUpdated">Loading calendar data...</span>
+  </div>
+
+  <div class="calendar-card">
+      <div id="calendar"></div>
+      <div class="legend">
+          <div class="legend-item"><div class="legend-color" style="background: var(--nrd-blue);"></div> Chris</div>
+          <div class="legend-item"><div class="legend-color" style="background: var(--nrd-orange);"></div> Lohen</div>
+          <div class="legend-item"><div class="legend-color" style="background: #94a3b8;"></div> Unassigned</div>
+      </div>
+  </div>
+</div>
+
+<!-- SCHEDULE MODAL -->
+<div class="modal-overlay" id="scheduleModal">
+  <div class="modal-content">
+      <h2 class="modal-title" id="modalTitle">Assign Schedule</h2>
+      
+      <div class="form-group">
+          <label>Job Order Number</label>
+          <select id="joSelect" class="form-control">
+              <option value="">Loading JOs...</option>
+          </select>
+      </div>
+      
+      <div class="form-group">
+          <label>Scheduled Date</label>
+          <input type="date" id="schedDate" class="form-control">
+      </div>
+      
+      <div class="form-group">
+          <label>Assigned Mechanic</label>
+          <select id="mechanicSelect" class="form-control">
+              <option value="">-- Select Mechanic --</option>
+              <option value="Chris">Chris</option>
+              <option value="Lohen">Lohen</option>
+          </select>
+      </div>
+      
+      <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-save" onclick="saveSchedule()" id="saveBtn">Save Schedule</button>
+      </div>
+  </div>
+</div>
+
+<script>
+// ==========================================
+// 1. ILAGAY DITO ANG BAGONG WEB APP URL MO
+// ==========================================
+const API_URL = "https://script.google.com/macros/s/AKfycbxD7olSxYcqUfVKcYTY-XtC2fEotmaj3JyHo8qk9_19mDHMFoH04UEJLVnG-ipJ6fXn/exec"; 
+
+let RAW_DATA = [];
+let calendar;
+
+document.addEventListener('DOMContentLoaded', function() {
+    initCalendar();
+    fetchData();
+});
+
+function initCalendar() {
+    var calendarEl = document.getElementById('calendar');
+    calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth,timeGridWeek'
+        },
+        editable: true, // Payagan ang drag and drop
+        droppable: true,
+        height: 700,
+        eventClick: function(info) {
+            // Pag kinlick ang event, buksan ang edit modal
+            openScheduleModal(info.event.id, info.event.startStr, info.event.extendedProps.mechanic);
+        },
+        eventDrop: function(info) {
+            // Kapag dinrag sa ibang araw
+            handleDragDrop(info.event.id, info.event.startStr, info.oldEvent.startStr);
+        }
+    });
+    calendar.render();
+}
+
+async function fetchData() {
+    try {
+        const res = await fetch(API_URL, { cache: "no-store" });
+        if (!res.ok) throw new Error("Network error");
+        RAW_DATA = await res.json();
+        
+        document.getElementById("liveDot").classList.remove("error");
+        document.getElementById("lastUpdated").textContent = "Data synced: " + new Date().toLocaleTimeString();
+        
+        populateCalendar();
+        populateJODropdown();
+    } catch (err) {
+        document.getElementById("liveDot").classList.add("error");
+        document.getElementById("lastUpdated").textContent = "Connection failed.";
+    }
+}
+
+function populateCalendar() {
+    // Alisin muna lahat ng lumang events
+    calendar.removeAllEvents();
+    
+    // I-filter lang ang mga may Scheduled Date
+    let scheduledRecords = RAW_DATA.filter(r => r.dateScheduled && r.dateScheduled !== "-");
+    
+    let events = scheduledRecords.map(r => {
+        // NRD Branding Colors based sa Mechanic
+        let bgColor = '#94a3b8'; // Default Gray
+        let mech = (r.mechanic || "").toLowerCase();
+        if (mech.includes('chris')) bgColor = '#1d6a96'; // Blue
+        if (mech.includes('lohen')) bgColor = '#f08a35'; // Orange
+        
+        // Pabilisin ang text display: "Customer (Model)"
+        let titleText = `${r.customer || "Unknown"} (${r.model || "N/A"})`;
+        
+        // Transform JS Date to YYYY-MM-DD para sa FullCalendar
+        let d = new Date(r.dateScheduled);
+        let dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        
+        return {
+            id: r.jo,
+            title: titleText,
+            start: dateStr,
+            backgroundColor: bgColor,
+            extendedProps: { mechanic: r.mechanic }
+        };
+    });
+    
+    calendar.addEventSource(events);
+}
+
+function populateJODropdown() {
+    const select = document.getElementById("joSelect");
+    select.innerHTML = '<option value="">-- Select Pending JO --</option>';
+    
+    // Ipakita lang ang mga JO na Pending o wala pang tapos
+    let pendingJOs = RAW_DATA.filter(r => r.status !== "Done" && r.jo);
+    
+    pendingJOs.forEach(r => {
+        let opt = document.createElement('option');
+        opt.value = r.jo;
+        opt.textContent = `${r.jo} - ${r.customer || "Unknown"}`;
+        select.appendChild(opt);
+    });
+}
+
+function openScheduleModal(jo = "", date = "", mechanic = "") {
+    document.getElementById("joSelect").value = jo;
+    
+    // Kung kinlick ang event para i-edit, hindi pwedeng palitan ang JO number
+    document.getElementById("joSelect").disabled = jo !== ""; 
+    document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Assign Schedule";
+    
+    document.getElementById("schedDate").value = date;
+    
+    // Auto-select mechanic dropdown
+    let mechSelect = document.getElementById("mechanicSelect");
+    mechSelect.value = ""; 
+    if(mechanic.toLowerCase().includes('chris')) mechSelect.value = "Chris";
+    if(mechanic.toLowerCase().includes('lohen')) mechSelect.value = "Lohen";
+    
+    document.getElementById("scheduleModal").style.display = "flex";
+}
+
+function closeModal() {
+    document.getElementById("scheduleModal").style.display = "none";
+}
+
+// DRAG AND DROP LOGIC (Auto-save)
+function handleDragDrop(jo, newDateStr, oldDateStr) {
+    Swal.fire({
+        title: 'Reschedule JO?',
+        text: `Move JO ${jo} to ${newDateStr}?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#1d6a96',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, move it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            sendUpdateToBackend(jo, newDateStr, undefined); // undefined mechanic means don't change it
+        } else {
+            // Revert sa kalendaryo kung cinancel
+            fetchData(); 
+        }
+    });
+}
+
+// SAVE BUTTON LOGIC (Mula sa Modal)
+function saveSchedule() {
+    const jo = document.getElementById("joSelect").value;
+    const date = document.getElementById("schedDate").value;
+    const mechanic = document.getElementById("mechanicSelect").value;
+    
+    if(!jo || !date) {
+        Swal.fire('Incomplete', 'Please select a JO and a Date.', 'warning');
+        return;
+    }
+    
+    document.getElementById("saveBtn").textContent = "Saving...";
+    document.getElementById("saveBtn").disabled = true;
+    
+    sendUpdateToBackend(jo, date, mechanic);
+}
+
+// SEND POST REQUEST TO GOOGLE APPS SCRIPT
+async function sendUpdateToBackend(jo, date, mechanic) {
+    let payload = { jo: jo };
+    if (date !== undefined) payload.dateScheduled = date;
+    if (mechanic !== undefined) payload.mechanic = mechanic;
+    
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        if(result.status === "success") {
+            Swal.fire({ title: 'Saved!', text: 'Schedule updated in Google Sheets.', icon: 'success', timer: 2000, showConfirmButton: false });
+            closeModal();
+            fetchData(); // Refresh UI
+        } else {
+            Swal.fire('Error', result.message || 'Failed to save.', 'error');
+            fetchData(); // Revert kung fail
+        }
+    } catch (e) {
+        Swal.fire('Error', 'Network error. Cannot reach database.', 'error');
+        fetchData();
+    } finally {
+        document.getElementById("saveBtn").textContent = "Save Schedule";
+        document.getElementById("saveBtn").disabled = false;
+    }
+}
+</script>
+</body>
+</html>
