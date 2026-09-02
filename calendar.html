@@ -35,7 +35,6 @@
   }
   
   * { box-sizing: border-box; }
-  
   html, body { margin: 0; padding: 0; }
   
   body { 
@@ -49,7 +48,7 @@
       background-attachment: fixed;
   }
   
-  .wrap { max-width: 1280px; margin: 0 auto; position: relative; } 
+  .wrap { max-width: 1400px; margin: 0 auto; position: relative; } 
   
   .top-header-card { 
       background-color: var(--surface-card); 
@@ -66,35 +65,74 @@
   .nav-tab:hover, .nav-tab.active { color: var(--nrd-blue); }
   .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--nrd-blue); border-radius: 3px 3px 0 0; }
 
-  /* FILTER BAR UX */
-  .filter-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 12px; flex-wrap: wrap;}
-  .filter-group { display: flex; gap: 8px; }
-  .filter-btn { background: var(--surface-card); border: 1px solid var(--border-light); padding: 8px 14px; border-radius: 8px; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; transition: 0.2s; font-family: 'Figtree';}
-  .filter-btn:hover, .filter-btn.active { background: var(--nrd-blue); color: white; border-color: var(--nrd-blue); }
+  /* MINI-ANALYTICS BAR */
+  .analytics-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
+  .stat-pill { background: var(--surface-card); border: 1px solid var(--border-light); padding: 10px 16px; border-radius: 10px; flex: 1; min-width: 150px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
+  .stat-pill-icon { font-size: 18px; }
+  .stat-pill-num { font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1; }
+  .stat-pill-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+
+  /* MAIN LAYOUT WITH SIDEBAR DRAWER */
+  .main-layout { display: flex; gap: 20px; align-items: start; }
+  
+  .sidebar-drawer { 
+      width: 320px; background: var(--surface-card); border-radius: 16px; padding: 20px; 
+      border: 1px solid var(--border-light); box-shadow: 0 10px 30px rgba(0,0,0,0.03); 
+      flex-shrink: 0; max-height: 700px; display: flex; flex-direction: column;
+  }
+  .sidebar-header { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
+  .sidebar-subtitle { font-size: 12px; color: var(--text-muted); margin-bottom: 16px; }
+  .external-events-list { overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; flex: 1; }
+  
+  .fc-external-event { 
+      background: var(--surface-bg); border: 1px solid var(--border-light); border-left: 4px solid var(--warning); 
+      border-radius: 8px; padding: 10px 12px; font-size: 12px; cursor: grab; transition: all 0.2s; 
+  }
+  .fc-external-event:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: var(--nrd-blue); }
+  .fc-external-event:active { cursor: grabbing; }
+  .event-jo { font-weight: 700; color: var(--nrd-blue); }
+  .event-cust { font-weight: 600; color: var(--text-main); margin-top: 2px; }
+  .event-issue { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
 
   .calendar-card {
-      background: var(--surface-card); border-radius: 16px; padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid var(--border-light);
-      position: relative;
+      flex: 1; background: var(--surface-card); border-radius: 16px; padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid var(--border-light); position: relative; min-width: 0;
   }
 
   .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif;}
   .btn-action:hover { background: #e07a2a; transform: translateY(-1px); }
 
-  /* FULLCALENDAR FIXES FOR OFFSET DRAG CURSOR */
+  /* FULLCALENDAR OVERRIDES & STATUS BORDERS */
   .fc-view-harness, .fc-view-harness * { transform: none !important; }
   .fc-event-dragging { opacity: 0.9 !important; z-index: 9999 !important; box-shadow: 0 12px 30px rgba(0,0,0,0.25) !important; }
   .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); border-radius: 12px; overflow: hidden; }
   .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
-  .fc-event { border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 600; cursor: grab; border: none; margin-bottom: 2px !important;}
+  
+  /* EVENT CAPSULES WITH COLOR-CODED BORDERS */
+  .fc-event { 
+      border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 600; cursor: grab; 
+      margin-bottom: 2px !important; border: 2px solid transparent !important;
+  }
   .fc-event:active { cursor: grabbing; }
-  .fc-button-primary { background-color: var(--nrd-blue) !important; border-color: var(--nrd-blue) !important; }
+  .fc-event-pending { border-color: var(--warning) !important; }
+  .fc-event-done { border-color: var(--success) !important; opacity: 0.8; }
+  
+  .fc-button-primary { background-color: var(--nrd-blue) !important; border-color: var(--nrd-blue) !important; text-transform: capitalize; }
   .fc-event-title-container { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* DONE EVENT STYLING */
-  .event-done { opacity: 0.75; }
+  /* STATUS BADGES IN EVENT */
   .status-tag-done { background: #10b981; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
   .status-tag-pending { background: #f59e0b; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+
+  /* HOVER TOOLTIP STYLING */
+  .custom-tooltip {
+      position: absolute; z-index: 9999; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);
+      color: #ffffff; padding: 12px 16px; border-radius: 10px; font-size: 12px; pointer-events: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); max-width: 280px; display: none;
+  }
+  .tt-title { font-weight: 700; font-size: 13px; color: var(--nrd-orange); margin-bottom: 4px; }
+  .tt-row { margin-bottom: 3px; color: #cbd5e1; }
+  .tt-label { font-weight: 600; color: #94a3b8; }
 
   /* MODAL STYLES */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
@@ -133,27 +171,60 @@
     </div>
   </div>
 
-  <div class="filter-bar">
-      <div class="filter-group">
-          <span style="font-size:12px; font-weight:600; color:var(--text-muted); align-self:center; margin-right:4px;">Mechanic Filter:</span>
-          <button class="filter-btn active" onclick="filterMechanic('all', this)">All</button>
-          <button class="filter-btn" onclick="filterMechanic('chris', this)">Chris Only</button>
-          <button class="filter-btn" onclick="filterMechanic('lohen', this)">Lohen Only</button>
-          <button class="filter-btn" onclick="filterMechanic('unassigned', this)">Unassigned</button>
+  <!-- MINI-ANALYTICS BAR -->
+  <div class="analytics-bar">
+      <div class="stat-pill">
+          <span class="stat-pill-icon">📋</span>
+          <div><div class="stat-pill-num" id="statUnscheduled">0</div><div class="stat-pill-label">Unscheduled JOs</div></div>
+      </div>
+      <div class="stat-pill">
+          <span class="stat-pill-icon">📅</span>
+          <div><div class="stat-pill-num" id="statTotalScheduled">0</div><div class="stat-pill-label">Total Scheduled</div></div>
+      </div>
+      <div class="stat-pill">
+          <span class="stat-pill-icon">👨‍🔧</span>
+          <div><div class="stat-pill-num" id="statChris" style="color:var(--nrd-blue);">0</div><div class="stat-pill-label">Chris Load</div></div>
+      </div>
+      <div class="stat-pill">
+          <span class="stat-pill-icon">👨‍🔧</span>
+          <div><div class="stat-pill-num" id="statLohen" style="color:var(--nrd-orange);">0</div><div class="stat-pill-label">Lohen Load</div></div>
+      </div>
+      <div class="stat-pill">
+          <span class="stat-pill-icon">✅</span>
+          <div><div class="stat-pill-num" id="statDone" style="color:var(--success);">0</div><div class="stat-pill-label">Resolved Units</div></div>
       </div>
   </div>
 
-  <div class="calendar-card">
-      <div id="calendar"></div>
-      <div class="legend">
-          <div class="legend-item"><div class="legend-color" style="background: var(--nrd-blue);"></div> Chris</div>
-          <div class="legend-item"><div class="legend-color" style="background: var(--nrd-orange);"></div> Lohen</div>
-          <div class="legend-item"><div class="legend-color" style="background: #94a3b8;"></div> Unassigned</div>
-          <div class="legend-item" style="margin-left: auto;"><span class="status-tag-done">✓ DONE</span> Resolved Unit</div>
-          <div class="legend-item"><span class="status-tag-pending">PENDING</span> In-Service Unit</div>
+  <!-- MAIN LAYOUT (SIDEBAR DRAWER + CALENDAR) -->
+  <div class="main-layout">
+      <!-- UNSCHEDULED JO SIDEBAR -->
+      <div class="sidebar-drawer">
+          <div class="sidebar-header">
+              <span>Unscheduled JOs</span>
+              <span id="sidebarCount" style="background:var(--warning-bg); color:var(--warning); padding:2px 8px; border-radius:12px; font-size:12px;">0</span>
+          </div>
+          <div class="sidebar-subtitle">Drag any JO card directly to the calendar date</div>
+          <div class="external-events-list" id="externalEventsList">
+              <div style="text-align:center; color:var(--text-muted); padding:20px; font-size:12px;">Loading JOs...</div>
+          </div>
+      </div>
+
+      <!-- CALENDAR CARD -->
+      <div class="calendar-card">
+          <div id="calendar"></div>
+          <div class="legend">
+              <div class="legend-item"><div class="legend-color" style="background: var(--nrd-blue);"></div> Chris</div>
+              <div class="legend-item"><div class="legend-color" style="background: var(--nrd-orange);"></div> Lohen</div>
+              <div class="legend-item"><div class="legend-color" style="background: #94a3b8;"></div> Unassigned</div>
+              <div class="legend-item" style="margin-left: auto;"><span class="status-tag-done">✓ DONE</span> Resolved</div>
+              <div class="legend-item"><span class="status-tag-pending">PENDING</span> In-Service</div>
+          </div>
       </div>
   </div>
 </div>
+
+<!-- RICH HOVER TOOLTIP -->
+<div class="custom-tooltip" id="hoverTooltip"></div>
 
 <!-- SCHEDULE MODAL -->
 <div class="modal-overlay" id="scheduleModal">
@@ -199,14 +270,12 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQH
 
 let RAW_DATA = [];
 let calendar;
-let currentFilter = 'all';
 
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
     fetchData();
 });
 
-// Helper Function para i-clean at i-format ang Date String sa YYYY-MM-DD
 function sanitizeDate(dateStr) {
     if (!dateStr || dateStr === "-" || dateStr === "NaT") return null;
     let d = new Date(dateStr);
@@ -220,12 +289,19 @@ function sanitizeDate(dateStr) {
 function initCalendar() {
     var calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
+        // VIEW SWITCHER OPTIONS (Month, Week, Day, List/Agenda)
         initialView: 'dayGridMonth',
-        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+        headerToolbar: { 
+            left: 'prev,next today', 
+            center: 'title', 
+            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' 
+        },
         editable: true,
         droppable: true,
         dragScroll: false,
         height: 650,
+        
+        // EVENT STYLING & CONTENT
         eventContent: function(arg) {
             let isDone = arg.event.extendedProps.isDone;
             let statusBadge = isDone 
@@ -234,16 +310,43 @@ function initCalendar() {
             
             let customEl = document.createElement('div');
             customEl.className = 'fc-event-title-container';
-            let issueText = arg.event.extendedProps.issue ? `\nIssue: ${arg.event.extendedProps.issue}` : '';
-            customEl.title = `${arg.event.title}${issueText}`;
             customEl.innerHTML = `${statusBadge} <span>${arg.event.title}</span>`;
             return { domNodes: [customEl] };
         },
+        
+        // RICH HOVER TOOLTIP LOGIC
+        eventMouseEnter: function(info) {
+            let props = info.event.extendedProps;
+            let tooltip = document.getElementById('hoverTooltip');
+            tooltip.innerHTML = `
+                <div class="tt-title">${info.event.id}</div>
+                <div class="tt-row"><span class="tt-label">Customer:</span> ${props.customer}</div>
+                <div class="tt-row"><span class="tt-label">Model/VIN:</span> ${props.model} (${props.vin})</div>
+                <div class="tt-row"><span class="tt-label">Issue:</span> ${props.issue}</div>
+                <div class="tt-row"><span class="tt-label">Mechanic:</span> ${props.mechanic || 'Unassigned'}</div>
+            `;
+            tooltip.style.display = 'block';
+            tooltip.style.left = info.jsEvent.pageX + 15 + 'px';
+            tooltip.style.top = info.jsEvent.pageY + 15 + 'px';
+        },
+        eventMouseLeave: function() {
+            document.getElementById('hoverTooltip').style.display = 'none';
+        },
+        
+        // EVENT CLICK & DROP HANDLERS
         eventClick: function(info) {
             openScheduleModal(info.event.id, info.event.startStr, info.event.extendedProps.mechanic);
         },
         eventDrop: function(info) {
             handleDragDrop(info.event.id, info.event.startStr);
+        },
+        
+        // HANDLE EXTERNAL DRAG FROM SIDEBAR DRAWER
+        eventReceive: function(info) {
+            let jo = info.event.id;
+            let newDateStr = sanitizeDate(info.event.startStr);
+            info.event.remove(); // Remove temporary dropped element until backend approves
+            sendUpdateToBackend(jo, newDateStr, undefined);
         }
     });
     calendar.render();
@@ -255,31 +358,42 @@ async function fetchData() {
         if (!res.ok) throw new Error("Network error");
         RAW_DATA = await res.json();
         
-        populateCalendar();
-        populateJODropdown();
+        populateCalendarAndUI();
     } catch (err) {
         console.error("Fetch error:", err);
     }
 }
 
-function populateCalendar() {
+function populateCalendarAndUI() {
     calendar.removeAllEvents();
     
-    let scheduledRecords = RAW_DATA.filter(r => {
+    let scheduledRecords = [];
+    let unscheduledRecords = [];
+    
+    let countChris = 0, countLohen = 0, countDone = 0;
+    
+    RAW_DATA.forEach(r => {
         let cleanDate = sanitizeDate(r.dateScheduled);
-        return cleanDate !== null;
+        let mech = (r.mechanic || "").toLowerCase();
+        
+        if (cleanDate !== null) {
+            scheduledRecords.push(r);
+            if (mech.includes('chris')) countChris++;
+            if (mech.includes('lohen')) countLohen++;
+            if (r.status === "Done") countDone++;
+        } else if (r.status !== "Done") {
+            unscheduledRecords.push(r);
+        }
     });
     
-    if (currentFilter !== 'all') {
-        scheduledRecords = scheduledRecords.filter(r => {
-            let m = (r.mechanic || "").toLowerCase();
-            if (currentFilter === 'chris') return m.includes('chris');
-            if (currentFilter === 'lohen') return m.includes('lohen');
-            if (currentFilter === 'unassigned') return !m.includes('chris') && !m.includes('lohen');
-            return true;
-        });
-    }
-
+    // UPDATE MINI-ANALYTICS BAR
+    document.getElementById('statUnscheduled').textContent = unscheduledRecords.length;
+    document.getElementById('statTotalScheduled').textContent = scheduledRecords.length;
+    document.getElementById('statChris').textContent = countChris;
+    document.getElementById('statLohen').textContent = countLohen;
+    document.getElementById('statDone').textContent = countDone;
+    
+    // POPULATE CALENDAR
     let events = scheduledRecords.map(r => {
         let bgColor = '#94a3b8'; // Unassigned Gray
         let mech = (r.mechanic || "").toLowerCase();
@@ -288,26 +402,68 @@ function populateCalendar() {
         
         let isDone = (r.status === "Done");
         let cleanDate = sanitizeDate(r.dateScheduled);
-        let titleText = `${r.jo} - ${r.customer || "Customer"} (${r.model || "Unit"})`;
+        let titleText = `${r.jo} - ${r.customer || "Customer"}`;
         
         return {
             id: r.jo,
             title: titleText,
             start: cleanDate,
             backgroundColor: bgColor,
-            className: isDone ? 'event-done' : '',
-            extendedProps: { mechanic: r.mechanic, isDone: isDone, issue: r.issue }
+            className: isDone ? 'fc-event-done' : 'fc-event-pending',
+            extendedProps: { 
+                mechanic: r.mechanic, 
+                isDone: isDone, 
+                issue: r.issue || 'No summary', 
+                customer: r.customer || 'Unknown', 
+                model: r.model || 'N/A', 
+                vin: r.vin || '-' 
+            }
         };
     });
-    
     calendar.addEventSource(events);
+    
+    // POPULATE SIDEBAR DRAWER (UNSCHEDULED JOs)
+    populateSidebarDrawer(unscheduledRecords);
+    
+    // POPULATE MODAL DROPDOWN
+    populateJODropdown();
 }
 
-function filterMechanic(type, btn) {
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    currentFilter = type;
-    populateCalendar();
+function populateSidebarDrawer(unscheduledJOs) {
+    const list = document.getElementById('externalEventsList');
+    document.getElementById('sidebarCount').textContent = unscheduledJOs.length;
+    list.innerHTML = '';
+    
+    if (unscheduledJOs.length === 0) {
+        list.innerHTML = '<div style="text-align:center; color:var(--text-muted); padding:20px; font-size:12px;">🎉 All JOs are Scheduled!</div>';
+        return;
+    }
+    
+    unscheduledJOs.forEach(r => {
+        let el = document.createElement('div');
+        el.className = 'fc-external-event';
+        el.dataset.jo = r.jo;
+        el.innerHTML = `
+            <div class="event-jo">${r.jo}</div>
+            <div class="event-cust">${r.customer || 'Unknown'} (${r.model || 'Unit'})</div>
+            <div class="event-issue">${r.issue || 'No issue summary'}</div>
+        `;
+        list.appendChild(el);
+    });
+    
+    // MAKE SIDEBAR ITEMS DRAGGABLE INTO CALENDAR
+    new FullCalendar.Draggable(list, {
+        itemSelector: '.fc-external-event',
+        eventData: function(eventEl) {
+            let jo = eventEl.dataset.jo;
+            let record = RAW_DATA.find(r => r.jo === jo) || {};
+            return {
+                id: jo,
+                title: `${jo} - ${record.customer || 'Customer'}`,
+                backgroundColor: '#94a3b8'
+            };
+        }
+    });
 }
 
 function populateJODropdown() {
@@ -318,8 +474,8 @@ function populateJODropdown() {
         let opt = document.createElement('option');
         opt.value = r.jo;
         let statusText = r.status === "Done" ? " [DONE]" : " [PENDING]";
-        select.appendChild(opt);
         opt.textContent = `${r.jo} - ${r.customer || "Unknown"} (${r.model || "No Model"})${statusText}`;
+        select.appendChild(opt);
     });
 }
 
