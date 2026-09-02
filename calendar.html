@@ -34,17 +34,11 @@
           radial-gradient(circle at 100% 100%, rgba(217, 56, 56, 0.15) 0%, transparent 60%);
   }
   
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 10px; }
-  ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
-  ::selection { background: var(--nrd-orange); color: #ffffff; }
-  
   * { box-sizing: border-box; }
   
   body { 
       font-family: 'Figtree', sans-serif; color: var(--text-main); 
-      margin: 0; padding: 20px 20px 40px 20px; transition: background-color 0.3s, color 0.3s;
+      margin: 0; padding: 20px; transition: background-color 0.3s, color 0.3s;
       background-color: var(--surface-bg);
       background-image: 
           radial-gradient(circle at 0% 0%, rgba(29, 106, 150, 0.15) 0%, transparent 60%),
@@ -53,77 +47,59 @@
       background-attachment: fixed;
   }
   
-  .wrap { max-width: 1280px; margin: 0 auto; } 
+  .wrap { max-width: 1280px; margin: 0 auto; position: relative; } 
   
   .top-header-card { 
-      position: sticky; top: 10px; z-index: 100;
-      background-color: rgba(255, 255, 255, 0.80); 
-      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-      background-image: radial-gradient(rgba(100, 116, 139, 0.1) 1px, transparent 1px);
-      background-size: 16px 16px;
-      border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); 
+      background-color: var(--surface-card); 
+      border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.03); 
       margin-bottom: 24px; border-top: 5px solid var(--nrd-blue); 
   }
-  [data-theme="dark"] .top-header-card { background-color: rgba(30, 41, 59, 0.80); }
 
   .top-header-top { padding: 20px 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
-  .top-header-left { display: flex; align-items: center; gap: 16px; }
-  h1 { font-size: 24px; font-weight: 800; margin: 0; background: linear-gradient(135deg, var(--nrd-blue), var(--nrd-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: -0.5px; line-height: 1.2; }
+  h1 { font-size: 24px; font-weight: 800; margin: 0; background: linear-gradient(135deg, var(--nrd-blue), var(--nrd-orange)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; line-height: 1.2; }
   .subtitle { color: var(--text-muted); font-size: 13px; margin: 2px 0 0 0; font-weight: 500; }
   
   .nav-tabs { display: flex; gap: 32px; padding: 0 24px; background: rgba(100, 116, 139, 0.03); border-top: 1px solid var(--border-light); border-radius: 0 0 16px 16px;}
   .nav-tab { padding: 14px 0; font-size: 14px; font-weight: 600; color: var(--text-muted); text-decoration: none; transition: all 0.2s; position: relative; }
-  .nav-tab:hover { color: var(--nrd-blue); }
-  .nav-tab.active { color: var(--nrd-blue); }
-  .nav-tab::after { content: ''; position: absolute; bottom: 0; left: 0; width: 0%; height: 3px; background: var(--nrd-blue); transition: width 0.3s; border-radius: 3px 3px 0 0; }
-  .nav-tab:hover::after, .nav-tab.active::after { width: 100%; }
+  .nav-tab:hover, .nav-tab.active { color: var(--nrd-blue); }
+  .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--nrd-blue); border-radius: 3px 3px 0 0; }
 
-  .status-line { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-muted); margin-bottom: 16px; font-weight: 500;}
-  .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 3px var(--success-bg); animation: pulse-dot 2s infinite ease-in-out; }
-  @keyframes pulse-dot { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
-  .dot.error { background: var(--danger); animation: none; box-shadow: 0 0 0 3px var(--danger-bg); }
-
-  /* CALENDAR CONTAINER */
   .calendar-card {
       background: var(--surface-card); border-radius: 16px; padding: 24px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid var(--border-light);
-      opacity: 0; animation: fadeUp 0.6s ease-out forwards;
+      position: relative; z-index: 1;
   }
-  @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* FULLCALENDAR OVERRIDES */
-  .fc { font-family: 'Figtree', sans-serif; }
+  .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif;}
+  .btn-action:hover { background: #e07a2a; transform: translateY(-1px); }
+
+  /* FULLCALENDAR FIXES FOR DRAG POSITION & CURSOR ALIGNMENT */
+  .fc-event-dragging { transform: none !important; opacity: 0.85 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; }
   .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); border-radius: 12px; overflow: hidden; }
   .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
-  .fc-col-header-cell { padding: 12px 0; background: rgba(100, 116, 139, 0.03); color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 12px; letter-spacing: 0.5px;}
-  .fc-daygrid-day-number { color: var(--text-main); font-weight: 500; padding: 8px !important; }
-  .fc-event { border-radius: 6px; padding: 2px 4px; font-size: 12px; font-weight: 600; cursor: pointer; transition: transform 0.2s; border: none;}
-  .fc-event:hover { transform: scale(1.02); z-index: 5; box-shadow: 0 4px 10px rgba(0,0,0,0.15);}
-  .fc-button-primary { background-color: var(--nrd-blue) !important; border-color: var(--nrd-blue) !important; text-transform: capitalize; font-weight: 600 !important; border-radius: 8px !important; padding: 8px 16px !important;}
-  .fc-button-primary:hover { background-color: #15557a !important; }
-  .fc-today-button { background-color: var(--surface-bg) !important; color: var(--text-main) !important; border: 1px solid var(--border-light) !important; }
-  .fc-toolbar-title { font-weight: 700 !important; color: var(--text-main); font-size: 20px !important;}
+  .fc-event { border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; margin-bottom: 2px !important;}
+  .fc-button-primary { background-color: var(--nrd-blue) !important; border-color: var(--nrd-blue) !important; }
+  .fc-event-title-container { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* BUTTONS & MODALS */
-  .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif; box-shadow: 0 4px 10px rgba(240, 138, 53, 0.2);}
-  .btn-action:hover { transform: translateY(-2px); box-shadow: 0 6px 15px rgba(240, 138, 53, 0.4); }
+  /* DONE EVENT STYLING */
+  .event-done { opacity: 0.75; text-decoration: none; }
+  .status-tag-done { background: #10b981; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
+  .status-tag-pending { background: #f59e0b; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
 
+  /* MODAL STYLES */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 450px; position: relative; box-shadow: 0 25px 50px rgba(0,0,0,0.3); animation: fadeUp 0.3s ease-out forwards; }
-  .modal-title { font-size: 20px; font-weight: 700; margin: 0 0 20px 0; color: var(--text-main); }
-  
+  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 450px; position: relative; }
   .form-group { margin-bottom: 16px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-  .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; font-family: 'Figtree', sans-serif; background: var(--surface-bg); color: var(--text-main); outline: none; transition: 0.2s; }
-  .form-control:focus { border-color: var(--nrd-blue); box-shadow: 0 0 0 3px rgba(29, 106, 150, 0.15); }
+  .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: var(--surface-bg); color: var(--text-main); outline: none; }
   
-  .modal-actions { display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px; }
+  .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 8px; }
+  .btn-delete { background: var(--danger-bg, #fee2e2); color: var(--danger, #ef4444); border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; }
+  .btn-delete:hover { background: #ef4444; color: white; }
   .btn-cancel { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
-  .btn-save { background: var(--nrd-blue); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-  .btn-save:hover { background: #15557a; transform: translateY(-1px); }
+  .btn-save { background: var(--nrd-blue); color: white; border: none; padding: 10px 24px; border-radius: 8px; font-weight: 600; cursor: pointer; }
 
-  /* MECHANIC LEGEND */
-  .legend { display: flex; gap: 16px; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .legend { display: flex; gap: 16px; margin-top: 16px; font-size: 13px; font-weight: 600; color: var(--text-muted); flex-wrap: wrap;}
   .legend-item { display: flex; align-items: center; gap: 6px; }
   .legend-color { width: 12px; height: 12px; border-radius: 3px; }
 </style>
@@ -133,26 +109,18 @@
 <div class="wrap">
   <div class="top-header-card">
     <div class="top-header-top">
-        <div class="top-header-left">
-            <div>
-                <h1>Service Tracker Dashboard</h1>
-                <p class="subtitle">Operations & Scheduling</p>
-            </div>
+        <div>
+            <h1>Service Tracker Scheduling</h1>
+            <p class="subtitle">Pasig Technician Assignment & Rescheduling</p>
         </div>
-        <div class="header-actions">
+        <div>
             <button class="btn-action" onclick="openScheduleModal()">+ Schedule a JO</button>
         </div>
     </div>
     <div class="nav-tabs">
-        <!-- UPDATE LINKS HERE PARA KONEKTADO SA MAIN DASHBOARD -->
-        <a href="index.html" class="nav-tab">Pasig</a>
-        <a href="starosa.html" class="nav-tab">Sta. Rosa</a>
-        <a href="calendar.html" class="nav-tab active">🗓️ Scheduling</a>
+        <a href="index.html" class="nav-tab">Pasig Dashboard</a>
+        <a href="calendar.html" class="nav-tab active">🗓️ Calendar View</a>
     </div>
-  </div>
-  
-  <div class="status-line">
-      <span class="dot" id="liveDot"></span><span id="lastUpdated">Loading calendar data...</span>
   </div>
 
   <div class="calendar-card">
@@ -161,6 +129,8 @@
           <div class="legend-item"><div class="legend-color" style="background: var(--nrd-blue);"></div> Chris</div>
           <div class="legend-item"><div class="legend-color" style="background: var(--nrd-orange);"></div> Lohen</div>
           <div class="legend-item"><div class="legend-color" style="background: #94a3b8;"></div> Unassigned</div>
+          <div class="legend-item" style="margin-left: auto;"><span class="status-tag-done">✓ DONE</span> Resolved Unit</div>
+          <div class="legend-item"><span class="status-tag-pending">PENDING</span> In-Service Unit</div>
       </div>
   </div>
 </div>
@@ -168,7 +138,7 @@
 <!-- SCHEDULE MODAL -->
 <div class="modal-overlay" id="scheduleModal">
   <div class="modal-content">
-      <h2 class="modal-title" id="modalTitle">Assign Schedule</h2>
+      <h2 style="margin-top:0;" id="modalTitle">Assign Schedule</h2>
       
       <div class="form-group">
           <label>Job Order Number</label>
@@ -192,15 +162,18 @@
       </div>
       
       <div class="modal-actions">
-          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-          <button class="btn-save" onclick="saveSchedule()" id="saveBtn">Save Schedule</button>
+          <button class="btn-delete" id="deleteBtn" onclick="deleteSchedule()" style="display:none;">🗑️ Delete Schedule</button>
+          <div style="display: flex; gap: 8px; margin-left: auto;">
+              <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+              <button class="btn-save" onclick="saveSchedule()" id="saveBtn">Save Schedule</button>
+          </div>
       </div>
   </div>
 </div>
 
 <script>
 // ==========================================
-// 1. ILAGAY DITO ANG BAGONG WEB APP URL MO
+// ILAGAY DITO ANG BAGONG WEB APP URL MO
 // ==========================================
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQHJx3HA9bBHHv389wYmJuXSRbloJhOUEd8nWjZY3KLo6HE/exec"; 
 
@@ -216,21 +189,27 @@ function initCalendar() {
     var calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth,timeGridWeek'
-        },
-        editable: true, // Payagan ang drag and drop
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek' },
+        editable: true,
         droppable: true,
-        height: 700,
+        dragScroll: false,
+        height: 650,
+        eventContent: function(arg) {
+            let isDone = arg.event.extendedProps.isDone;
+            let statusBadge = isDone 
+                ? `<span class="status-tag-done">✓ DONE</span>` 
+                : `<span class="status-tag-pending">PENDING</span>`;
+            
+            let customEl = document.createElement('div');
+            customEl.className = 'fc-event-title-container';
+            customEl.innerHTML = `${statusBadge} <span>${arg.event.title}</span>`;
+            return { domNodes: [customEl] };
+        },
         eventClick: function(info) {
-            // Pag kinlick ang event, buksan ang edit modal
             openScheduleModal(info.event.id, info.event.startStr, info.event.extendedProps.mechanic);
         },
         eventDrop: function(info) {
-            // Kapag dinrag sa ibang araw
-            handleDragDrop(info.event.id, info.event.startStr, info.oldEvent.startStr);
+            handleDragDrop(info.event.id, info.event.startStr);
         }
     });
     calendar.render();
@@ -242,44 +221,33 @@ async function fetchData() {
         if (!res.ok) throw new Error("Network error");
         RAW_DATA = await res.json();
         
-        document.getElementById("liveDot").classList.remove("error");
-        document.getElementById("lastUpdated").textContent = "Data synced: " + new Date().toLocaleTimeString();
-        
         populateCalendar();
         populateJODropdown();
     } catch (err) {
-        document.getElementById("liveDot").classList.add("error");
-        document.getElementById("lastUpdated").textContent = "Connection failed.";
+        console.error("Fetch error:", err);
     }
 }
 
 function populateCalendar() {
-    // Alisin muna lahat ng lumang events
     calendar.removeAllEvents();
-    
-    // I-filter lang ang mga may Scheduled Date
     let scheduledRecords = RAW_DATA.filter(r => r.dateScheduled && r.dateScheduled !== "-");
     
     let events = scheduledRecords.map(r => {
-        // NRD Branding Colors based sa Mechanic
-        let bgColor = '#94a3b8'; // Default Gray
+        let bgColor = '#94a3b8'; // Unassigned Gray
         let mech = (r.mechanic || "").toLowerCase();
-        if (mech.includes('chris')) bgColor = '#1d6a96'; // Blue
-        if (mech.includes('lohen')) bgColor = '#f08a35'; // Orange
+        if (mech.includes('chris')) bgColor = '#1d6a96'; // NRD Blue
+        if (mech.includes('lohen')) bgColor = '#f08a35'; // NRD Orange
         
-        // Pabilisin ang text display: "Customer (Model)"
-        let titleText = `${r.customer || "Unknown"} (${r.model || "N/A"})`;
-        
-        // Transform JS Date to YYYY-MM-DD para sa FullCalendar
-        let d = new Date(r.dateScheduled);
-        let dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+        let isDone = (r.status === "Done");
+        let titleText = `${r.jo} - ${r.customer || "Customer"} (${r.model || "Unit"})`;
         
         return {
             id: r.jo,
             title: titleText,
-            start: dateStr,
+            start: r.dateScheduled,
             backgroundColor: bgColor,
-            extendedProps: { mechanic: r.mechanic }
+            className: isDone ? 'event-done' : '',
+            extendedProps: { mechanic: r.mechanic, isDone: isDone }
         };
     });
     
@@ -288,33 +256,32 @@ function populateCalendar() {
 
 function populateJODropdown() {
     const select = document.getElementById("joSelect");
-    select.innerHTML = '<option value="">-- Select Pending JO --</option>';
+    select.innerHTML = '<option value="">-- Select JO to Schedule --</option>';
     
-    // Ipakita lang ang mga JO na Pending o wala pang tapos
-    let pendingJOs = RAW_DATA.filter(r => r.status !== "Done" && r.jo);
-    
-    pendingJOs.forEach(r => {
+    RAW_DATA.forEach(r => {
         let opt = document.createElement('option');
         opt.value = r.jo;
-        opt.textContent = `${r.jo} - ${r.customer || "Unknown"}`;
+        let statusText = r.status === "Done" ? " [DONE]" : " [PENDING]";
+        opt.textContent = `${r.jo} - ${r.customer || "Unknown"} (${r.model || "No Model"})${statusText}`;
         select.appendChild(opt);
     });
 }
 
 function openScheduleModal(jo = "", date = "", mechanic = "") {
-    document.getElementById("joSelect").value = jo;
+    const select = document.getElementById("joSelect");
+    select.value = jo;
+    select.disabled = jo !== ""; 
     
-    // Kung kinlick ang event para i-edit, hindi pwedeng palitan ang JO number
-    document.getElementById("joSelect").disabled = jo !== ""; 
     document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Assign Schedule";
-    
     document.getElementById("schedDate").value = date;
     
-    // Auto-select mechanic dropdown
     let mechSelect = document.getElementById("mechanicSelect");
     mechSelect.value = ""; 
     if(mechanic.toLowerCase().includes('chris')) mechSelect.value = "Chris";
     if(mechanic.toLowerCase().includes('lohen')) mechSelect.value = "Lohen";
+    
+    // Ipakita lang ang Delete button kapag existing schedule ang in-edit
+    document.getElementById("deleteBtn").style.display = jo ? "inline-block" : "none";
     
     document.getElementById("scheduleModal").style.display = "flex";
 }
@@ -323,8 +290,7 @@ function closeModal() {
     document.getElementById("scheduleModal").style.display = "none";
 }
 
-// DRAG AND DROP LOGIC (Auto-save)
-function handleDragDrop(jo, newDateStr, oldDateStr) {
+function handleDragDrop(jo, newDateStr) {
     Swal.fire({
         title: 'Reschedule JO?',
         text: `Move JO ${jo} to ${newDateStr}?`,
@@ -335,15 +301,13 @@ function handleDragDrop(jo, newDateStr, oldDateStr) {
         confirmButtonText: 'Yes, move it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            sendUpdateToBackend(jo, newDateStr, undefined); // undefined mechanic means don't change it
+            sendUpdateToBackend(jo, newDateStr, undefined);
         } else {
-            // Revert sa kalendaryo kung cinancel
             fetchData(); 
         }
     });
 }
 
-// SAVE BUTTON LOGIC (Mula sa Modal)
 function saveSchedule() {
     const jo = document.getElementById("joSelect").value;
     const date = document.getElementById("schedDate").value;
@@ -360,7 +324,24 @@ function saveSchedule() {
     sendUpdateToBackend(jo, date, mechanic);
 }
 
-// SEND POST REQUEST TO GOOGLE APPS SCRIPT
+function deleteSchedule() {
+    const jo = document.getElementById("joSelect").value;
+    
+    Swal.fire({
+        title: 'Delete Schedule?',
+        text: `Are you sure you want to clear the schedule for JO ${jo}?`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            sendUpdateToBackend(jo, "", ""); // Empty string clears the Date and Mechanic in Sheet
+        }
+    });
+}
+
 async function sendUpdateToBackend(jo, date, mechanic) {
     let payload = { jo: jo };
     if (date !== undefined) payload.dateScheduled = date;
@@ -375,12 +356,12 @@ async function sendUpdateToBackend(jo, date, mechanic) {
         const result = await response.json();
         
         if(result.status === "success") {
-            Swal.fire({ title: 'Saved!', text: 'Schedule updated in Google Sheets.', icon: 'success', timer: 2000, showConfirmButton: false });
+            Swal.fire({ title: 'Updated!', text: 'Schedule updated in Google Sheets.', icon: 'success', timer: 1500, showConfirmButton: false });
             closeModal();
-            fetchData(); // Refresh UI
+            fetchData();
         } else {
             Swal.fire('Error', result.message || 'Failed to save.', 'error');
-            fetchData(); // Revert kung fail
+            fetchData();
         }
     } catch (e) {
         Swal.fire('Error', 'Network error. Cannot reach database.', 'error');
