@@ -36,8 +36,7 @@
   
   * { box-sizing: border-box; }
   
-  /* FIX DRAG OFFSET BY SETTING RELATIVE CONTAINERS WITHOUT TRANSFORMS */
-  html, body { margin: 0; padding: 0; height: 100%; }
+  html, body { margin: 0; padding: 0; }
   
   body { 
       font-family: 'Figtree', sans-serif; color: var(--text-main); 
@@ -96,11 +95,6 @@
   .event-done { opacity: 0.75; }
   .status-tag-done { background: #10b981; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
   .status-tag-pending { background: #f59e0b; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
-
-  /* WORKLOAD BADGES IN DAY HEADER */
-  .workload-badge { font-size: 9px; font-weight: 700; padding: 1px 5px; border-radius: 4px; margin-left: 2px; }
-  .wb-chris { background: rgba(29, 106, 150, 0.15); color: var(--nrd-blue); }
-  .wb-lohen { background: rgba(240, 138, 53, 0.15); color: var(--nrd-orange); }
 
   /* MODAL STYLES */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
@@ -212,6 +206,17 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchData();
 });
 
+// Helper Function para i-clean at i-format ang Date String sa YYYY-MM-DD
+function sanitizeDate(dateStr) {
+    if (!dateStr || dateStr === "-" || dateStr === "NaT") return null;
+    let d = new Date(dateStr);
+    if (isNaN(d.getTime())) return null;
+    let year = d.getFullYear();
+    let month = String(d.getMonth() + 1).padStart(2, '0');
+    let day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 function initCalendar() {
     var calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
@@ -229,7 +234,6 @@ function initCalendar() {
             
             let customEl = document.createElement('div');
             customEl.className = 'fc-event-title-container';
-            // Hover Tooltip details
             let issueText = arg.event.extendedProps.issue ? `\nIssue: ${arg.event.extendedProps.issue}` : '';
             customEl.title = `${arg.event.title}${issueText}`;
             customEl.innerHTML = `${statusBadge} <span>${arg.event.title}</span>`;
@@ -260,9 +264,12 @@ async function fetchData() {
 
 function populateCalendar() {
     calendar.removeAllEvents();
-    let scheduledRecords = RAW_DATA.filter(r => r.dateScheduled && r.dateScheduled !== "-");
     
-    // Apply Mechanic Filter UX
+    let scheduledRecords = RAW_DATA.filter(r => {
+        let cleanDate = sanitizeDate(r.dateScheduled);
+        return cleanDate !== null;
+    });
+    
     if (currentFilter !== 'all') {
         scheduledRecords = scheduledRecords.filter(r => {
             let m = (r.mechanic || "").toLowerCase();
@@ -280,12 +287,13 @@ function populateCalendar() {
         if (mech.includes('lohen')) bgColor = '#f08a35'; // NRD Orange
         
         let isDone = (r.status === "Done");
+        let cleanDate = sanitizeDate(r.dateScheduled);
         let titleText = `${r.jo} - ${r.customer || "Customer"} (${r.model || "Unit"})`;
         
         return {
             id: r.jo,
             title: titleText,
-            start: r.dateScheduled,
+            start: cleanDate,
             backgroundColor: bgColor,
             className: isDone ? 'event-done' : '',
             extendedProps: { mechanic: r.mechanic, isDone: isDone, issue: r.issue }
@@ -310,8 +318,8 @@ function populateJODropdown() {
         let opt = document.createElement('option');
         opt.value = r.jo;
         let statusText = r.status === "Done" ? " [DONE]" : " [PENDING]";
-        opt.textContent = `${r.jo} - ${r.customer || "Unknown"} (${r.model || "No Model"})${statusText}`;
         select.appendChild(opt);
+        opt.textContent = `${r.jo} - ${r.customer || "Unknown"} (${r.model || "No Model"})${statusText}`;
     });
 }
 
@@ -321,7 +329,7 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
     select.disabled = jo !== ""; 
     
     document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Assign Schedule";
-    document.getElementById("schedDate").value = date;
+    document.getElementById("schedDate").value = sanitizeDate(date) || "";
     
     let mechSelect = document.getElementById("mechanicSelect");
     mechSelect.value = ""; 
@@ -337,9 +345,10 @@ function closeModal() {
 }
 
 function handleDragDrop(jo, newDateStr) {
+    let cleanNewDate = sanitizeDate(newDateStr);
     Swal.fire({
         title: 'Reschedule JO?',
-        text: `Move JO ${jo} to ${newDateStr}?`,
+        text: `Move JO ${jo} to ${cleanNewDate}?`,
         icon: 'question',
         showCancelButton: true,
         confirmButtonColor: '#1d6a96',
@@ -347,7 +356,7 @@ function handleDragDrop(jo, newDateStr) {
         confirmButtonText: 'Yes, move it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            sendUpdateToBackend(jo, newDateStr, undefined);
+            sendUpdateToBackend(jo, cleanNewDate, undefined);
         } else {
             fetchData(); 
         }
