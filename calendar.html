@@ -271,6 +271,13 @@
           <div class="form-group"><label>Date Raised</label><input type="date" id="formDateRaised" class="form-control"></div>
           <div class="form-group"><label>Time Raised</label><input type="time" id="formTimeRaised" class="form-control"></div>
           
+          <!-- ISSUE CLASSIFICATION (NEW FEATURE) -->
+          <div class="form-group" style="grid-column: span 2;">
+              <label>Issue Classification</label>
+              <input type="text" id="formIssueClass" list="issueClassList" class="form-control" placeholder="Select or type issue classification...">
+              <datalist id="issueClassList"></datalist>
+          </div>
+
           <div class="form-group" style="grid-column: span 2;"><label>Issue Summary</label><textarea id="formIssue" class="form-control" rows="2"></textarea></div>
           <div class="form-group" style="grid-column: span 2;"><label>Remarks CS</label><textarea id="formRemarks" class="form-control" rows="2"></textarea></div>
           
@@ -320,11 +327,11 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQHJx3HA9bBHHv389wYmJuXSRbloJhOUEd8nWjZY3KLo6HE/exec"; 
 
 let RAW_DATA = [];
-let lastDataHash = ""; // Tracker for Real-time Auto Refresh
+let lastDataHash = ""; 
 let calendar;
 let draggableInstance = null;
-let currentFilter = 'all'; // Default mechanic filter
-let isDragging = false; // Flag to prevent UI breaking
+let currentFilter = 'all'; 
+let isDragging = false; 
 
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
@@ -354,9 +361,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // AUTO-REFRESH EVERY 15 SECONDS (Real-time Sync)
     setInterval(async () => {
-        // Only run sync if modal is closed and no drag is happening to avoid interrupting the user
         if (document.getElementById("scheduleModal").style.display === "flex" || isDragging) return;
-        
         try {
             const res = await fetch(API_URL, { cache: "no-store" });
             if (!res.ok) return;
@@ -378,7 +383,7 @@ function filterMechanic(type, btn) {
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     currentFilter = type;
-    populateCalendarAndUI(); // Re-render based on new filter (client-side only)
+    populateCalendarAndUI(); 
 }
 
 function hideTooltip() {
@@ -501,7 +506,7 @@ function initCalendar() {
                 cancelButtonText: 'Keep Unassigned'
             }).then((result) => {
                 if (result.isDismissed && result.dismiss !== Swal.DismissReason.cancel) {
-                    populateCalendarAndUI(); // Abort drop, re-render
+                    populateCalendarAndUI(); 
                     return; 
                 }
                 let chosenMechanic = "";
@@ -540,12 +545,10 @@ function populateCalendarAndUI() {
         let mech = (r.mechanic || "").toLowerCase();
         
         if (cleanDate !== null) {
-            // Count analytics for everyone regardless of filter
             if (mech.includes('chris')) countChris++;
             if (mech.includes('lohen')) countLohen++;
             if (r.status === "Done") countDone++;
             
-            // Apply Local Mechanic Filter
             if (currentFilter === 'all' || (currentFilter === 'chris' && mech.includes('chris')) || (currentFilter === 'lohen' && mech.includes('lohen'))) {
                 scheduledRecords.push(r);
             }
@@ -605,11 +608,13 @@ function populateDropdowns() {
     const joDataList = document.getElementById("joDataList");
     const custList = document.getElementById("custList");
     const modelList = document.getElementById("modelList");
+    const issueClassList = document.getElementById("issueClassList"); // NEW
     
-    joDataList.innerHTML = ''; custList.innerHTML = ''; modelList.innerHTML = '';
+    joDataList.innerHTML = ''; custList.innerHTML = ''; modelList.innerHTML = ''; issueClassList.innerHTML = '';
     
     let uniqueCustomers = new Set();
     let uniqueModels = new Set(["R280", "D400"]); 
+    let uniqueIssueClass = new Set(); // NEW
 
     RAW_DATA.forEach(r => {
         if(r.jo && r.status !== "Done") {
@@ -619,10 +624,12 @@ function populateDropdowns() {
         }
         if(r.customer && r.customer.trim() !== "" && r.customer !== "-") uniqueCustomers.add(r.customer.trim());
         if(r.model && r.model.trim() !== "" && r.model !== "-") uniqueModels.add(r.model.trim());
+        if(r.issueClass && r.issueClass.trim() !== "" && r.issueClass !== "-") uniqueIssueClass.add(r.issueClass.trim()); // NEW
     });
 
     Array.from(uniqueCustomers).sort().forEach(cust => { let opt = document.createElement('option'); opt.value = cust; custList.appendChild(opt); });
     Array.from(uniqueModels).sort().forEach(mod => { let opt = document.createElement('option'); opt.value = mod; modelList.appendChild(opt); });
+    Array.from(uniqueIssueClass).sort().forEach(ic => { let opt = document.createElement('option'); opt.value = ic; issueClassList.appendChild(opt); }); // NEW
 }
 
 function autoFillFormFields(e) {
@@ -637,6 +644,7 @@ function autoFillFormFields(e) {
         document.getElementById("formAddress").value = record.address || "";
         document.getElementById("formDateRaised").value = sanitizeDate(record.date) || "";
         document.getElementById("formTimeRaised").value = ""; 
+        document.getElementById("formIssueClass").value = record.issueClass || ""; // NEW
         document.getElementById("formIssue").value = record.issue || "";
         document.getElementById("formRemarks").value = record.remarksCS || "";
         document.getElementById("schedDate").value = sanitizeDate(record.dateScheduled) || "";
@@ -675,7 +683,7 @@ function generateNextJO() {
     
     document.getElementById("formCust").value = ""; document.getElementById("formModel").value = "";
     document.getElementById("formVin").value = ""; document.getElementById("formContact").value = "";
-    document.getElementById("formAddress").value = "";
+    document.getElementById("formAddress").value = ""; document.getElementById("formIssueClass").value = ""; // NEW
     
     let today = new Date();
     document.getElementById("formDateRaised").value = today.toISOString().split('T')[0];
@@ -700,7 +708,8 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
     document.getElementById("formCust").value = ""; document.getElementById("formModel").value = "";
     document.getElementById("formVin").value = ""; document.getElementById("formContact").value = "";
     document.getElementById("formAddress").value = ""; document.getElementById("formDateRaised").value = "";
-    document.getElementById("formTimeRaised").value = ""; document.getElementById("formIssue").value = "";
+    document.getElementById("formTimeRaised").value = ""; document.getElementById("formIssueClass").value = ""; // NEW
+    document.getElementById("formIssue").value = "";
     document.getElementById("formRemarks").value = ""; document.getElementById("schedDate").value = sanitizeDate(date) || "";
     document.getElementById("mechanicSelect").value = ""; 
     
@@ -716,6 +725,7 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
         document.getElementById("formContact").value = record.contactNumber || "";
         document.getElementById("formAddress").value = record.address || "";
         document.getElementById("formDateRaised").value = sanitizeDate(record.date) || "";
+        document.getElementById("formIssueClass").value = record.issueClass || ""; // NEW
         document.getElementById("formIssue").value = record.issue || "";
         document.getElementById("formRemarks").value = record.remarksCS || "";
         
@@ -753,10 +763,10 @@ function saveSchedule() {
         jo: jo, customer: document.getElementById("formCust").value, model: document.getElementById("formModel").value,
         vin: document.getElementById("formVin").value, contactNumber: document.getElementById("formContact").value,
         address: document.getElementById("formAddress").value, dateRaised: document.getElementById("formDateRaised").value,
-        timeRaised: document.getElementById("formTimeRaised").value, issue: document.getElementById("formIssue").value,
-        remarksCS: document.getElementById("formRemarks").value, dateScheduled: document.getElementById("schedDate").value,
-        mechanic: document.getElementById("mechanicSelect").value, status: document.getElementById("formStatus").value,
-        dateResolved: document.getElementById("formDateResolved").value
+        timeRaised: document.getElementById("formTimeRaised").value, issueClass: document.getElementById("formIssueClass").value, // NEW
+        issue: document.getElementById("formIssue").value, remarksCS: document.getElementById("formRemarks").value, 
+        dateScheduled: document.getElementById("schedDate").value, mechanic: document.getElementById("mechanicSelect").value, 
+        status: document.getElementById("formStatus").value, dateResolved: document.getElementById("formDateResolved").value
     };
     
     document.getElementById("saveBtn").textContent = "Saving..."; document.getElementById("saveBtn").disabled = true;
