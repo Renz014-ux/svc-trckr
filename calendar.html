@@ -96,7 +96,7 @@
   .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif;}
   .btn-action:hover { background: #e07a2a; transform: translateY(-1px); }
 
-  /* FULLCALENDAR OVERRIDES & WORKLOAD BADGES */
+  /* FULLCALENDAR OVERRIDES */
   .fc-view-harness, .fc-view-harness * { transform: none !important; }
   .fc-event-dragging { opacity: 0.85 !important; z-index: 9999 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; }
   .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); border-radius: 12px; overflow: hidden; }
@@ -268,14 +268,17 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQH
 
 let RAW_DATA = [];
 let calendar;
+let draggableInstance = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
+    initExternalDraggableOnce();
     fetchData();
     
-    // Global Event Listener to forcefully kill stuck tooltips on click or drag
+    // Global Event Listeners to clean up stuck tooltips
     window.addEventListener('mouseup', hideTooltip);
     window.addEventListener('dragend', hideTooltip);
+    window.addEventListener('mouseleave', hideTooltip);
 });
 
 function hideTooltip() {
@@ -294,6 +297,24 @@ function sanitizeDate(dateStr) {
     let month = String(d.getMonth() + 1).padStart(2, '0');
     let day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+}
+
+function initExternalDraggableOnce() {
+    const list = document.getElementById('externalEventsList');
+    if (list && !draggableInstance) {
+        draggableInstance = new FullCalendar.Draggable(list, {
+            itemSelector: '.fc-external-event',
+            eventData: function(eventEl) {
+                let jo = eventEl.dataset.jo;
+                let record = RAW_DATA.find(r => r.jo === jo) || {};
+                return {
+                    id: jo,
+                    title: `${jo} - ${record.customer || 'Customer'}`,
+                    backgroundColor: '#94a3b8'
+                };
+            }
+        });
+    }
 }
 
 function initCalendar() {
@@ -337,7 +358,6 @@ function initCalendar() {
             return { domNodes: [customEl] };
         },
         
-        // KILL TOOLTIP IMMEDIATELY ON DRAG START
         eventDragStart: function() {
             hideTooltip();
         },
@@ -373,11 +393,7 @@ function initCalendar() {
             let oldDateStr = sanitizeDate(info.oldEvent.startStr);
             let newDateStr = sanitizeDate(info.event.startStr);
             
-            // IF DROPPED ON THE SAME EXACT DATE, DO NOTHING & PREVENT HANGING
-            if (oldDateStr === newDateStr) {
-                return;
-            }
-            
+            if (oldDateStr === newDateStr) return;
             handleDragDrop(jo, newDateStr);
         },
         
@@ -503,19 +519,6 @@ function populateSidebarDrawer(unscheduledJOs) {
             <div class="event-issue">${r.issue || 'No issue summary'}</div>
         `;
         list.appendChild(el);
-    });
-    
-    new FullCalendar.Draggable(list, {
-        itemSelector: '.fc-external-event',
-        eventData: function(eventEl) {
-            let jo = eventEl.dataset.jo;
-            let record = RAW_DATA.find(r => r.jo === jo) || {};
-            return {
-                id: jo,
-                title: `${jo} - ${record.customer || 'Customer'}`,
-                backgroundColor: '#94a3b8'
-            };
-        }
     });
 }
 
