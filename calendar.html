@@ -240,8 +240,17 @@
               <datalist id="joDataList"></datalist>
           </div>
           
-          <div class="form-group"><label>Customer</label><input type="text" id="formCust" class="form-control"></div>
-          <div class="form-group"><label>Model</label><input type="text" id="formModel" class="form-control"></div>
+          <!-- SEARCHABLE DATALIST FOR CUSTOMER AND MODEL -->
+          <div class="form-group">
+              <label>Customer</label>
+              <input type="text" id="formCust" list="custList" class="form-control" placeholder="Search or type customer...">
+              <datalist id="custList"></datalist>
+          </div>
+          <div class="form-group">
+              <label>Model</label>
+              <input type="text" id="formModel" list="modelList" class="form-control" placeholder="Select or type model...">
+              <datalist id="modelList"></datalist>
+          </div>
           
           <div class="form-group"><label>VIN Number</label><input type="text" id="formVin" class="form-control"></div>
           <div class="form-group"><label>Contact Number</label><input type="text" id="formContact" class="form-control"></div>
@@ -522,7 +531,7 @@ function populateCalendarAndUI() {
     
     calendar.addEventSource(events);
     populateSidebarDrawer(unscheduledRecords);
-    populateJODropdown();
+    populateDropdowns(); // Replaces old populateJODropdown
 }
 
 function populateSidebarDrawer(unscheduledJOs) {
@@ -548,18 +557,48 @@ function populateSidebarDrawer(unscheduledJOs) {
     });
 }
 
-function populateJODropdown() {
-    const dataList = document.getElementById("joDataList");
-    dataList.innerHTML = '';
+function populateDropdowns() {
+    const joDataList = document.getElementById("joDataList");
+    const custList = document.getElementById("custList");
+    const modelList = document.getElementById("modelList");
     
+    joDataList.innerHTML = '';
+    custList.innerHTML = '';
+    modelList.innerHTML = '';
+    
+    let uniqueCustomers = new Set();
+    let uniqueModels = new Set(["R280", "D400"]); // Default fixed options
+
     RAW_DATA.forEach(r => {
-        // EXCLUDE DONE JOs
+        // Populate JO Options (Exclude DONE)
         if(r.jo && r.status !== "Done") {
             let opt = document.createElement('option');
             opt.value = r.jo;
             opt.textContent = `${r.customer || "Unknown"} | ${r.model || "Unit"} [PENDING]`;
-            dataList.appendChild(opt);
+            joDataList.appendChild(opt);
         }
+        // Collect Unique Customers
+        if(r.customer && r.customer.trim() !== "" && r.customer !== "-") {
+            uniqueCustomers.add(r.customer.trim());
+        }
+        // Collect Unique Models
+        if(r.model && r.model.trim() !== "" && r.model !== "-") {
+            uniqueModels.add(r.model.trim());
+        }
+    });
+
+    // Append to Customer Datalist
+    Array.from(uniqueCustomers).sort().forEach(cust => {
+        let opt = document.createElement('option');
+        opt.value = cust;
+        custList.appendChild(opt);
+    });
+
+    // Append to Model Datalist
+    Array.from(uniqueModels).sort().forEach(mod => {
+        let opt = document.createElement('option');
+        opt.value = mod;
+        modelList.appendChild(opt);
     });
 }
 
@@ -610,7 +649,7 @@ function generateNextJO() {
     
     let joInput = document.getElementById("joSelect");
     joInput.value = nextJO;
-    joInput.disabled = true; // Lock field for auto-gen
+    joInput.disabled = true; 
     
     document.getElementById("formCust").value = "";
     document.getElementById("formModel").value = "";
@@ -635,7 +674,7 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
     
     let joInput = document.getElementById("joSelect");
     joInput.value = jo;
-    joInput.disabled = jo !== ""; // Enable ONLY if it's completely new/empty
+    joInput.disabled = jo !== ""; 
     
     document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Create / Edit JO";
     document.getElementById("formCust").value = "";
