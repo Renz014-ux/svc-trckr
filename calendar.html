@@ -27,13 +27,6 @@
     --text-main: #f8fafc; --text-muted: #94a3b8;
   }
   
-  [data-theme="dark"] body {
-      background-image: 
-          radial-gradient(circle at 0% 0%, rgba(29, 106, 150, 0.25) 0%, transparent 60%),
-          radial-gradient(circle at 100% 0%, rgba(240, 138, 53, 0.15) 0%, transparent 60%),
-          radial-gradient(circle at 100% 100%, rgba(217, 56, 56, 0.15) 0%, transparent 60%);
-  }
-  
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   
@@ -86,10 +79,11 @@
   
   .fc-external-event { 
       background: var(--surface-bg); border: 1px solid var(--border-light); border-left: 4px solid var(--warning); 
-      border-radius: 8px; padding: 10px 12px; font-size: 12px; cursor: grab; transition: all 0.2s; 
+      border-radius: 8px; padding: 10px 12px; font-size: 12px; cursor: grab; transition: transform 0.15s ease, box-shadow 0.15s ease;
+      touch-action: none; user-select: none;
   }
   .fc-external-event:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-color: var(--nrd-blue); }
-  .fc-external-event:active { cursor: grabbing; }
+  .fc-external-event:active { cursor: grabbing; transform: scale(0.98); }
   .event-jo { font-weight: 700; color: var(--nrd-blue); }
   .event-cust { font-weight: 600; color: var(--text-main); margin-top: 2px; }
   .event-issue { font-size: 11px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px; }
@@ -102,16 +96,19 @@
   .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif;}
   .btn-action:hover { background: #e07a2a; transform: translateY(-1px); }
 
-  /* FULLCALENDAR OVERRIDES & STATUS BORDERS */
+  /* FULLCALENDAR OVERRIDES & WORKLOAD BADGES */
   .fc-view-harness, .fc-view-harness * { transform: none !important; }
-  .fc-event-dragging { opacity: 0.9 !important; z-index: 9999 !important; box-shadow: 0 12px 30px rgba(0,0,0,0.25) !important; }
+  .fc-event-dragging { opacity: 0.85 !important; z-index: 9999 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; }
   .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); border-radius: 12px; overflow: hidden; }
   .fc-theme-standard td, .fc-theme-standard th { border-color: var(--border-light); }
   
-  /* EVENT CAPSULES WITH COLOR-CODED BORDERS */
+  .fc-daygrid-day-top { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; }
+  .day-workload-badge { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 10px; background: rgba(100, 116, 139, 0.1); color: var(--text-muted); }
+  .day-workload-badge.heavy { background: rgba(240, 138, 53, 0.18); color: var(--nrd-orange); }
+
   .fc-event { 
       border-radius: 6px; padding: 3px 6px; font-size: 11px; font-weight: 600; cursor: grab; 
-      margin-bottom: 2px !important; border: 2px solid transparent !important;
+      margin-bottom: 2px !important; border: 2px solid transparent !important; transition: none !important;
   }
   .fc-event:active { cursor: grabbing; }
   .fc-event-pending { border-color: var(--warning) !important; }
@@ -120,7 +117,6 @@
   .fc-button-primary { background-color: var(--nrd-blue) !important; border-color: var(--nrd-blue) !important; text-transform: capitalize; }
   .fc-event-title-container { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-  /* STATUS BADGES IN EVENT */
   .status-tag-done { background: #10b981; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
   .status-tag-pending { background: #f59e0b; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
 
@@ -195,13 +191,13 @@
       </div>
   </div>
 
-  <!-- MAIN LAYOUT (SIDEBAR DRAWER + CALENDAR) -->
+  <!-- MAIN LAYOUT -->
   <div class="main-layout">
       <!-- UNSCHEDULED JO SIDEBAR -->
       <div class="sidebar-drawer">
           <div class="sidebar-header">
               <span>Unscheduled JOs</span>
-              <span id="sidebarCount" style="background:var(--warning-bg); color:var(--warning); padding:2px 8px; border-radius:12px; font-size:12px;">0</span>
+              <span id="sidebarCount" style="background:rgba(245, 158, 11, 0.2); color:var(--warning); padding:2px 8px; border-radius:12px; font-size:12px;">0</span>
           </div>
           <div class="sidebar-subtitle">Drag any JO card directly to the calendar date</div>
           <div class="external-events-list" id="externalEventsList">
@@ -223,7 +219,6 @@
   </div>
 </div>
 
-<!-- RICH HOVER TOOLTIP -->
 <div class="custom-tooltip" id="hoverTooltip"></div>
 
 <!-- SCHEDULE MODAL -->
@@ -289,7 +284,6 @@ function sanitizeDate(dateStr) {
 function initCalendar() {
     var calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
-        // VIEW SWITCHER OPTIONS (Month, Week, Day, List/Agenda)
         initialView: 'dayGridMonth',
         headerToolbar: { 
             left: 'prev,next today', 
@@ -301,7 +295,22 @@ function initCalendar() {
         dragScroll: false,
         height: 650,
         
-        // EVENT STYLING & CONTENT
+        // WORKLOAD INDICATOR IN HEADER DAYS
+        dayCellDidMount: function(arg) {
+            let dateStr = sanitizeDate(arg.date);
+            let countOnDay = RAW_DATA.filter(r => sanitizeDate(r.dateScheduled) === dateStr).length;
+            
+            if (countOnDay > 0) {
+                let topEl = arg.el.querySelector('.fc-daygrid-day-top');
+                if (topEl) {
+                    let badge = document.createElement('span');
+                    badge.className = `day-workload-badge ${countOnDay >= 3 ? 'heavy' : ''}`;
+                    badge.textContent = `${countOnDay} Units`;
+                    topEl.insertBefore(badge, topEl.firstChild);
+                }
+            }
+        },
+
         eventContent: function(arg) {
             let isDone = arg.event.extendedProps.isDone;
             let statusBadge = isDone 
@@ -314,7 +323,6 @@ function initCalendar() {
             return { domNodes: [customEl] };
         },
         
-        // RICH HOVER TOOLTIP LOGIC
         eventMouseEnter: function(info) {
             let props = info.event.extendedProps;
             let tooltip = document.getElementById('hoverTooltip');
@@ -333,7 +341,6 @@ function initCalendar() {
             document.getElementById('hoverTooltip').style.display = 'none';
         },
         
-        // EVENT CLICK & DROP HANDLERS
         eventClick: function(info) {
             openScheduleModal(info.event.id, info.event.startStr, info.event.extendedProps.mechanic);
         },
@@ -341,12 +348,32 @@ function initCalendar() {
             handleDragDrop(info.event.id, info.event.startStr);
         },
         
-        // HANDLE EXTERNAL DRAG FROM SIDEBAR DRAWER
+        // AUTO-ASSIGN MECHANIC PROMPT UPON DRAGGING FROM SIDEBAR
         eventReceive: function(info) {
             let jo = info.event.id;
             let newDateStr = sanitizeDate(info.event.startStr);
-            info.event.remove(); // Remove temporary dropped element until backend approves
-            sendUpdateToBackend(jo, newDateStr, undefined);
+            info.event.remove(); // Re-render seamlessly after selection
+            
+            Swal.fire({
+                title: 'Assign Technician',
+                text: `Assigning JO ${jo} for ${newDateStr}. Select mechanic:`,
+                icon: 'question',
+                showCancelButton: true,
+                showClass: { popup: '' }, // Smooth instant popup without lag
+                confirmButtonColor: '#1d6a96',
+                denyButtonColor: '#f08a35',
+                cancelButtonColor: '#64748b',
+                showDenyButton: true,
+                confirmButtonText: 'Chris',
+                denyButtonText: 'Lohen',
+                cancelButtonText: 'Unassigned'
+            }).then((result) => {
+                let chosenMechanic = "";
+                if (result.isConfirmed) chosenMechanic = "Chris";
+                else if (result.isDenied) chosenMechanic = "Lohen";
+                
+                sendUpdateToBackend(jo, newDateStr, chosenMechanic);
+            });
         }
     });
     calendar.render();
@@ -369,7 +396,6 @@ function populateCalendarAndUI() {
     
     let scheduledRecords = [];
     let unscheduledRecords = [];
-    
     let countChris = 0, countLohen = 0, countDone = 0;
     
     RAW_DATA.forEach(r => {
@@ -386,19 +412,17 @@ function populateCalendarAndUI() {
         }
     });
     
-    // UPDATE MINI-ANALYTICS BAR
     document.getElementById('statUnscheduled').textContent = unscheduledRecords.length;
     document.getElementById('statTotalScheduled').textContent = scheduledRecords.length;
     document.getElementById('statChris').textContent = countChris;
     document.getElementById('statLohen').textContent = countLohen;
     document.getElementById('statDone').textContent = countDone;
     
-    // POPULATE CALENDAR
     let events = scheduledRecords.map(r => {
-        let bgColor = '#94a3b8'; // Unassigned Gray
+        let bgColor = '#94a3b8'; 
         let mech = (r.mechanic || "").toLowerCase();
-        if (mech.includes('chris')) bgColor = '#1d6a96'; // NRD Blue
-        if (mech.includes('lohen')) bgColor = '#f08a35'; // NRD Orange
+        if (mech.includes('chris')) bgColor = '#1d6a96'; 
+        if (mech.includes('lohen')) bgColor = '#f08a35'; 
         
         let isDone = (r.status === "Done");
         let cleanDate = sanitizeDate(r.dateScheduled);
@@ -420,12 +444,9 @@ function populateCalendarAndUI() {
             }
         };
     });
+    
     calendar.addEventSource(events);
-    
-    // POPULATE SIDEBAR DRAWER (UNSCHEDULED JOs)
     populateSidebarDrawer(unscheduledRecords);
-    
-    // POPULATE MODAL DROPDOWN
     populateJODropdown();
 }
 
@@ -451,7 +472,6 @@ function populateSidebarDrawer(unscheduledJOs) {
         list.appendChild(el);
     });
     
-    // MAKE SIDEBAR ITEMS DRAGGABLE INTO CALENDAR
     new FullCalendar.Draggable(list, {
         itemSelector: '.fc-external-event',
         eventData: function(eventEl) {
@@ -502,21 +522,12 @@ function closeModal() {
 
 function handleDragDrop(jo, newDateStr) {
     let cleanNewDate = sanitizeDate(newDateStr);
-    Swal.fire({
-        title: 'Reschedule JO?',
-        text: `Move JO ${jo} to ${cleanNewDate}?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#1d6a96',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Yes, move it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            sendUpdateToBackend(jo, cleanNewDate, undefined);
-        } else {
-            fetchData(); 
-        }
-    });
+    
+    // INSTANT UI UPDATE (Optimistic Rendering)
+    let ev = calendar.getEventById(jo);
+    if(ev) ev.setStart(cleanNewDate);
+    
+    sendUpdateToBackend(jo, cleanNewDate, undefined);
 }
 
 function saveSchedule() {
@@ -567,7 +578,16 @@ async function sendUpdateToBackend(jo, date, mechanic) {
         const result = await response.json();
         
         if(result.status === "success") {
-            Swal.fire({ title: 'Updated!', text: 'Schedule updated in Google Sheets.', icon: 'success', timer: 1500, showConfirmButton: false });
+            // PROFESSIONAL REBRANDED TOAST
+            Swal.fire({ 
+                title: 'Database Synced!', 
+                text: 'Schedule updated successfully.', 
+                icon: 'success', 
+                timer: 1500, 
+                showConfirmButton: false,
+                toast: true,
+                position: 'bottom-end'
+            });
             closeModal();
             fetchData();
         } else {
