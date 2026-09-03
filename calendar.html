@@ -233,7 +233,10 @@
           <!-- JO Number with DataList Support -->
           <div class="form-group" style="grid-column: span 2;">
               <label>Job Order Number</label>
-              <input type="text" id="joSelect" list="joDataList" class="form-control" placeholder="Search pending JO or type a New JO Number" style="border-color: var(--nrd-orange); border-width: 2px;">
+              <div style="display: flex; gap: 8px;">
+                  <input type="text" id="joSelect" list="joDataList" class="form-control" placeholder="Search pending JO..." style="border-color: var(--nrd-orange); border-width: 2px;">
+                  <button type="button" class="btn-action" style="background: var(--nrd-blue); padding: 10px 16px; font-size: 13px; white-space: nowrap;" onclick="generateNextJO()">✨ Auto-Generate JO</button>
+              </div>
               <datalist id="joDataList"></datalist>
           </div>
           
@@ -554,17 +557,71 @@ function populateSidebarDrawer(unscheduledJOs) {
     });
 }
 
+// 1. UPDATED: Hindi na isasama ang mga "Done" sa listahan
 function populateJODropdown() {
     const dataList = document.getElementById("joDataList");
     dataList.innerHTML = '';
     
     RAW_DATA.forEach(r => {
-        if(r.jo) {
+        // I-filter: Ilabas lang kapag HINDI "Done"
+        if(r.jo && r.status !== "Done") {
             let opt = document.createElement('option');
             opt.value = r.jo;
-            let statusText = r.status === "Done" ? "[DONE]" : "[PENDING]";
-            opt.textContent = `${r.customer || "Unknown"} | ${r.model || "Unit"} ${statusText}`;
+            opt.textContent = `${r.customer || "Unknown"} | ${r.model || "Unit"} [PENDING]`;
             dataList.appendChild(opt);
+        }
+    });
+}
+
+// 2. NEW: Function para awtomatikong basahin ang last JO at mag-add ng +1
+function generateNextJO() {
+    let maxNum = 0;
+    let prefix = "ASGARD-"; // Default format kung sakaling walang laman ang sheet
+    
+    // Hanapin ang pinakamataas na number sa buong database
+    RAW_DATA.forEach(r => {
+        if (r.jo && r.jo.includes("-")) {
+            let parts = r.jo.split("-");
+            if (parts.length > 1) {
+                let numPart = parseInt(parts[parts.length - 1], 10);
+                if (!isNaN(numPart) && numPart > maxNum) {
+                    maxNum = numPart;
+                    prefix = r.jo.substring(0, r.jo.lastIndexOf("-") + 1);
+                }
+            }
+        }
+    });
+    
+    // Mag-add ng +1 at lagyan ng leading zeros (e.g. 177 + 1 = 000178)
+    let nextNum = maxNum + 1;
+    let paddedNum = String(nextNum).padStart(6, '0');
+    let nextJO = prefix + paddedNum;
+    
+    // I-set ang bagong JO number at i-lock ang input field para di ma-edit nang aksidente
+    let joInput = document.getElementById("joSelect");
+    joInput.value = nextJO;
+    joInput.disabled = true; 
+    
+    // I-clear ang ibang form fields para sa bagong entry
+    document.getElementById("formCust").value = "";
+    document.getElementById("formModel").value = "";
+    document.getElementById("formVin").value = "";
+    document.getElementById("formContact").value = "";
+    document.getElementById("formAddress").value = "";
+    
+    // Auto-set Date Raised sa araw na ito
+    let today = new Date();
+    document.getElementById("formDateRaised").value = today.toISOString().split('T')[0];
+    
+    document.getElementById("formTimeRaised").value = ""; 
+    document.getElementById("formIssue").value = "";
+    document.getElementById("formRemarks").value = "";
+    document.getElementById("schedDate").value = "";
+    document.getElementById("mechanicSelect").value = "";
+    
+    // Itago ang mga delete/unassign buttons dahil bagong record ito
+    document.getElementById("unassignBtn").style.display = "none";
+    document.getElementById("deleteBtn").style.display = "none";
         }
     });
 }
