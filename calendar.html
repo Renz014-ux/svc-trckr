@@ -96,7 +96,7 @@
   .btn-action { background: var(--nrd-orange); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: 0.2s; font-family: 'Figtree', sans-serif;}
   .btn-action:hover { background: #e07a2a; transform: translateY(-1px); }
 
-  /* FULLCALENDAR OVERRIDES */
+  /* FULLCALENDAR OVERRIDES & WORKLOAD BADGES */
   .fc-view-harness, .fc-view-harness * { transform: none !important; }
   .fc-event-dragging { opacity: 0.85 !important; z-index: 9999 !important; box-shadow: 0 10px 25px rgba(0,0,0,0.2) !important; }
   .fc-theme-standard .fc-scrollgrid { border-color: var(--border-light); border-radius: 12px; overflow: hidden; }
@@ -268,14 +268,14 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQH
 
 let RAW_DATA = [];
 let calendar;
-let draggableInstance = null;
+let draggableInstance = null; // Prevent double-initialization bug
 
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
-    initExternalDraggableOnce();
+    initExternalDraggableOnce(); // Initialize draggable only once
     fetchData();
     
-    // Global Event Listeners to clean up stuck tooltips
+    // Safety triggers to kill stuck tooltips
     window.addEventListener('mouseup', hideTooltip);
     window.addEventListener('dragend', hideTooltip);
     window.addEventListener('mouseleave', hideTooltip);
@@ -299,6 +299,7 @@ function sanitizeDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
+// FIX: Initialize draggable only once to prevent memory leaks and double-events
 function initExternalDraggableOnce() {
     const list = document.getElementById('externalEventsList');
     if (list && !draggableInstance) {
@@ -393,7 +394,7 @@ function initCalendar() {
             let oldDateStr = sanitizeDate(info.oldEvent.startStr);
             let newDateStr = sanitizeDate(info.event.startStr);
             
-            if (oldDateStr === newDateStr) return;
+            if (oldDateStr === newDateStr) return; // Prevent logic hang on same date drop
             handleDragDrop(jo, newDateStr);
         },
         
@@ -403,22 +404,31 @@ function initCalendar() {
             let newDateStr = sanitizeDate(info.event.startStr);
             info.event.remove(); 
             
+            // FIX: Robust check for Aborting a drop (Esc key, clicked outside)
             Swal.fire({
                 title: 'Assign Technician',
                 text: `Assigning JO ${jo} for ${newDateStr}:`,
                 icon: 'question',
                 showCancelButton: true,
+                showCloseButton: true,
                 confirmButtonColor: '#1d6a96',
                 denyButtonColor: '#f08a35',
                 cancelButtonColor: '#64748b',
                 showDenyButton: true,
                 confirmButtonText: 'Chris',
                 denyButtonText: 'Lohen',
-                cancelButtonText: 'Unassigned'
+                cancelButtonText: 'Keep Unassigned'
             }).then((result) => {
+                if (result.isDismissed && result.dismiss !== Swal.DismissReason.cancel) {
+                    // Abort drop if user clicked backdrop, closed, or pressed Esc
+                    fetchData();
+                    return; 
+                }
+                
                 let chosenMechanic = "";
                 if (result.isConfirmed) chosenMechanic = "Chris";
                 else if (result.isDenied) chosenMechanic = "Lohen";
+                // If result.dismiss === Swal.DismissReason.cancel, mechanic stays ""
                 
                 sendUpdateToBackend(jo, newDateStr, chosenMechanic);
             });
@@ -441,7 +451,10 @@ async function fetchData() {
 
 function populateCalendarAndUI() {
     hideTooltip();
+    
+    // FIX: Clear both events and background sources to prevent memory stacking
     calendar.removeAllEvents();
+    calendar.getEventSources().forEach(src => src.remove());
     
     let scheduledRecords = [];
     let unscheduledRecords = [];
@@ -520,6 +533,8 @@ function populateSidebarDrawer(unscheduledJOs) {
         `;
         list.appendChild(el);
     });
+    
+    // Note: Draggable logic is no longer here, it is safely in initExternalDraggableOnce()
 }
 
 function populateJODropdown() {
