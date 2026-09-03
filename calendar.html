@@ -120,10 +120,10 @@
   .status-tag-done { background: #10b981; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
   .status-tag-pending { background: #f59e0b; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
 
-  /* HOVER TOOLTIP STYLING */
+  /* HOVER TOOLTIP STYLING (WITH POINTER-EVENTS NONE FIX) */
   .custom-tooltip {
-      position: absolute; z-index: 9999; background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(8px);
-      color: #ffffff; padding: 12px 16px; border-radius: 10px; font-size: 12px; pointer-events: none;
+      position: absolute; z-index: 9999; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+      color: #ffffff; padding: 12px 16px; border-radius: 10px; font-size: 12px; pointer-events: none !important;
       box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); max-width: 280px; display: none;
   }
   .tt-title { font-weight: 700; font-size: 13px; color: var(--nrd-orange); margin-bottom: 4px; }
@@ -138,6 +138,8 @@
   .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: var(--surface-bg); color: var(--text-main); outline: none; }
   
   .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 8px; }
+  .btn-unassign { background: #fef3c7; color: #d97706; border: 1px solid rgba(217, 119, 6, 0.2); padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; }
+  .btn-unassign:hover { background: #f59e0b; color: white; }
   .btn-delete { background: #fee2e2; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; }
   .btn-delete:hover { background: #ef4444; color: white; }
   .btn-cancel { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); padding: 10px 16px; border-radius: 8px; font-weight: 600; cursor: pointer; }
@@ -193,8 +195,8 @@
 
   <!-- MAIN LAYOUT -->
   <div class="main-layout">
-      <!-- UNSCHEDULED JO SIDEBAR -->
-      <div class="sidebar-drawer">
+      <!-- UNSCHEDULED JO SIDEBAR DRAWER -->
+      <div class="sidebar-drawer" id="sidebarDrawer">
           <div class="sidebar-header">
               <span>Unscheduled JOs</span>
               <span id="sidebarCount" style="background:rgba(245, 158, 11, 0.2); color:var(--warning); padding:2px 8px; border-radius:12px; font-size:12px;">0</span>
@@ -248,7 +250,8 @@
       </div>
       
       <div class="modal-actions">
-          <button class="btn-delete" id="deleteBtn" onclick="deleteSchedule()" style="display:none;">🗑️ Delete Schedule</button>
+          <button class="btn-unassign" id="unassignBtn" onclick="unassignSchedule()" style="display:none;" title="Remove date and return to Unscheduled list">↩️ Unschedule</button>
+          <button class="btn-delete" id="deleteBtn" onclick="deleteSchedule()" style="display:none;">🗑️ Clear</button>
           <div style="display: flex; gap: 8px; margin-left: auto;">
               <button class="btn-cancel" onclick="closeModal()">Cancel</button>
               <button class="btn-save" onclick="saveSchedule()" id="saveBtn">Save Schedule</button>
@@ -270,6 +273,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
     fetchData();
 });
+
+function hideTooltip() {
+    let tooltip = document.getElementById('hoverTooltip');
+    if (tooltip) tooltip.style.display = 'none';
+}
 
 function sanitizeDate(dateStr) {
     if (!dateStr || dateStr === "-" || dateStr === "NaT") return null;
@@ -295,7 +303,6 @@ function initCalendar() {
         dragScroll: false,
         height: 650,
         
-        // WORKLOAD INDICATOR IN HEADER DAYS
         dayCellDidMount: function(arg) {
             let dateStr = sanitizeDate(arg.date);
             let countOnDay = RAW_DATA.filter(r => sanitizeDate(r.dateScheduled) === dateStr).length;
@@ -323,6 +330,7 @@ function initCalendar() {
             return { domNodes: [customEl] };
         },
         
+        // TOOLTIP WITH STUCK PREVENTOR
         eventMouseEnter: function(info) {
             let props = info.event.extendedProps;
             let tooltip = document.getElementById('hoverTooltip');
@@ -334,32 +342,33 @@ function initCalendar() {
                 <div class="tt-row"><span class="tt-label">Mechanic:</span> ${props.mechanic || 'Unassigned'}</div>
             `;
             tooltip.style.display = 'block';
-            tooltip.style.left = info.jsEvent.pageX + 15 + 'px';
-            tooltip.style.top = info.jsEvent.pageY + 15 + 'px';
+            tooltip.style.left = (info.jsEvent.pageX + 15) + 'px';
+            tooltip.style.top = (info.jsEvent.pageY + 15) + 'px';
         },
         eventMouseLeave: function() {
-            document.getElementById('hoverTooltip').style.display = 'none';
+            hideTooltip();
         },
         
         eventClick: function(info) {
+            hideTooltip(); // Immediate hide to stop hanging UI
             openScheduleModal(info.event.id, info.event.startStr, info.event.extendedProps.mechanic);
         },
         eventDrop: function(info) {
+            hideTooltip();
             handleDragDrop(info.event.id, info.event.startStr);
         },
         
-        // AUTO-ASSIGN MECHANIC PROMPT UPON DRAGGING FROM SIDEBAR
         eventReceive: function(info) {
+            hideTooltip();
             let jo = info.event.id;
             let newDateStr = sanitizeDate(info.event.startStr);
-            info.event.remove(); // Re-render seamlessly after selection
+            info.event.remove(); 
             
             Swal.fire({
                 title: 'Assign Technician',
-                text: `Assigning JO ${jo} for ${newDateStr}. Select mechanic:`,
+                text: `Assigning JO ${jo} for ${newDateStr}:`,
                 icon: 'question',
                 showCancelButton: true,
-                showClass: { popup: '' }, // Smooth instant popup without lag
                 confirmButtonColor: '#1d6a96',
                 denyButtonColor: '#f08a35',
                 cancelButtonColor: '#64748b',
@@ -500,6 +509,7 @@ function populateJODropdown() {
 }
 
 function openScheduleModal(jo = "", date = "", mechanic = "") {
+    hideTooltip();
     const select = document.getElementById("joSelect");
     select.value = jo;
     select.disabled = jo !== ""; 
@@ -512,18 +522,18 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
     if(mechanic.toLowerCase().includes('chris')) mechSelect.value = "Chris";
     if(mechanic.toLowerCase().includes('lohen')) mechSelect.value = "Lohen";
     
+    document.getElementById("unassignBtn").style.display = jo ? "inline-block" : "none";
     document.getElementById("deleteBtn").style.display = jo ? "inline-block" : "none";
     document.getElementById("scheduleModal").style.display = "flex";
 }
 
 function closeModal() {
+    hideTooltip();
     document.getElementById("scheduleModal").style.display = "none";
 }
 
 function handleDragDrop(jo, newDateStr) {
     let cleanNewDate = sanitizeDate(newDateStr);
-    
-    // INSTANT UI UPDATE (Optimistic Rendering)
     let ev = calendar.getEventById(jo);
     if(ev) ev.setStart(cleanNewDate);
     
@@ -546,17 +556,36 @@ function saveSchedule() {
     sendUpdateToBackend(jo, date, mechanic);
 }
 
+// ACTION TO RETURN TO UNSCHEDULED SIDEBAR DRAWER
+function unassignSchedule() {
+    const jo = document.getElementById("joSelect").value;
+    
+    Swal.fire({
+        title: 'Return to Unscheduled?',
+        text: `Move JO ${jo} back to the Unscheduled list?`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#f08a35',
+        cancelButtonColor: '#64748b',
+        confirmButtonText: 'Yes, Unschedule'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            sendUpdateToBackend(jo, "", ""); // Empty date removes it from calendar to sidebar
+        }
+    });
+}
+
 function deleteSchedule() {
     const jo = document.getElementById("joSelect").value;
     
     Swal.fire({
-        title: 'Delete Schedule?',
-        text: `Are you sure you want to clear the schedule for JO ${jo}?`,
+        title: 'Clear Schedule?',
+        text: `Clear assigned date and mechanic for JO ${jo}?`,
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#ef4444',
         cancelButtonColor: '#64748b',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Yes, clear it!'
     }).then((result) => {
         if (result.isConfirmed) {
             sendUpdateToBackend(jo, "", ""); 
@@ -578,7 +607,6 @@ async function sendUpdateToBackend(jo, date, mechanic) {
         const result = await response.json();
         
         if(result.status === "success") {
-            // PROFESSIONAL REBRANDED TOAST
             Swal.fire({ 
                 title: 'Database Synced!', 
                 text: 'Schedule updated successfully.', 
