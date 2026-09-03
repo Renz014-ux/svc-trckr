@@ -58,12 +58,16 @@
   .nav-tab:hover, .nav-tab.active { color: var(--nrd-blue); }
   .nav-tab.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 3px; background: var(--nrd-blue); border-radius: 3px 3px 0 0; }
 
-  /* MINI-ANALYTICS BAR */
+  /* MINI-ANALYTICS BAR & FILTER */
   .analytics-bar { display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap; }
   .stat-pill { background: var(--surface-card); border: 1px solid var(--border-light); padding: 10px 16px; border-radius: 10px; flex: 1; min-width: 150px; display: flex; align-items: center; gap: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
   .stat-pill-icon { font-size: 18px; }
   .stat-pill-num { font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1; }
   .stat-pill-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+
+  /* FILTER BUTTONS */
+  .filter-btn { background: var(--surface-bg); border: 1px solid var(--border-light); color: var(--text-muted); padding: 6px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Figtree'; }
+  .filter-btn.active, .filter-btn:hover { background: var(--nrd-blue); color: white; border-color: var(--nrd-blue); }
 
   /* MAIN LAYOUT */
   .main-layout { display: flex; gap: 20px; align-items: start; }
@@ -170,6 +174,14 @@
     </div>
   </div>
 
+  <!-- MECHANIC FILTER BAR -->
+  <div style="display: flex; gap: 8px; margin-bottom: 16px; align-items: center;">
+      <span style="font-size: 12px; font-weight: 600; color: var(--text-muted);">PERSONAL FILTER:</span>
+      <button class="filter-btn active" onclick="filterMechanic('all', this)">All</button>
+      <button class="filter-btn" onclick="filterMechanic('chris', this)">Chris</button>
+      <button class="filter-btn" onclick="filterMechanic('lohen', this)">Lohen</button>
+  </div>
+
   <!-- MINI-ANALYTICS BAR -->
   <div class="analytics-bar">
       <div class="stat-pill">
@@ -230,7 +242,7 @@
       <h2 style="margin-top:0; color: var(--nrd-blue);" id="modalTitle">Create / Edit JO & Schedule</h2>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px;">
-          <!-- JO Number with DataList & Auto-Generate Button -->
+          <!-- JO Number -->
           <div class="form-group" style="grid-column: span 2;">
               <label>Job Order Number</label>
               <div style="display: flex; gap: 8px;">
@@ -240,7 +252,6 @@
               <datalist id="joDataList"></datalist>
           </div>
           
-          <!-- SEARCHABLE DATALIST FOR CUSTOMER AND MODEL -->
           <div class="form-group">
               <label>Customer</label>
               <input type="text" id="formCust" list="custList" class="form-control" placeholder="Search or type customer...">
@@ -276,6 +287,15 @@
                   <option value="Lohen">Lohen</option>
               </select>
           </div>
+
+          <!-- REPAIR STATUS (NEW FEATURE) -->
+          <div class="form-group" style="margin-top: 8px; grid-column: span 2;">
+              <label>Repair Status</label>
+              <select id="formStatus" class="form-control" style="border-color: var(--warning); border-width: 2px;">
+                  <option value="Pending">Pending</option>
+                  <option value="Done">Done</option>
+              </select>
+          </div>
       </div>
       
       <div class="modal-actions">
@@ -296,8 +316,11 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQHJx3HA9bBHHv389wYmJuXSRbloJhOUEd8nWjZY3KLo6HE/exec"; 
 
 let RAW_DATA = [];
+let lastDataHash = ""; // Tracker for Real-time Auto Refresh
 let calendar;
 let draggableInstance = null;
+let currentFilter = 'all'; // Default mechanic filter
+let isDragging = false; // Flag to prevent UI breaking
 
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
@@ -305,20 +328,45 @@ document.addEventListener('DOMContentLoaded', function() {
     fetchData();
     
     // Safety triggers
-    window.addEventListener('mouseup', hideTooltip);
-    window.addEventListener('dragend', hideTooltip);
-    window.addEventListener('mouseleave', hideTooltip);
+    window.addEventListener('mouseup', () => { hideTooltip(); isDragging = false; });
+    window.addEventListener('dragend', () => { hideTooltip(); isDragging = false; });
+    window.addEventListener('mouseleave', () => { hideTooltip(); isDragging = false; });
     
     // Auto-fill logic when selecting from Dropdown
     document.getElementById('joSelect').addEventListener('change', autoFillFormFields);
+
+    // AUTO-REFRESH EVERY 15 SECONDS (Real-time Sync)
+    setInterval(async () => {
+        // Only run sync if modal is closed and no drag is happening to avoid interrupting the user
+        if (document.getElementById("scheduleModal").style.display === "flex" || isDragging) return;
+        
+        try {
+            const res = await fetch(API_URL, { cache: "no-store" });
+            if (!res.ok) return;
+            const newData = await res.json();
+            const newHash = JSON.stringify(newData);
+            
+            if (lastDataHash !== newHash && lastDataHash !== "") {
+                RAW_DATA = newData;
+                lastDataHash = newHash;
+                populateCalendarAndUI(); 
+            }
+        } catch (e) {
+            console.log("Background sync error (normal if network is unstable)");
+        }
+    }, 15000);
 });
+
+function filterMechanic(type, btn) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentFilter = type;
+    populateCalendarAndUI(); // Re-render based on new filter (client-side only)
+}
 
 function hideTooltip() {
     let tooltip = document.getElementById('hoverTooltip');
-    if (tooltip) {
-        tooltip.style.display = 'none';
-        tooltip.innerHTML = '';
-    }
+    if (tooltip) { tooltip.style.display = 'none'; tooltip.innerHTML = ''; }
 }
 
 function sanitizeDate(dateStr) {
@@ -339,11 +387,7 @@ function initExternalDraggableOnce() {
             eventData: function(eventEl) {
                 let jo = eventEl.dataset.jo;
                 let record = RAW_DATA.find(r => r.jo === jo) || {};
-                return {
-                    id: jo,
-                    title: `${jo} - ${record.customer || 'Customer'}`,
-                    backgroundColor: '#94a3b8'
-                };
+                return { id: jo, title: `${jo} - ${record.customer || 'Customer'}`, backgroundColor: '#94a3b8' };
             }
         });
     }
@@ -353,11 +397,7 @@ function initCalendar() {
     var calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
-        headerToolbar: { 
-            left: 'prev,next today', 
-            center: 'title', 
-            right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' 
-        },
+        headerToolbar: { left: 'prev,next today', center: 'title', right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek' },
         editable: true,
         droppable: true,
         dragScroll: false,
@@ -366,7 +406,6 @@ function initCalendar() {
         dayCellDidMount: function(arg) {
             let dateStr = sanitizeDate(arg.date);
             let countOnDay = RAW_DATA.filter(r => sanitizeDate(r.dateScheduled) === dateStr).length;
-            
             if (countOnDay > 0) {
                 let topEl = arg.el.querySelector('.fc-daygrid-day-top');
                 if (topEl) {
@@ -380,19 +419,17 @@ function initCalendar() {
 
         eventContent: function(arg) {
             let isDone = arg.event.extendedProps.isDone;
-            let statusBadge = isDone 
-                ? `<span class="status-tag-done">✓ DONE</span>` 
-                : `<span class="status-tag-pending">PENDING</span>`;
-            
+            let statusBadge = isDone ? `<span class="status-tag-done">✓ DONE</span>` : `<span class="status-tag-pending">PENDING</span>`;
             let customEl = document.createElement('div');
             customEl.className = 'fc-event-title-container';
             customEl.innerHTML = `${statusBadge} <span>${arg.event.title}</span>`;
             return { domNodes: [customEl] };
         },
         
-        eventDragStart: function() { hideTooltip(); },
+        eventDragStart: function() { hideTooltip(); isDragging = true; },
         
         eventMouseEnter: function(info) {
+            if(isDragging) return;
             hideTooltip();
             let props = info.event.extendedProps;
             let tooltip = document.getElementById('hoverTooltip');
@@ -417,16 +454,17 @@ function initCalendar() {
         
         eventDrop: function(info) {
             hideTooltip();
+            isDragging = false;
             let jo = info.event.id;
             let oldDateStr = sanitizeDate(info.oldEvent.startStr);
             let newDateStr = sanitizeDate(info.event.startStr);
-            
             if (oldDateStr === newDateStr) return; 
             handleDragDrop(jo, newDateStr);
         },
         
         eventReceive: function(info) {
             hideTooltip();
+            isDragging = false;
             let jo = info.event.id;
             let newDateStr = sanitizeDate(info.event.startStr);
             info.event.remove(); 
@@ -446,14 +484,12 @@ function initCalendar() {
                 cancelButtonText: 'Keep Unassigned'
             }).then((result) => {
                 if (result.isDismissed && result.dismiss !== Swal.DismissReason.cancel) {
-                    fetchData();
+                    populateCalendarAndUI(); // Abort drop, re-render
                     return; 
                 }
-                
                 let chosenMechanic = "";
                 if (result.isConfirmed) chosenMechanic = "Chris";
                 else if (result.isDenied) chosenMechanic = "Lohen";
-                
                 sendUpdateToBackend(jo, newDateStr, chosenMechanic);
             });
         }
@@ -466,7 +502,7 @@ async function fetchData() {
         const res = await fetch(API_URL, { cache: "no-store" });
         if (!res.ok) throw new Error("Network error");
         RAW_DATA = await res.json();
-        
+        lastDataHash = JSON.stringify(RAW_DATA);
         populateCalendarAndUI();
     } catch (err) {
         console.error("Fetch error:", err);
@@ -487,17 +523,22 @@ function populateCalendarAndUI() {
         let mech = (r.mechanic || "").toLowerCase();
         
         if (cleanDate !== null) {
-            scheduledRecords.push(r);
+            // Count analytics for everyone regardless of filter
             if (mech.includes('chris')) countChris++;
             if (mech.includes('lohen')) countLohen++;
             if (r.status === "Done") countDone++;
+            
+            // Apply Local Mechanic Filter
+            if (currentFilter === 'all' || (currentFilter === 'chris' && mech.includes('chris')) || (currentFilter === 'lohen' && mech.includes('lohen'))) {
+                scheduledRecords.push(r);
+            }
         } else if (r.status !== "Done") {
             unscheduledRecords.push(r);
         }
     });
     
     document.getElementById('statUnscheduled').textContent = unscheduledRecords.length;
-    document.getElementById('statTotalScheduled').textContent = scheduledRecords.length;
+    document.getElementById('statTotalScheduled').textContent = (countChris + countLohen + (RAW_DATA.filter(r=>sanitizeDate(r.dateScheduled) && !r.mechanic).length));
     document.getElementById('statChris').textContent = countChris;
     document.getElementById('statLohen').textContent = countLohen;
     document.getElementById('statDone').textContent = countDone;
@@ -513,25 +554,15 @@ function populateCalendarAndUI() {
         let titleText = `${r.jo} - ${r.customer || "Customer"}`;
         
         return {
-            id: r.jo,
-            title: titleText,
-            start: cleanDate,
-            backgroundColor: bgColor,
+            id: r.jo, title: titleText, start: cleanDate, backgroundColor: bgColor,
             className: isDone ? 'fc-event-done' : 'fc-event-pending',
-            extendedProps: { 
-                mechanic: r.mechanic, 
-                isDone: isDone, 
-                issue: r.issue || 'No summary', 
-                customer: r.customer || 'Unknown', 
-                model: r.model || 'N/A', 
-                vin: r.vin || '-' 
-            }
+            extendedProps: { mechanic: r.mechanic, isDone: isDone, issue: r.issue || 'No summary', customer: r.customer || 'Unknown', model: r.model || 'N/A', vin: r.vin || '-' }
         };
     });
     
     calendar.addEventSource(events);
     populateSidebarDrawer(unscheduledRecords);
-    populateDropdowns(); // Replaces old populateJODropdown
+    populateDropdowns();
 }
 
 function populateSidebarDrawer(unscheduledJOs) {
@@ -548,11 +579,7 @@ function populateSidebarDrawer(unscheduledJOs) {
         let el = document.createElement('div');
         el.className = 'fc-external-event';
         el.dataset.jo = r.jo;
-        el.innerHTML = `
-            <div class="event-jo">${r.jo}</div>
-            <div class="event-cust">${r.customer || 'Unknown'} (${r.model || 'Unit'})</div>
-            <div class="event-issue">${r.issue || 'No issue summary'}</div>
-        `;
+        el.innerHTML = `<div class="event-jo">${r.jo}</div><div class="event-cust">${r.customer || 'Unknown'} (${r.model || 'Unit'})</div><div class="event-issue">${r.issue || 'No issue summary'}</div>`;
         list.appendChild(el);
     });
 }
@@ -562,44 +589,23 @@ function populateDropdowns() {
     const custList = document.getElementById("custList");
     const modelList = document.getElementById("modelList");
     
-    joDataList.innerHTML = '';
-    custList.innerHTML = '';
-    modelList.innerHTML = '';
+    joDataList.innerHTML = ''; custList.innerHTML = ''; modelList.innerHTML = '';
     
     let uniqueCustomers = new Set();
-    let uniqueModels = new Set(["R280", "D400"]); // Default fixed options
+    let uniqueModels = new Set(["R280", "D400"]); 
 
     RAW_DATA.forEach(r => {
-        // Populate JO Options (Exclude DONE)
         if(r.jo && r.status !== "Done") {
             let opt = document.createElement('option');
-            opt.value = r.jo;
-            opt.textContent = `${r.customer || "Unknown"} | ${r.model || "Unit"} [PENDING]`;
+            opt.value = r.jo; opt.textContent = `${r.customer || "Unknown"} | ${r.model || "Unit"} [PENDING]`;
             joDataList.appendChild(opt);
         }
-        // Collect Unique Customers
-        if(r.customer && r.customer.trim() !== "" && r.customer !== "-") {
-            uniqueCustomers.add(r.customer.trim());
-        }
-        // Collect Unique Models
-        if(r.model && r.model.trim() !== "" && r.model !== "-") {
-            uniqueModels.add(r.model.trim());
-        }
+        if(r.customer && r.customer.trim() !== "" && r.customer !== "-") uniqueCustomers.add(r.customer.trim());
+        if(r.model && r.model.trim() !== "" && r.model !== "-") uniqueModels.add(r.model.trim());
     });
 
-    // Append to Customer Datalist
-    Array.from(uniqueCustomers).sort().forEach(cust => {
-        let opt = document.createElement('option');
-        opt.value = cust;
-        custList.appendChild(opt);
-    });
-
-    // Append to Model Datalist
-    Array.from(uniqueModels).sort().forEach(mod => {
-        let opt = document.createElement('option');
-        opt.value = mod;
-        modelList.appendChild(opt);
-    });
+    Array.from(uniqueCustomers).sort().forEach(cust => { let opt = document.createElement('option'); opt.value = cust; custList.appendChild(opt); });
+    Array.from(uniqueModels).sort().forEach(mod => { let opt = document.createElement('option'); opt.value = mod; modelList.appendChild(opt); });
 }
 
 function autoFillFormFields(e) {
@@ -617,6 +623,7 @@ function autoFillFormFields(e) {
         document.getElementById("formIssue").value = record.issue || "";
         document.getElementById("formRemarks").value = record.remarksCS || "";
         document.getElementById("schedDate").value = sanitizeDate(record.dateScheduled) || "";
+        document.getElementById("formStatus").value = record.status === "Done" ? "Done" : "Pending";
         
         let m = (record.mechanic || "").toLowerCase();
         document.getElementById("mechanicSelect").value = m.includes('chris') ? "Chris" : (m.includes('lohen') ? "Lohen" : "");
@@ -627,43 +634,32 @@ function autoFillFormFields(e) {
 }
 
 function generateNextJO() {
-    let maxNum = 0;
-    let prefix = "ASGARD-"; 
-    
+    let maxNum = 0; let prefix = "ASGARD-"; 
     RAW_DATA.forEach(r => {
         if (r.jo && r.jo.includes("-")) {
             let parts = r.jo.split("-");
             if (parts.length > 1) {
                 let numPart = parseInt(parts[parts.length - 1], 10);
-                if (!isNaN(numPart) && numPart > maxNum) {
-                    maxNum = numPart;
-                    prefix = r.jo.substring(0, r.jo.lastIndexOf("-") + 1);
-                }
+                if (!isNaN(numPart) && numPart > maxNum) { maxNum = numPart; prefix = r.jo.substring(0, r.jo.lastIndexOf("-") + 1); }
             }
         }
     });
     
     let nextNum = maxNum + 1;
-    let paddedNum = String(nextNum).padStart(6, '0');
-    let nextJO = prefix + paddedNum;
+    let nextJO = prefix + String(nextNum).padStart(6, '0');
     
     let joInput = document.getElementById("joSelect");
-    joInput.value = nextJO;
-    joInput.disabled = true; 
+    joInput.value = nextJO; joInput.disabled = true; 
     
-    document.getElementById("formCust").value = "";
-    document.getElementById("formModel").value = "";
-    document.getElementById("formVin").value = "";
-    document.getElementById("formContact").value = "";
+    document.getElementById("formCust").value = ""; document.getElementById("formModel").value = "";
+    document.getElementById("formVin").value = ""; document.getElementById("formContact").value = "";
     document.getElementById("formAddress").value = "";
     
     let today = new Date();
     document.getElementById("formDateRaised").value = today.toISOString().split('T')[0];
-    document.getElementById("formTimeRaised").value = ""; 
-    document.getElementById("formIssue").value = "";
-    document.getElementById("formRemarks").value = "";
-    document.getElementById("schedDate").value = "";
-    document.getElementById("mechanicSelect").value = "";
+    document.getElementById("formTimeRaised").value = ""; document.getElementById("formIssue").value = "";
+    document.getElementById("formRemarks").value = ""; document.getElementById("schedDate").value = "";
+    document.getElementById("mechanicSelect").value = ""; document.getElementById("formStatus").value = "Pending";
     
     document.getElementById("unassignBtn").style.display = "none";
     document.getElementById("deleteBtn").style.display = "none";
@@ -671,23 +667,16 @@ function generateNextJO() {
 
 function openScheduleModal(jo = "", date = "", mechanic = "") {
     hideTooltip();
-    
     let joInput = document.getElementById("joSelect");
-    joInput.value = jo;
-    joInput.disabled = jo !== ""; 
+    joInput.value = jo; joInput.disabled = jo !== ""; 
     
     document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Create / Edit JO";
-    document.getElementById("formCust").value = "";
-    document.getElementById("formModel").value = "";
-    document.getElementById("formVin").value = "";
-    document.getElementById("formContact").value = "";
-    document.getElementById("formAddress").value = "";
-    document.getElementById("formDateRaised").value = "";
-    document.getElementById("formTimeRaised").value = "";
-    document.getElementById("formIssue").value = "";
-    document.getElementById("formRemarks").value = "";
-    document.getElementById("schedDate").value = sanitizeDate(date) || "";
-    document.getElementById("mechanicSelect").value = "";
+    document.getElementById("formCust").value = ""; document.getElementById("formModel").value = "";
+    document.getElementById("formVin").value = ""; document.getElementById("formContact").value = "";
+    document.getElementById("formAddress").value = ""; document.getElementById("formDateRaised").value = "";
+    document.getElementById("formTimeRaised").value = ""; document.getElementById("formIssue").value = "";
+    document.getElementById("formRemarks").value = ""; document.getElementById("schedDate").value = sanitizeDate(date) || "";
+    document.getElementById("mechanicSelect").value = ""; document.getElementById("formStatus").value = "Pending";
     
     let record = RAW_DATA.find(r => r.jo === jo);
     if(record) {
@@ -699,6 +688,7 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
         document.getElementById("formDateRaised").value = sanitizeDate(record.date) || "";
         document.getElementById("formIssue").value = record.issue || "";
         document.getElementById("formRemarks").value = record.remarksCS || "";
+        document.getElementById("formStatus").value = record.status === "Done" ? "Done" : "Pending";
     }
     
     let mechSelect = document.getElementById("mechanicSelect");
@@ -711,8 +701,7 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
 }
 
 function closeModal() {
-    hideTooltip();
-    document.getElementById("scheduleModal").style.display = "none";
+    hideTooltip(); document.getElementById("scheduleModal").style.display = "none";
 }
 
 function handleDragDrop(jo, newDateStr) {
@@ -725,87 +714,39 @@ function handleDragDrop(jo, newDateStr) {
 function saveSchedule() {
     hideTooltip();
     const jo = document.getElementById("joSelect").value;
-    
-    if(!jo) {
-        Swal.fire('Incomplete', 'Job Order Number is required.', 'warning');
-        return;
-    }
+    if(!jo) { Swal.fire('Incomplete', 'Job Order Number is required.', 'warning'); return; }
     
     let payload = {
-        jo: jo,
-        customer: document.getElementById("formCust").value,
-        model: document.getElementById("formModel").value,
-        vin: document.getElementById("formVin").value,
-        contactNumber: document.getElementById("formContact").value,
-        address: document.getElementById("formAddress").value,
-        dateRaised: document.getElementById("formDateRaised").value,
-        timeRaised: document.getElementById("formTimeRaised").value,
-        issue: document.getElementById("formIssue").value,
-        remarksCS: document.getElementById("formRemarks").value,
-        dateScheduled: document.getElementById("schedDate").value,
-        mechanic: document.getElementById("mechanicSelect").value
+        jo: jo, customer: document.getElementById("formCust").value, model: document.getElementById("formModel").value,
+        vin: document.getElementById("formVin").value, contactNumber: document.getElementById("formContact").value,
+        address: document.getElementById("formAddress").value, dateRaised: document.getElementById("formDateRaised").value,
+        timeRaised: document.getElementById("formTimeRaised").value, issue: document.getElementById("formIssue").value,
+        remarksCS: document.getElementById("formRemarks").value, dateScheduled: document.getElementById("schedDate").value,
+        mechanic: document.getElementById("mechanicSelect").value, status: document.getElementById("formStatus").value
     };
     
-    document.getElementById("saveBtn").textContent = "Saving...";
-    document.getElementById("saveBtn").disabled = true;
+    document.getElementById("saveBtn").textContent = "Saving..."; document.getElementById("saveBtn").disabled = true;
     
-    fetch(API_URL, {
-        method: 'POST',
-        body: JSON.stringify(payload)
-    }).then(res => res.json()).then(result => {
+    fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) })
+    .then(res => res.json()).then(result => {
         if(result.status === "success") {
             Swal.fire({ title: 'Database Synced!', text: 'Information updated successfully.', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'bottom-end' });
-            closeModal();
-            fetchData();
-        } else {
-            Swal.fire('Error', result.message || 'Failed to save.', 'error');
-            fetchData();
-        }
-    }).catch(e => {
-        Swal.fire('Error', 'Network error. Cannot reach database.', 'error');
-        fetchData();
-    }).finally(() => {
-        document.getElementById("saveBtn").textContent = "Save / Update";
-        document.getElementById("saveBtn").disabled = false;
-    });
+            closeModal(); fetchData();
+        } else { Swal.fire('Error', result.message || 'Failed to save.', 'error'); fetchData(); }
+    }).catch(e => { Swal.fire('Error', 'Network error. Cannot reach database.', 'error'); fetchData();
+    }).finally(() => { document.getElementById("saveBtn").textContent = "Save / Update"; document.getElementById("saveBtn").disabled = false; });
 }
 
 function unassignSchedule() {
-    hideTooltip();
-    const jo = document.getElementById("joSelect").value;
-    
-    Swal.fire({
-        title: 'Return to Unscheduled?',
-        text: `Move JO ${jo} back to the Unscheduled list?`,
-        icon: 'question',
-        showCancelButton: true,
-        confirmButtonColor: '#f08a35',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Yes, Unschedule'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            sendUpdateToBackend(jo, "", ""); 
-        }
-    });
+    hideTooltip(); const jo = document.getElementById("joSelect").value;
+    Swal.fire({ title: 'Return to Unscheduled?', text: `Move JO ${jo} back to the Unscheduled list?`, icon: 'question', showCancelButton: true, confirmButtonColor: '#f08a35', cancelButtonColor: '#64748b', confirmButtonText: 'Yes, Unschedule'
+    }).then((result) => { if (result.isConfirmed) { sendUpdateToBackend(jo, "", ""); } });
 }
 
 function deleteSchedule() {
-    hideTooltip();
-    const jo = document.getElementById("joSelect").value;
-    
-    Swal.fire({
-        title: 'Clear Schedule?',
-        text: `Clear assigned date and mechanic for JO ${jo}?`,
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#ef4444',
-        cancelButtonColor: '#64748b',
-        confirmButtonText: 'Yes, clear it!'
-    }).then((result) => {
-        if (result.isConfirmed) {
-            sendUpdateToBackend(jo, "", ""); 
-        }
-    });
+    hideTooltip(); const jo = document.getElementById("joSelect").value;
+    Swal.fire({ title: 'Clear Schedule?', text: `Clear assigned date and mechanic for JO ${jo}?`, icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#64748b', confirmButtonText: 'Yes, clear it!'
+    }).then((result) => { if (result.isConfirmed) { sendUpdateToBackend(jo, "", ""); } });
 }
 
 async function sendUpdateToBackend(jo, date, mechanic) {
@@ -814,33 +755,13 @@ async function sendUpdateToBackend(jo, date, mechanic) {
     if (mechanic !== undefined) payload.mechanic = mechanic;
     
     try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            body: JSON.stringify(payload)
-        });
-        
+        const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
         const result = await response.json();
-        
         if(result.status === "success") {
-            Swal.fire({ 
-                title: 'Database Synced!', 
-                text: 'Schedule updated successfully.', 
-                icon: 'success', 
-                timer: 1500, 
-                showConfirmButton: false,
-                toast: true,
-                position: 'bottom-end'
-            });
-            closeModal();
-            fetchData();
-        } else {
-            Swal.fire('Error', result.message || 'Failed to save.', 'error');
-            fetchData();
-        }
-    } catch (e) {
-        Swal.fire('Error', 'Network error. Cannot reach database.', 'error');
-        fetchData();
-    }
+            Swal.fire({ title: 'Database Synced!', text: 'Schedule updated successfully.', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'bottom-end' });
+            closeModal(); fetchData();
+        } else { Swal.fire('Error', result.message || 'Failed to save.', 'error'); fetchData(); }
+    } catch (e) { Swal.fire('Error', 'Network error. Cannot reach database.', 'error'); fetchData(); }
 }
 </script>
 </body>
