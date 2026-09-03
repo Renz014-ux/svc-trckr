@@ -288,13 +288,17 @@
               </select>
           </div>
 
-          <!-- REPAIR STATUS (NEW FEATURE) -->
-          <div class="form-group" style="margin-top: 8px; grid-column: span 2;">
+          <!-- REPAIR STATUS & DATE RESOLVED -->
+          <div class="form-group" style="margin-top: 8px;">
               <label>Repair Status</label>
               <select id="formStatus" class="form-control" style="border-color: var(--warning); border-width: 2px;">
                   <option value="Pending">Pending</option>
                   <option value="Done">Done</option>
               </select>
+          </div>
+          <div class="form-group" style="margin-top: 8px;">
+              <label>Date Resolved</label>
+              <input type="date" id="formDateResolved" class="form-control" style="border-color: var(--success); border-width: 2px;">
           </div>
       </div>
       
@@ -334,6 +338,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Auto-fill logic when selecting from Dropdown
     document.getElementById('joSelect').addEventListener('change', autoFillFormFields);
+
+    // Auto-fill Date Resolved when Status becomes Done
+    document.getElementById('formStatus').addEventListener('change', function(e) {
+        if (e.target.value === 'Done') {
+            let dateResInput = document.getElementById('formDateResolved');
+            if (!dateResInput.value) {
+                dateResInput.value = new Date().toISOString().split('T')[0];
+            }
+            e.target.style.borderColor = 'var(--success)';
+        } else {
+            e.target.style.borderColor = 'var(--warning)';
+        }
+    });
 
     // AUTO-REFRESH EVERY 15 SECONDS (Real-time Sync)
     setInterval(async () => {
@@ -623,7 +640,12 @@ function autoFillFormFields(e) {
         document.getElementById("formIssue").value = record.issue || "";
         document.getElementById("formRemarks").value = record.remarksCS || "";
         document.getElementById("schedDate").value = sanitizeDate(record.dateScheduled) || "";
-        document.getElementById("formStatus").value = record.status === "Done" ? "Done" : "Pending";
+        
+        let statEl = document.getElementById("formStatus");
+        statEl.value = record.status === "Done" ? "Done" : "Pending";
+        statEl.style.borderColor = record.status === "Done" ? "var(--success)" : "var(--warning)";
+        
+        document.getElementById("formDateResolved").value = sanitizeDate(record.dateResolved) || "";
         
         let m = (record.mechanic || "").toLowerCase();
         document.getElementById("mechanicSelect").value = m.includes('chris') ? "Chris" : (m.includes('lohen') ? "Lohen" : "");
@@ -659,7 +681,11 @@ function generateNextJO() {
     document.getElementById("formDateRaised").value = today.toISOString().split('T')[0];
     document.getElementById("formTimeRaised").value = ""; document.getElementById("formIssue").value = "";
     document.getElementById("formRemarks").value = ""; document.getElementById("schedDate").value = "";
-    document.getElementById("mechanicSelect").value = ""; document.getElementById("formStatus").value = "Pending";
+    document.getElementById("mechanicSelect").value = ""; 
+    
+    let statEl = document.getElementById("formStatus");
+    statEl.value = "Pending"; statEl.style.borderColor = "var(--warning)";
+    document.getElementById("formDateResolved").value = "";
     
     document.getElementById("unassignBtn").style.display = "none";
     document.getElementById("deleteBtn").style.display = "none";
@@ -676,7 +702,11 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
     document.getElementById("formAddress").value = ""; document.getElementById("formDateRaised").value = "";
     document.getElementById("formTimeRaised").value = ""; document.getElementById("formIssue").value = "";
     document.getElementById("formRemarks").value = ""; document.getElementById("schedDate").value = sanitizeDate(date) || "";
-    document.getElementById("mechanicSelect").value = ""; document.getElementById("formStatus").value = "Pending";
+    document.getElementById("mechanicSelect").value = ""; 
+    
+    let statEl = document.getElementById("formStatus");
+    statEl.value = "Pending"; statEl.style.borderColor = "var(--warning)";
+    document.getElementById("formDateResolved").value = "";
     
     let record = RAW_DATA.find(r => r.jo === jo);
     if(record) {
@@ -688,7 +718,10 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
         document.getElementById("formDateRaised").value = sanitizeDate(record.date) || "";
         document.getElementById("formIssue").value = record.issue || "";
         document.getElementById("formRemarks").value = record.remarksCS || "";
-        document.getElementById("formStatus").value = record.status === "Done" ? "Done" : "Pending";
+        
+        statEl.value = record.status === "Done" ? "Done" : "Pending";
+        statEl.style.borderColor = record.status === "Done" ? "var(--success)" : "var(--warning)";
+        document.getElementById("formDateResolved").value = sanitizeDate(record.dateResolved) || "";
     }
     
     let mechSelect = document.getElementById("mechanicSelect");
@@ -722,7 +755,8 @@ function saveSchedule() {
         address: document.getElementById("formAddress").value, dateRaised: document.getElementById("formDateRaised").value,
         timeRaised: document.getElementById("formTimeRaised").value, issue: document.getElementById("formIssue").value,
         remarksCS: document.getElementById("formRemarks").value, dateScheduled: document.getElementById("schedDate").value,
-        mechanic: document.getElementById("mechanicSelect").value, status: document.getElementById("formStatus").value
+        mechanic: document.getElementById("mechanicSelect").value, status: document.getElementById("formStatus").value,
+        dateResolved: document.getElementById("formDateResolved").value
     };
     
     document.getElementById("saveBtn").textContent = "Saving..."; document.getElementById("saveBtn").disabled = true;
