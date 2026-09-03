@@ -130,7 +130,7 @@
   .tt-row { margin-bottom: 3px; color: #cbd5e1; }
   .tt-label { font-weight: 600; color: #94a3b8; }
 
-  /* MODAL STYLES (UPDATED FOR 2-COLUMN FORM) */
+  /* 2-COLUMN MODAL STYLES */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
   .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
   .form-group { margin-bottom: 14px; }
@@ -230,7 +230,7 @@
       <h2 style="margin-top:0; color: var(--nrd-blue);" id="modalTitle">Create / Edit JO & Schedule</h2>
       
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px;">
-          <!-- JO Number with DataList Support -->
+          <!-- JO Number with DataList & Auto-Generate Button -->
           <div class="form-group" style="grid-column: span 2;">
               <label>Job Order Number</label>
               <div style="display: flex; gap: 8px;">
@@ -254,7 +254,7 @@
           <div class="form-group" style="grid-column: span 2;"><label>Issue Summary</label><textarea id="formIssue" class="form-control" rows="2"></textarea></div>
           <div class="form-group" style="grid-column: span 2;"><label>Remarks CS</label><textarea id="formRemarks" class="form-control" rows="2"></textarea></div>
           
-          <!-- HIGHLIGHTED SCHEDULING AREA -->
+          <!-- SCHEDULING AREA -->
           <div class="form-group" style="margin-top: 8px;">
               <label>Scheduled Date</label>
               <input type="date" id="schedDate" class="form-control" style="border-color: var(--nrd-blue); border-width: 2px; background: rgba(29, 106, 150, 0.05);">
@@ -288,19 +288,19 @@ const API_URL = "https://script.google.com/macros/s/AKfycbwrJ3OwlTptfFAuzW6jXpQH
 
 let RAW_DATA = [];
 let calendar;
-let draggableInstance = null; // Prevent double-initialization bug
+let draggableInstance = null;
 
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
-    initExternalDraggableOnce(); // Initialize draggable only once
+    initExternalDraggableOnce(); 
     fetchData();
     
-    // Safety triggers to kill stuck tooltips
+    // Safety triggers
     window.addEventListener('mouseup', hideTooltip);
     window.addEventListener('dragend', hideTooltip);
     window.addEventListener('mouseleave', hideTooltip);
     
-    // Auto-fill logic for DataList
+    // Auto-fill logic when selecting from Dropdown
     document.getElementById('joSelect').addEventListener('change', autoFillFormFields);
 });
 
@@ -322,7 +322,6 @@ function sanitizeDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
-// Ensure Draggable is only instantiated once
 function initExternalDraggableOnce() {
     const list = document.getElementById('externalEventsList');
     if (list && !draggableInstance) {
@@ -413,9 +412,7 @@ function initCalendar() {
             let oldDateStr = sanitizeDate(info.oldEvent.startStr);
             let newDateStr = sanitizeDate(info.event.startStr);
             
-            if (oldDateStr === newDateStr) return; // Prevent logic hang on same date drop
-            
-            // For simple drag and drop, we only update date/mechanic payload
+            if (oldDateStr === newDateStr) return; 
             handleDragDrop(jo, newDateStr);
         },
         
@@ -425,7 +422,6 @@ function initCalendar() {
             let newDateStr = sanitizeDate(info.event.startStr);
             info.event.remove(); 
             
-            // Robust check for Aborting a drop (Esc key, clicked outside)
             Swal.fire({
                 title: 'Assign Technician',
                 text: `Assigning JO ${jo} for ${newDateStr}:`,
@@ -441,7 +437,6 @@ function initCalendar() {
                 cancelButtonText: 'Keep Unassigned'
             }).then((result) => {
                 if (result.isDismissed && result.dismiss !== Swal.DismissReason.cancel) {
-                    // Abort drop if user clicked backdrop, closed, or pressed Esc
                     fetchData();
                     return; 
                 }
@@ -449,9 +444,7 @@ function initCalendar() {
                 let chosenMechanic = "";
                 if (result.isConfirmed) chosenMechanic = "Chris";
                 else if (result.isDenied) chosenMechanic = "Lohen";
-                // If canceled normally, mechanic stays ""
                 
-                // For drag from sidebar, just send jo, date, mechanic payload
                 sendUpdateToBackend(jo, newDateStr, chosenMechanic);
             });
         }
@@ -473,8 +466,6 @@ async function fetchData() {
 
 function populateCalendarAndUI() {
     hideTooltip();
-    
-    // Clear both events and background sources to prevent memory stacking
     calendar.removeAllEvents();
     calendar.getEventSources().forEach(src => src.remove());
     
@@ -557,13 +548,12 @@ function populateSidebarDrawer(unscheduledJOs) {
     });
 }
 
-// 1. UPDATED: Hindi na isasama ang mga "Done" sa listahan
 function populateJODropdown() {
     const dataList = document.getElementById("joDataList");
     dataList.innerHTML = '';
     
     RAW_DATA.forEach(r => {
-        // I-filter: Ilabas lang kapag HINDI "Done"
+        // EXCLUDE DONE JOs
         if(r.jo && r.status !== "Done") {
             let opt = document.createElement('option');
             opt.value = r.jo;
@@ -573,60 +563,6 @@ function populateJODropdown() {
     });
 }
 
-// 2. NEW: Function para awtomatikong basahin ang last JO at mag-add ng +1
-function generateNextJO() {
-    let maxNum = 0;
-    let prefix = "ASGARD-"; // Default format kung sakaling walang laman ang sheet
-    
-    // Hanapin ang pinakamataas na number sa buong database
-    RAW_DATA.forEach(r => {
-        if (r.jo && r.jo.includes("-")) {
-            let parts = r.jo.split("-");
-            if (parts.length > 1) {
-                let numPart = parseInt(parts[parts.length - 1], 10);
-                if (!isNaN(numPart) && numPart > maxNum) {
-                    maxNum = numPart;
-                    prefix = r.jo.substring(0, r.jo.lastIndexOf("-") + 1);
-                }
-            }
-        }
-    });
-    
-    // Mag-add ng +1 at lagyan ng leading zeros (e.g. 177 + 1 = 000178)
-    let nextNum = maxNum + 1;
-    let paddedNum = String(nextNum).padStart(6, '0');
-    let nextJO = prefix + paddedNum;
-    
-    // I-set ang bagong JO number at i-lock ang input field para di ma-edit nang aksidente
-    let joInput = document.getElementById("joSelect");
-    joInput.value = nextJO;
-    joInput.disabled = true; 
-    
-    // I-clear ang ibang form fields para sa bagong entry
-    document.getElementById("formCust").value = "";
-    document.getElementById("formModel").value = "";
-    document.getElementById("formVin").value = "";
-    document.getElementById("formContact").value = "";
-    document.getElementById("formAddress").value = "";
-    
-    // Auto-set Date Raised sa araw na ito
-    let today = new Date();
-    document.getElementById("formDateRaised").value = today.toISOString().split('T')[0];
-    
-    document.getElementById("formTimeRaised").value = ""; 
-    document.getElementById("formIssue").value = "";
-    document.getElementById("formRemarks").value = "";
-    document.getElementById("schedDate").value = "";
-    document.getElementById("mechanicSelect").value = "";
-    
-    // Itago ang mga delete/unassign buttons dahil bagong record ito
-    document.getElementById("unassignBtn").style.display = "none";
-    document.getElementById("deleteBtn").style.display = "none";
-        }
-    });
-}
-
-// Helper to auto-fill the form when a JO is selected from DataList
 function autoFillFormFields(e) {
     let selectedJO = e.target.value;
     let record = RAW_DATA.find(r => r.jo === selectedJO);
@@ -651,11 +587,57 @@ function autoFillFormFields(e) {
     }
 }
 
+function generateNextJO() {
+    let maxNum = 0;
+    let prefix = "ASGARD-"; 
+    
+    RAW_DATA.forEach(r => {
+        if (r.jo && r.jo.includes("-")) {
+            let parts = r.jo.split("-");
+            if (parts.length > 1) {
+                let numPart = parseInt(parts[parts.length - 1], 10);
+                if (!isNaN(numPart) && numPart > maxNum) {
+                    maxNum = numPart;
+                    prefix = r.jo.substring(0, r.jo.lastIndexOf("-") + 1);
+                }
+            }
+        }
+    });
+    
+    let nextNum = maxNum + 1;
+    let paddedNum = String(nextNum).padStart(6, '0');
+    let nextJO = prefix + paddedNum;
+    
+    let joInput = document.getElementById("joSelect");
+    joInput.value = nextJO;
+    joInput.disabled = true; // Lock field for auto-gen
+    
+    document.getElementById("formCust").value = "";
+    document.getElementById("formModel").value = "";
+    document.getElementById("formVin").value = "";
+    document.getElementById("formContact").value = "";
+    document.getElementById("formAddress").value = "";
+    
+    let today = new Date();
+    document.getElementById("formDateRaised").value = today.toISOString().split('T')[0];
+    document.getElementById("formTimeRaised").value = ""; 
+    document.getElementById("formIssue").value = "";
+    document.getElementById("formRemarks").value = "";
+    document.getElementById("schedDate").value = "";
+    document.getElementById("mechanicSelect").value = "";
+    
+    document.getElementById("unassignBtn").style.display = "none";
+    document.getElementById("deleteBtn").style.display = "none";
+}
+
 function openScheduleModal(jo = "", date = "", mechanic = "") {
     hideTooltip();
     
-    // Clear all fields first
-    document.getElementById("joSelect").value = jo;
+    let joInput = document.getElementById("joSelect");
+    joInput.value = jo;
+    joInput.disabled = jo !== ""; // Enable ONLY if it's completely new/empty
+    
+    document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Create / Edit JO";
     document.getElementById("formCust").value = "";
     document.getElementById("formModel").value = "";
     document.getElementById("formVin").value = "";
@@ -668,7 +650,6 @@ function openScheduleModal(jo = "", date = "", mechanic = "") {
     document.getElementById("schedDate").value = sanitizeDate(date) || "";
     document.getElementById("mechanicSelect").value = "";
     
-    // If opening an existing JO, populate fields
     let record = RAW_DATA.find(r => r.jo === jo);
     if(record) {
         document.getElementById("formCust").value = record.customer || "";
@@ -695,16 +676,13 @@ function closeModal() {
     document.getElementById("scheduleModal").style.display = "none";
 }
 
-// Simple Drag & Drop handler (Only updates date & mechanic)
 function handleDragDrop(jo, newDateStr) {
     let cleanNewDate = sanitizeDate(newDateStr);
     let ev = calendar.getEventById(jo);
     if(ev) ev.setStart(cleanNewDate);
-    
     sendUpdateToBackend(jo, cleanNewDate, undefined);
 }
 
-// Form Save Handler (Sends full payload)
 function saveSchedule() {
     hideTooltip();
     const jo = document.getElementById("joSelect").value;
@@ -737,7 +715,7 @@ function saveSchedule() {
         body: JSON.stringify(payload)
     }).then(res => res.json()).then(result => {
         if(result.status === "success") {
-            Swal.fire({ title: 'Database Synced!', text: 'Schedule updated successfully.', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'bottom-end' });
+            Swal.fire({ title: 'Database Synced!', text: 'Information updated successfully.', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'bottom-end' });
             closeModal();
             fetchData();
         } else {
@@ -791,7 +769,6 @@ function deleteSchedule() {
     });
 }
 
-// Mini Payload Sender (For Drag/Drops and Unassigns)
 async function sendUpdateToBackend(jo, date, mechanic) {
     let payload = { jo: jo };
     if (date !== undefined) payload.dateScheduled = date;
