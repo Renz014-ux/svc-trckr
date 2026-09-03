@@ -65,7 +65,7 @@
   .stat-pill-num { font-size: 18px; font-weight: 800; color: var(--text-main); line-height: 1; }
   .stat-pill-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
 
-  /* MAIN LAYOUT WITH SIDEBAR DRAWER */
+  /* MAIN LAYOUT */
   .main-layout { display: flex; gap: 20px; align-items: start; }
   
   .sidebar-drawer { 
@@ -120,9 +120,9 @@
   .status-tag-done { background: #10b981; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
   .status-tag-pending { background: #f59e0b; color: white; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-right: 4px; font-weight: 700; text-transform: uppercase; display: inline-block; }
 
-  /* HOVER TOOLTIP STYLING (WITH POINTER-EVENTS NONE FIX) */
+  /* HOVER TOOLTIP STYLING */
   .custom-tooltip {
-      position: absolute; z-index: 9999; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
+      position: absolute; z-index: 99999; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(8px);
       color: #ffffff; padding: 12px 16px; border-radius: 10px; font-size: 12px; pointer-events: none !important;
       box-shadow: 0 10px 25px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); max-width: 280px; display: none;
   }
@@ -272,11 +272,18 @@ let calendar;
 document.addEventListener('DOMContentLoaded', function() {
     initCalendar();
     fetchData();
+    
+    // Global Event Listener to forcefully kill stuck tooltips on click or drag
+    window.addEventListener('mouseup', hideTooltip);
+    window.addEventListener('dragend', hideTooltip);
 });
 
 function hideTooltip() {
     let tooltip = document.getElementById('hoverTooltip');
-    if (tooltip) tooltip.style.display = 'none';
+    if (tooltip) {
+        tooltip.style.display = 'none';
+        tooltip.innerHTML = '';
+    }
 }
 
 function sanitizeDate(dateStr) {
@@ -330,8 +337,13 @@ function initCalendar() {
             return { domNodes: [customEl] };
         },
         
-        // TOOLTIP WITH STUCK PREVENTOR
+        // KILL TOOLTIP IMMEDIATELY ON DRAG START
+        eventDragStart: function() {
+            hideTooltip();
+        },
+        
         eventMouseEnter: function(info) {
+            hideTooltip();
             let props = info.event.extendedProps;
             let tooltip = document.getElementById('hoverTooltip');
             tooltip.innerHTML = `
@@ -345,17 +357,28 @@ function initCalendar() {
             tooltip.style.left = (info.jsEvent.pageX + 15) + 'px';
             tooltip.style.top = (info.jsEvent.pageY + 15) + 'px';
         },
+        
         eventMouseLeave: function() {
             hideTooltip();
         },
         
         eventClick: function(info) {
-            hideTooltip(); // Immediate hide to stop hanging UI
+            hideTooltip(); 
             openScheduleModal(info.event.id, info.event.startStr, info.event.extendedProps.mechanic);
         },
+        
         eventDrop: function(info) {
             hideTooltip();
-            handleDragDrop(info.event.id, info.event.startStr);
+            let jo = info.event.id;
+            let oldDateStr = sanitizeDate(info.oldEvent.startStr);
+            let newDateStr = sanitizeDate(info.event.startStr);
+            
+            // IF DROPPED ON THE SAME EXACT DATE, DO NOTHING & PREVENT HANGING
+            if (oldDateStr === newDateStr) {
+                return;
+            }
+            
+            handleDragDrop(jo, newDateStr);
         },
         
         eventReceive: function(info) {
@@ -401,6 +424,7 @@ async function fetchData() {
 }
 
 function populateCalendarAndUI() {
+    hideTooltip();
     calendar.removeAllEvents();
     
     let scheduledRecords = [];
@@ -541,6 +565,7 @@ function handleDragDrop(jo, newDateStr) {
 }
 
 function saveSchedule() {
+    hideTooltip();
     const jo = document.getElementById("joSelect").value;
     const date = document.getElementById("schedDate").value;
     const mechanic = document.getElementById("mechanicSelect").value;
@@ -556,8 +581,8 @@ function saveSchedule() {
     sendUpdateToBackend(jo, date, mechanic);
 }
 
-// ACTION TO RETURN TO UNSCHEDULED SIDEBAR DRAWER
 function unassignSchedule() {
+    hideTooltip();
     const jo = document.getElementById("joSelect").value;
     
     Swal.fire({
@@ -570,12 +595,13 @@ function unassignSchedule() {
         confirmButtonText: 'Yes, Unschedule'
     }).then((result) => {
         if (result.isConfirmed) {
-            sendUpdateToBackend(jo, "", ""); // Empty date removes it from calendar to sidebar
+            sendUpdateToBackend(jo, "", ""); 
         }
     });
 }
 
 function deleteSchedule() {
+    hideTooltip();
     const jo = document.getElementById("joSelect").value;
     
     Swal.fire({
