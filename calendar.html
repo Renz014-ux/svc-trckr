@@ -130,14 +130,15 @@
   .tt-row { margin-bottom: 3px; color: #cbd5e1; }
   .tt-label { font-weight: 600; color: #94a3b8; }
 
-  /* MODAL STYLES */
+  /* MODAL STYLES (UPDATED FOR 2-COLUMN FORM) */
   .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center; backdrop-filter: blur(4px); }
-  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 450px; position: relative; }
-  .form-group { margin-bottom: 16px; }
+  .modal-content { background: var(--surface-card); padding: 32px; border-radius: 16px; width: 90%; max-width: 650px; max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+  .form-group { margin-bottom: 14px; }
   .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-  .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 14px; background: var(--surface-bg); color: var(--text-main); outline: none; }
+  .form-control { width: 100%; padding: 10px 14px; border: 1px solid var(--border-light); border-radius: 8px; font-size: 13px; background: var(--surface-bg); color: var(--text-main); outline: none; font-family: 'Figtree'; }
+  .form-control:focus { border-color: var(--nrd-blue); }
   
-  .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 8px; }
+  .modal-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; gap: 8px; border-top: 1px solid var(--border-light); padding-top: 16px;}
   .btn-unassign { background: #fef3c7; color: #d97706; border: 1px solid rgba(217, 119, 6, 0.2); padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; }
   .btn-unassign:hover { background: #f59e0b; color: white; }
   .btn-delete { background: #fee2e2; color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px 14px; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; font-size: 13px; }
@@ -223,30 +224,46 @@
 
 <div class="custom-tooltip" id="hoverTooltip"></div>
 
-<!-- SCHEDULE MODAL -->
+<!-- 2-COLUMN SCHEDULE & DATA ENTRY MODAL -->
 <div class="modal-overlay" id="scheduleModal">
   <div class="modal-content">
-      <h2 style="margin-top:0;" id="modalTitle">Assign Schedule</h2>
+      <h2 style="margin-top:0; color: var(--nrd-blue);" id="modalTitle">Create / Edit JO & Schedule</h2>
       
-      <div class="form-group">
-          <label>Job Order Number</label>
-          <select id="joSelect" class="form-control">
-              <option value="">Loading JOs...</option>
-          </select>
-      </div>
-      
-      <div class="form-group">
-          <label>Scheduled Date</label>
-          <input type="date" id="schedDate" class="form-control">
-      </div>
-      
-      <div class="form-group">
-          <label>Assigned Mechanic</label>
-          <select id="mechanicSelect" class="form-control">
-              <option value="">-- Select Mechanic --</option>
-              <option value="Chris">Chris</option>
-              <option value="Lohen">Lohen</option>
-          </select>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0 16px;">
+          <!-- JO Number with DataList Support -->
+          <div class="form-group" style="grid-column: span 2;">
+              <label>Job Order Number</label>
+              <input type="text" id="joSelect" list="joDataList" class="form-control" placeholder="Search pending JO or type a New JO Number" style="border-color: var(--nrd-orange); border-width: 2px;">
+              <datalist id="joDataList"></datalist>
+          </div>
+          
+          <div class="form-group"><label>Customer</label><input type="text" id="formCust" class="form-control"></div>
+          <div class="form-group"><label>Model</label><input type="text" id="formModel" class="form-control"></div>
+          
+          <div class="form-group"><label>VIN Number</label><input type="text" id="formVin" class="form-control"></div>
+          <div class="form-group"><label>Contact Number</label><input type="text" id="formContact" class="form-control"></div>
+          
+          <div class="form-group" style="grid-column: span 2;"><label>Address</label><input type="text" id="formAddress" class="form-control"></div>
+          
+          <div class="form-group"><label>Date Raised</label><input type="date" id="formDateRaised" class="form-control"></div>
+          <div class="form-group"><label>Time Raised</label><input type="time" id="formTimeRaised" class="form-control"></div>
+          
+          <div class="form-group" style="grid-column: span 2;"><label>Issue Summary</label><textarea id="formIssue" class="form-control" rows="2"></textarea></div>
+          <div class="form-group" style="grid-column: span 2;"><label>Remarks CS</label><textarea id="formRemarks" class="form-control" rows="2"></textarea></div>
+          
+          <!-- HIGHLIGHTED SCHEDULING AREA -->
+          <div class="form-group" style="margin-top: 8px;">
+              <label>Scheduled Date</label>
+              <input type="date" id="schedDate" class="form-control" style="border-color: var(--nrd-blue); border-width: 2px; background: rgba(29, 106, 150, 0.05);">
+          </div>
+          <div class="form-group" style="margin-top: 8px;">
+              <label>Assigned Mechanic</label>
+              <select id="mechanicSelect" class="form-control" style="border-color: var(--nrd-blue); border-width: 2px; background: rgba(29, 106, 150, 0.05);">
+                  <option value="">-- Unassigned --</option>
+                  <option value="Chris">Chris</option>
+                  <option value="Lohen">Lohen</option>
+              </select>
+          </div>
       </div>
       
       <div class="modal-actions">
@@ -254,7 +271,7 @@
           <button class="btn-delete" id="deleteBtn" onclick="deleteSchedule()" style="display:none;">🗑️ Clear</button>
           <div style="display: flex; gap: 8px; margin-left: auto;">
               <button class="btn-cancel" onclick="closeModal()">Cancel</button>
-              <button class="btn-save" onclick="saveSchedule()" id="saveBtn">Save Schedule</button>
+              <button class="btn-save" onclick="saveSchedule()" id="saveBtn">Save / Update</button>
           </div>
       </div>
   </div>
@@ -279,6 +296,9 @@ document.addEventListener('DOMContentLoaded', function() {
     window.addEventListener('mouseup', hideTooltip);
     window.addEventListener('dragend', hideTooltip);
     window.addEventListener('mouseleave', hideTooltip);
+    
+    // Auto-fill logic for DataList
+    document.getElementById('joSelect').addEventListener('change', autoFillFormFields);
 });
 
 function hideTooltip() {
@@ -299,7 +319,7 @@ function sanitizeDate(dateStr) {
     return `${year}-${month}-${day}`;
 }
 
-// FIX: Initialize draggable only once to prevent memory leaks and double-events
+// Ensure Draggable is only instantiated once
 function initExternalDraggableOnce() {
     const list = document.getElementById('externalEventsList');
     if (list && !draggableInstance) {
@@ -359,9 +379,7 @@ function initCalendar() {
             return { domNodes: [customEl] };
         },
         
-        eventDragStart: function() {
-            hideTooltip();
-        },
+        eventDragStart: function() { hideTooltip(); },
         
         eventMouseEnter: function(info) {
             hideTooltip();
@@ -379,9 +397,7 @@ function initCalendar() {
             tooltip.style.top = (info.jsEvent.pageY + 15) + 'px';
         },
         
-        eventMouseLeave: function() {
-            hideTooltip();
-        },
+        eventMouseLeave: function() { hideTooltip(); },
         
         eventClick: function(info) {
             hideTooltip(); 
@@ -395,6 +411,8 @@ function initCalendar() {
             let newDateStr = sanitizeDate(info.event.startStr);
             
             if (oldDateStr === newDateStr) return; // Prevent logic hang on same date drop
+            
+            // For simple drag and drop, we only update date/mechanic payload
             handleDragDrop(jo, newDateStr);
         },
         
@@ -404,7 +422,7 @@ function initCalendar() {
             let newDateStr = sanitizeDate(info.event.startStr);
             info.event.remove(); 
             
-            // FIX: Robust check for Aborting a drop (Esc key, clicked outside)
+            // Robust check for Aborting a drop (Esc key, clicked outside)
             Swal.fire({
                 title: 'Assign Technician',
                 text: `Assigning JO ${jo} for ${newDateStr}:`,
@@ -428,8 +446,9 @@ function initCalendar() {
                 let chosenMechanic = "";
                 if (result.isConfirmed) chosenMechanic = "Chris";
                 else if (result.isDenied) chosenMechanic = "Lohen";
-                // If result.dismiss === Swal.DismissReason.cancel, mechanic stays ""
+                // If canceled normally, mechanic stays ""
                 
+                // For drag from sidebar, just send jo, date, mechanic payload
                 sendUpdateToBackend(jo, newDateStr, chosenMechanic);
             });
         }
@@ -452,7 +471,7 @@ async function fetchData() {
 function populateCalendarAndUI() {
     hideTooltip();
     
-    // FIX: Clear both events and background sources to prevent memory stacking
+    // Clear both events and background sources to prevent memory stacking
     calendar.removeAllEvents();
     calendar.getEventSources().forEach(src => src.remove());
     
@@ -533,34 +552,79 @@ function populateSidebarDrawer(unscheduledJOs) {
         `;
         list.appendChild(el);
     });
-    
-    // Note: Draggable logic is no longer here, it is safely in initExternalDraggableOnce()
 }
 
 function populateJODropdown() {
-    const select = document.getElementById("joSelect");
-    select.innerHTML = '<option value="">-- Select JO to Schedule --</option>';
+    const dataList = document.getElementById("joDataList");
+    dataList.innerHTML = '';
     
     RAW_DATA.forEach(r => {
-        let opt = document.createElement('option');
-        opt.value = r.jo;
-        let statusText = r.status === "Done" ? " [DONE]" : " [PENDING]";
-        opt.textContent = `${r.jo} - ${r.customer || "Unknown"} (${r.model || "No Model"})${statusText}`;
-        select.appendChild(opt);
+        if(r.jo) {
+            let opt = document.createElement('option');
+            opt.value = r.jo;
+            let statusText = r.status === "Done" ? "[DONE]" : "[PENDING]";
+            opt.textContent = `${r.customer || "Unknown"} | ${r.model || "Unit"} ${statusText}`;
+            dataList.appendChild(opt);
+        }
     });
+}
+
+// Helper to auto-fill the form when a JO is selected from DataList
+function autoFillFormFields(e) {
+    let selectedJO = e.target.value;
+    let record = RAW_DATA.find(r => r.jo === selectedJO);
+    
+    if(record) {
+        document.getElementById("formCust").value = record.customer || "";
+        document.getElementById("formModel").value = record.model || "";
+        document.getElementById("formVin").value = record.vin || "";
+        document.getElementById("formContact").value = record.contactNumber || "";
+        document.getElementById("formAddress").value = record.address || "";
+        document.getElementById("formDateRaised").value = sanitizeDate(record.date) || "";
+        document.getElementById("formTimeRaised").value = ""; 
+        document.getElementById("formIssue").value = record.issue || "";
+        document.getElementById("formRemarks").value = record.remarksCS || "";
+        document.getElementById("schedDate").value = sanitizeDate(record.dateScheduled) || "";
+        
+        let m = (record.mechanic || "").toLowerCase();
+        document.getElementById("mechanicSelect").value = m.includes('chris') ? "Chris" : (m.includes('lohen') ? "Lohen" : "");
+        
+        document.getElementById("unassignBtn").style.display = record.dateScheduled ? "inline-block" : "none";
+        document.getElementById("deleteBtn").style.display = "inline-block";
+    }
 }
 
 function openScheduleModal(jo = "", date = "", mechanic = "") {
     hideTooltip();
-    const select = document.getElementById("joSelect");
-    select.value = jo;
-    select.disabled = jo !== ""; 
     
-    document.getElementById("modalTitle").textContent = jo ? "Edit Schedule" : "Assign Schedule";
+    // Clear all fields first
+    document.getElementById("joSelect").value = jo;
+    document.getElementById("formCust").value = "";
+    document.getElementById("formModel").value = "";
+    document.getElementById("formVin").value = "";
+    document.getElementById("formContact").value = "";
+    document.getElementById("formAddress").value = "";
+    document.getElementById("formDateRaised").value = "";
+    document.getElementById("formTimeRaised").value = "";
+    document.getElementById("formIssue").value = "";
+    document.getElementById("formRemarks").value = "";
     document.getElementById("schedDate").value = sanitizeDate(date) || "";
+    document.getElementById("mechanicSelect").value = "";
+    
+    // If opening an existing JO, populate fields
+    let record = RAW_DATA.find(r => r.jo === jo);
+    if(record) {
+        document.getElementById("formCust").value = record.customer || "";
+        document.getElementById("formModel").value = record.model || "";
+        document.getElementById("formVin").value = record.vin || "";
+        document.getElementById("formContact").value = record.contactNumber || "";
+        document.getElementById("formAddress").value = record.address || "";
+        document.getElementById("formDateRaised").value = sanitizeDate(record.date) || "";
+        document.getElementById("formIssue").value = record.issue || "";
+        document.getElementById("formRemarks").value = record.remarksCS || "";
+    }
     
     let mechSelect = document.getElementById("mechanicSelect");
-    mechSelect.value = ""; 
     if(mechanic.toLowerCase().includes('chris')) mechSelect.value = "Chris";
     if(mechanic.toLowerCase().includes('lohen')) mechSelect.value = "Lohen";
     
@@ -574,6 +638,7 @@ function closeModal() {
     document.getElementById("scheduleModal").style.display = "none";
 }
 
+// Simple Drag & Drop handler (Only updates date & mechanic)
 function handleDragDrop(jo, newDateStr) {
     let cleanNewDate = sanitizeDate(newDateStr);
     let ev = calendar.getEventById(jo);
@@ -582,21 +647,53 @@ function handleDragDrop(jo, newDateStr) {
     sendUpdateToBackend(jo, cleanNewDate, undefined);
 }
 
+// Form Save Handler (Sends full payload)
 function saveSchedule() {
     hideTooltip();
     const jo = document.getElementById("joSelect").value;
-    const date = document.getElementById("schedDate").value;
-    const mechanic = document.getElementById("mechanicSelect").value;
     
-    if(!jo || !date) {
-        Swal.fire('Incomplete', 'Please select a JO and a Date.', 'warning');
+    if(!jo) {
+        Swal.fire('Incomplete', 'Job Order Number is required.', 'warning');
         return;
     }
+    
+    let payload = {
+        jo: jo,
+        customer: document.getElementById("formCust").value,
+        model: document.getElementById("formModel").value,
+        vin: document.getElementById("formVin").value,
+        contactNumber: document.getElementById("formContact").value,
+        address: document.getElementById("formAddress").value,
+        dateRaised: document.getElementById("formDateRaised").value,
+        timeRaised: document.getElementById("formTimeRaised").value,
+        issue: document.getElementById("formIssue").value,
+        remarksCS: document.getElementById("formRemarks").value,
+        dateScheduled: document.getElementById("schedDate").value,
+        mechanic: document.getElementById("mechanicSelect").value
+    };
     
     document.getElementById("saveBtn").textContent = "Saving...";
     document.getElementById("saveBtn").disabled = true;
     
-    sendUpdateToBackend(jo, date, mechanic);
+    fetch(API_URL, {
+        method: 'POST',
+        body: JSON.stringify(payload)
+    }).then(res => res.json()).then(result => {
+        if(result.status === "success") {
+            Swal.fire({ title: 'Database Synced!', text: 'Schedule updated successfully.', icon: 'success', timer: 1500, showConfirmButton: false, toast: true, position: 'bottom-end' });
+            closeModal();
+            fetchData();
+        } else {
+            Swal.fire('Error', result.message || 'Failed to save.', 'error');
+            fetchData();
+        }
+    }).catch(e => {
+        Swal.fire('Error', 'Network error. Cannot reach database.', 'error');
+        fetchData();
+    }).finally(() => {
+        document.getElementById("saveBtn").textContent = "Save / Update";
+        document.getElementById("saveBtn").disabled = false;
+    });
 }
 
 function unassignSchedule() {
@@ -637,6 +734,7 @@ function deleteSchedule() {
     });
 }
 
+// Mini Payload Sender (For Drag/Drops and Unassigns)
 async function sendUpdateToBackend(jo, date, mechanic) {
     let payload = { jo: jo };
     if (date !== undefined) payload.dateScheduled = date;
@@ -669,9 +767,6 @@ async function sendUpdateToBackend(jo, date, mechanic) {
     } catch (e) {
         Swal.fire('Error', 'Network error. Cannot reach database.', 'error');
         fetchData();
-    } finally {
-        document.getElementById("saveBtn").textContent = "Save Schedule";
-        document.getElementById("saveBtn").disabled = false;
     }
 }
 </script>
